@@ -61,11 +61,14 @@ void sal_VideoPaletteSync();
 void sal_VideoBitmapScale(int startx, int starty, int viswidth, int visheight, int newwidth, int newheight,int pitch, u16 *src, u16 *dst);
 
 s32 sal_AudioInit(s32 rate, s32 bits, s32 stereo, s32 Hz);
+void sal_AudioPause(void);
+void sal_AudioResume(void);
 void sal_AudioClose(void);
-u32 sal_AudioGetCurrentBufferIndex();
-u32 sal_AudioGetPrevBufferIndex();
-u32 sal_AudioGetNextBufferIndex(u32 index);
-s16 *sal_AudioGetBuffer(u32 bufferIndex);
+u32 sal_AudioGenerate(u32 samples);
+u32 sal_AudioGetFramesBuffered();
+u32 sal_AudioGetMaxFrames();
+u32 sal_AudioGetSamplesPerFrame();
+u32 sal_AudioGetBytesPerSample();
 
 void sal_AudioSetVolume(s32 l, s32 r);
 u32 sal_AudioRatePrevious(u32 currRate);

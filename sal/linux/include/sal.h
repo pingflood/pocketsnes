@@ -76,10 +76,6 @@ extern "C" {
 #include "sal_common.h"
 
 u32 sal_InputWait();
-void sal_SubmitSamples(void);
-void *sal_GetCurrentAudioBuffer(void);
-u32 sal_AudioGetSampleCount();
-u32 sal_AudioGetBufferSize();
 
 #ifdef __cplusplus
 }

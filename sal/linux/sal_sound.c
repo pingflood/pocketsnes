@@ -3,30 +3,42 @@
 
 #include <sal.h>
 
-#define SOUND_BUFFER_COUNT 	4
-#define MAX_SOUND_LEN 	((48000/50)*2)
+#define BUFFER_FRAMES 4
+// 48000 Hz maximum; 1/50 of a second; 5 frames to hold (4 plus a bit extra)
+#define BUFFER_SAMPLES (48000 / 50 * (BUFFER_FRAMES + 1))
 
 static SDL_AudioSpec audiospec;
-static unsigned int buf_w, buf_r;
-static short mSoundBuffer[SOUND_BUFFER_COUNT][MAX_SOUND_LEN];
-static u32 mSoundSampleCount, mSoundBufferSize;
+
+volatile static unsigned int ReadPos, WritePos;
+
+// 2 channels per sample (stereo); 2 bytes per sample-channel (16-bit)
+static uint8_t Buffer[BUFFER_SAMPLES * 2 * 2];
+static u32 SamplesPerFrame, BytesPerSample;
 
 static void sdl_audio_callback (void *userdata, Uint8 *stream, int len)
 {
-	memcpy(stream, mSoundBuffer[buf_r], len);
-	if (++buf_r >= SOUND_BUFFER_COUNT) 
-		buf_r = 0;
-}
+	u32 SamplesRequested = len / BytesPerSample, SamplesBuffered, LocalWritePos = WritePos /* isolate a bit against races */;
+	if (ReadPos <= LocalWritePos)
+		SamplesBuffered = LocalWritePos - ReadPos;
+	else
+		SamplesBuffered = BUFFER_SAMPLES - (ReadPos - LocalWritePos);
 
-void *sal_GetCurrentAudioBuffer(void)
-{
-	return &mSoundBuffer[buf_w];
-}
+	if (SamplesRequested > SamplesBuffered)
+	{
+		printf("Audio Warning: Underrun occurred\n");
+		return;
+	}
 
-void sal_SubmitSamples(void)
-{
-	if (buf_w != buf_r && ++buf_w == SOUND_BUFFER_COUNT)
-		buf_w = 0;
+	if (ReadPos + SamplesRequested > BUFFER_SAMPLES)
+	{
+		memcpy(stream, &Buffer[ReadPos * BytesPerSample], (BUFFER_SAMPLES - ReadPos) * BytesPerSample);
+		memcpy(&stream[(BUFFER_SAMPLES - ReadPos) * BytesPerSample], &Buffer[0], (SamplesRequested - (BUFFER_SAMPLES - ReadPos)) * BytesPerSample);
+	}
+	else
+	{
+		memcpy(stream, &Buffer[ReadPos * BytesPerSample], len);
+	}
+	ReadPos = (ReadPos + SamplesRequested) % BUFFER_SAMPLES;
 }
 
 s32 sal_AudioInit(s32 rate, s32 bits, s32 stereo, s32 Hz)
@@ -40,8 +52,8 @@ s32 sal_AudioInit(s32 rate, s32 bits, s32 stereo, s32 Hz)
 		audiospec.samples--;
 
 	 
-	mSoundSampleCount = audiospec.samples * audiospec.channels;
-	mSoundBufferSize = mSoundSampleCount * (bits >> 3);
+	SamplesPerFrame = audiospec.samples;
+	BytesPerSample = audiospec.channels * (bits >> 3);
 
 
 	audiospec.callback = sdl_audio_callback;
@@ -51,26 +63,75 @@ s32 sal_AudioInit(s32 rate, s32 bits, s32 stereo, s32 Hz)
 		return SAL_ERROR;
 	}
 
-	SDL_PauseAudio(0);
+	WritePos = ReadPos = 0;
+
 	return SAL_OK;
+}
+
+void sal_AudioPause(void)
+{
+	SDL_PauseAudio(1);
+}
+
+void sal_AudioResume(void)
+{
+	SDL_PauseAudio(0);
 }
 
 void sal_AudioClose(void)
 {
-	SDL_PauseAudio(1);
 	SDL_CloseAudio();
 }
 
-void sal_AudioSetVolume(s32 l, s32 r) 
-{ 
-} 
-
-u32 sal_AudioGetSampleCount()
+u32 sal_AudioGenerate(u32 samples)
 {
-	return mSoundSampleCount;
+	u32 SamplesAvailable, LocalReadPos = ReadPos /* isolate a bit against races */;
+	if (LocalReadPos <= WritePos)
+		SamplesAvailable = BUFFER_SAMPLES - (WritePos - LocalReadPos);
+	else
+		SamplesAvailable = LocalReadPos - WritePos;
+	if (samples >= SamplesAvailable)
+	{
+		printf("Audio Warning: Overrun occurred\n");
+		samples = SamplesAvailable - 1;
+	}
+	if (samples > BUFFER_SAMPLES - WritePos)
+	{
+		sal_AudioGenerate(BUFFER_SAMPLES - WritePos);
+		sal_AudioGenerate(samples - (BUFFER_SAMPLES - WritePos));
+	}
+	else
+	{
+		S9xMixSamples(&Buffer[WritePos * BytesPerSample], samples * audiospec.channels);
+		WritePos = (WritePos + samples) % BUFFER_SAMPLES;
+	}
 }
 
-u32 sal_AudioGetBufferSize()
+u32 sal_AudioGetFramesBuffered()
 {
-	return mSoundBufferSize;
+	u32 SamplesBuffered, LocalReadPos = ReadPos /* isolate a bit against races */;
+	if (LocalReadPos <= WritePos)
+		SamplesBuffered = WritePos - LocalReadPos;
+	else
+		SamplesBuffered = BUFFER_SAMPLES - (LocalReadPos - WritePos);
+	return SamplesBuffered / SamplesPerFrame;
+}
+
+u32 sal_AudioGetMaxFrames()
+{
+	return BUFFER_FRAMES;
+}
+
+u32 sal_AudioGetSamplesPerFrame()
+{
+	return SamplesPerFrame;
+}
+
+u32 sal_AudioGetBytesPerSample()
+{
+	return BytesPerSample;
+}
+
+void sal_AudioSetVolume(s32 l, s32 r)
+{
 }
