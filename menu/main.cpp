@@ -258,6 +258,7 @@ uint32 S9xReadJoypad (int which1)
 	}
 
 	
+#if 0
 	if ((joy & SAL_INPUT_L)&&(joy & SAL_INPUT_R)&&(joy & SAL_INPUT_LEFT))
 	{
 		if (mQuickStateTimer==0)
@@ -278,7 +279,6 @@ uint32 S9xReadJoypad (int which1)
 		return val;
 	}
 
-#if 0
 	if ((joy & SAL_INPUT_L)&&(joy & SAL_INPUT_R)&&(joy & SAL_INPUT_UP))
 	{
 		if(mVolumeTimer==0)
