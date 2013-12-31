@@ -50,7 +50,7 @@ void DefaultMenuOptions(void)
 	mMenuOptions->stereo=1;
 	mMenuOptions->fullScreen=0;
 	mMenuOptions->transparency=1;
-//	mMenuOptions->autoSaveSram=0;
+	mMenuOptions->autoSaveSram=0;
 }
 
 s32 LoadMenuOptions(const char *path, const char *filename, const char *ext,
@@ -1036,13 +1036,11 @@ void MainMenuUpdateText(s32 menu_index)
 			strcpy(mMenuText[MENU_RETURN],"Return to game");
 			break;
 
-#if 0
 		case MENU_AUTO_SAVE_SRAM:
 			sprintf(mMenuText[MENU_AUTO_SAVE_SRAM],
-						"Auto Save SRAM:             %s",
+						"Save SRAM when changed:     %s",
 						mMenuOptions->autoSaveSram ? "ON" : "OFF");
 			break;
-#endif
 
 		case MENU_TRANSPARENCY:
 			sprintf(mMenuText[MENU_TRANSPARENCY],
@@ -1161,7 +1159,7 @@ void MainMenuUpdateTextAll(void)
 	MainMenuUpdateText(MENU_DELETE_CURRENT_SETTINGS);
 	MainMenuUpdateText(MENU_RETURN);
 	MainMenuUpdateText(MENU_CREDITS);
-//	MainMenuUpdateText(MENU_AUTO_SAVE_SRAM);
+	MainMenuUpdateText(MENU_AUTO_SAVE_SRAM);
 	MainMenuUpdateText(MENU_SAVE_SRAM);
 	MainMenuUpdateText(MENU_ROM_SELECT);
 }
@@ -1300,12 +1298,12 @@ s32 MenuRun(s8 *romName)
 					MainMenuUpdateText(MENU_TRANSPARENCY);
 					break;
 
-#if 0
 				case MENU_AUTO_SAVE_SRAM:
 					mMenuOptions->autoSaveSram^=1;
 					MainMenuUpdateText(MENU_AUTO_SAVE_SRAM);
 					break;
 
+#if 0
 				case MENU_CPU_SPEED:
 					
 					if (keys & SAL_INPUT_RIGHT)

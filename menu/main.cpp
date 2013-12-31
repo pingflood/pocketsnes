@@ -400,8 +400,11 @@ bool8_32 S9xOpenSoundDevice(int a, unsigned char b, int c)
 
 void S9xAutoSaveSRAM (void)
 {
-	Memory.SaveSRAM (S9xGetFilename (".srm"));
-	// sync(); // Only sync at exit or with a ROM change
+	if (mMenuOptions.autoSaveSram)
+	{
+		Memory.SaveSRAM (S9xGetFilename (".srm"));
+		// sync(); // Only sync at exit or with a ROM change
+	}
 }
 
 void S9xLoadSRAM (void)
