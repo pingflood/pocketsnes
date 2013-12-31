@@ -24,10 +24,7 @@ static void sdl_audio_callback (void *userdata, Uint8 *stream, int len)
 		SamplesBuffered = BUFFER_SAMPLES - (ReadPos - LocalWritePos);
 
 	if (SamplesRequested > SamplesBuffered)
-	{
-		printf("Audio Warning: Underrun occurred\n");
 		return;
-	}
 
 	if (ReadPos + SamplesRequested > BUFFER_SAMPLES)
 	{
@@ -92,7 +89,6 @@ u32 sal_AudioGenerate(u32 samples)
 		SamplesAvailable = LocalReadPos - WritePos;
 	if (samples >= SamplesAvailable)
 	{
-		printf("Audio Warning: Overrun occurred\n");
 		samples = SamplesAvailable - 1;
 	}
 	if (samples > BUFFER_SAMPLES - WritePos)
