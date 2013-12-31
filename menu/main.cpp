@@ -420,6 +420,7 @@ int Run(int sound)
 {
   	int skip=0, done=0, doneLast=0,aim=0,i;
 	Settings.NextAPUEnabled = Settings.APUEnabled = sound;
+	Settings.SoundSync = mMenuOptions.soundSync;
 	sal_TimerInit(Settings.FrameTime);
 	done=sal_TimerRead()-1;
 

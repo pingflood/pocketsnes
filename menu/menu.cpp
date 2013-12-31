@@ -51,6 +51,7 @@ void DefaultMenuOptions(void)
 	mMenuOptions->fullScreen=0;
 	mMenuOptions->transparency=1;
 	mMenuOptions->autoSaveSram=0;
+	mMenuOptions->soundSync=1;
 }
 
 s32 LoadMenuOptions(const char *path, const char *filename, const char *ext,
@@ -1042,6 +1043,20 @@ void MainMenuUpdateText(s32 menu_index)
 						mMenuOptions->autoSaveSram ? "ON" : "OFF");
 			break;
 
+		case MENU_SOUND_SYNC:
+			switch (mMenuOptions->soundSync)
+			{
+				case 0:
+					strcpy(mMenuText[MENU_SOUND_SYNC], "Prefer fluid...             Video");
+					break;
+				case 1:
+					strcpy(mMenuText[MENU_SOUND_SYNC], "Prefer fluid...             Vid & aud");
+					break;
+				default:
+					strcpy(mMenuText[MENU_SOUND_SYNC], "Prefer fluid...             Audio");
+					break;
+			}
+
 		case MENU_TRANSPARENCY:
 			sprintf(mMenuText[MENU_TRANSPARENCY],
 						"Transparency:               %s",
@@ -1151,6 +1166,7 @@ void MainMenuUpdateTextAll(void)
 //	MainMenuUpdateText(MENU_SOUND_VOL);
 	MainMenuUpdateText(MENU_FRAMESKIP);
 	MainMenuUpdateText(MENU_FPS);
+	MainMenuUpdateText(MENU_SOUND_SYNC);
 //	MainMenuUpdateText(MENU_FULLSCREEN);
 	MainMenuUpdateText(MENU_LOAD_GLOBAL_SETTINGS);
 	MainMenuUpdateText(MENU_SAVE_GLOBAL_SETTINGS);
@@ -1301,6 +1317,21 @@ s32 MenuRun(s8 *romName)
 				case MENU_AUTO_SAVE_SRAM:
 					mMenuOptions->autoSaveSram^=1;
 					MainMenuUpdateText(MENU_AUTO_SAVE_SRAM);
+					break;
+
+				case MENU_SOUND_SYNC:
+					if (keys & SAL_INPUT_RIGHT)
+					{
+						mMenuOptions->soundSync = (mMenuOptions->soundSync + 1) % 3;
+					}
+					else
+					{
+						if (mMenuOptions->soundSync == 0)
+							mMenuOptions->soundSync = 2;
+						else
+							mMenuOptions->soundSync--;
+					}
+					MainMenuUpdateText(MENU_SOUND_SYNC);
 					break;
 
 #if 0

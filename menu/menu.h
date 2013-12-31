@@ -36,6 +36,7 @@ enum  MENU_ENUM
 //	MENU_FULLSCREEN,
 	MENU_TRANSPARENCY,
 	MENU_FPS,
+	MENU_SOUND_SYNC,
 //	MENU_CPU_SPEED,
 	MENU_LOAD_GLOBAL_SETTINGS,
 	MENU_SAVE_GLOBAL_SETTINGS,
@@ -119,7 +120,7 @@ struct MENU_OPTIONS
   unsigned int autoSaveSram;
   unsigned int cpuSpeed;
   unsigned int soundRate;
-  unsigned int spare01;
+  unsigned int soundSync;
   unsigned int spare02;
   unsigned int spare03;
   unsigned int spare04;
