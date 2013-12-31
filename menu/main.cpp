@@ -70,7 +70,8 @@ u32 SamplesDoneThisFrame = 0;
 void S9xGenerateSound (void)
 {
 	so.err_counter += so.err_rate;
-	if (so.err_counter >= FIXED_POINT)
+	if ((Settings.SoundSync >= 2 && so.err_counter >= FIXED_POINT)
+	 || (Settings.SoundSync == 1 && so.err_counter >= FIXED_POINT * 128))
 	{
 		u32 SamplesThisRun = so.err_counter >> FIXED_POINT_SHIFT;
 		so.err_counter &= FIXED_POINT_REMAINDER;
@@ -559,7 +560,7 @@ int SnesInit()
 	Settings.TurboMode = FALSE;
 	Settings.TurboSkipFrames = 15;
 	Settings.ThreadSound = FALSE;
-	Settings.SoundSync = FALSE;
+	Settings.SoundSync = 1;
 	Settings.FixFrequency = TRUE;
 	//Settings.NoPatch = true;		
 
