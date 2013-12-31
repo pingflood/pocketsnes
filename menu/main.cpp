@@ -17,6 +17,10 @@
 #define SNES_SCREEN_WIDTH  256
 #define SNES_SCREEN_HEIGHT 192
 
+#define FIXED_POINT 0x10000UL
+#define FIXED_POINT_REMAINDER 0xffffUL
+#define FIXED_POINT_SHIFT 16
+
 static struct MENU_OPTIONS mMenuOptions;
 static int mEmuScreenHeight;
 static int mEmuScreenWidth;
@@ -61,10 +65,18 @@ void S9xExit ()
 {
 }
 
+u32 SamplesDoneThisFrame = 0;
+
 void S9xGenerateSound (void)
 {
-	S9xMessage (0,0,"generate sound");
-	return;
+	so.err_counter += so.err_rate;
+	if (so.err_counter >= FIXED_POINT)
+	{
+		u32 SamplesThisRun = so.err_counter >> FIXED_POINT_SHIFT;
+		so.err_counter &= FIXED_POINT_REMAINDER;
+		sal_AudioGenerate(SamplesThisRun);
+		SamplesDoneThisFrame += SamplesThisRun;
+	}
 }
 
 void S9xSetPalette ()
@@ -453,7 +465,7 @@ int Run(int sound)
 				//Run SNES for one glorious frame
 				S9xMainLoop ();
 
-				sal_AudioGenerate(sal_AudioGetSamplesPerFrame());
+				sal_AudioGenerate(sal_AudioGetSamplesPerFrame() - SamplesDoneThisFrame);
 //				HandleQuickStateRequests();
 			}
 			if (done>=aim) break; // Up to date now
