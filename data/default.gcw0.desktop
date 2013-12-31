@@ -10,3 +10,4 @@ Type=Application
 StartupNotify=true
 Icon=pocketsnes
 Categories=emulators;
+X-OD-Manual=manual-en.txt
