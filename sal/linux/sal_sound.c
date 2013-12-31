@@ -3,8 +3,8 @@
 
 #include <sal.h>
 
-#define BUFFER_FRAMES 4
-// 48000 Hz maximum; 1/50 of a second; 5 frames to hold (4 plus a bit extra)
+#define BUFFER_FRAMES 2
+// 48000 Hz maximum; 1/50 of a second; 3 frames to hold (2 plus a bit extra)
 #define BUFFER_SAMPLES (48000 / 50 * (BUFFER_FRAMES + 1))
 
 static SDL_AudioSpec audiospec;
