@@ -91,7 +91,7 @@ The compromise is to synthesise sound every 2.9 milliseconds.
 The default value of this option is "Vid & aud".
 
 - Transparency -
-Transparency refers to graphical layer effects on the SNES. Emulating them can slow down games, but disabling them can render a game unplayable due to information-carrying backgrounds being missing; some games even render a permanent black screen if transparency is diabled.
+Transparency refers to graphical layer effects on the SNES. Emulating them can slow down games, but disabling them can render a game unplayable due to information-carrying backgrounds being missing; some games even render a permanent black screen if transparency is disabled.
 
 The default value of this option is ON.
 
