@@ -145,6 +145,9 @@ u16 IntermediateScreen[SNES_WIDTH * SNES_HEIGHT_EXTENDED];
 
 bool8_32 S9xInitUpdate ()
 {
+	if (mInMenu) return TRUE;
+
+	GFX.Screen = (u8*) IntermediateScreen; /* replacement needed after loading the saved states menu */
 	return TRUE;
 }
 
