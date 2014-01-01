@@ -8,6 +8,6 @@ Exec=pocketsnes.gcw0
 Terminal=false
 Type=Application
 StartupNotify=true
-Icon=pocketsnes
+Icon=sfc
 Categories=emulators;
 X-OD-Manual=manual-en.txt
