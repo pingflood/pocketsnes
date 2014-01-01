@@ -1107,19 +1107,17 @@ void MainMenuUpdateText(s32 menu_index)
 						mMenuOptions->showFps ? "ON" : "OFF");
 			break;
 
-#if 0
 		case MENU_FULLSCREEN:
 			switch(mMenuOptions->fullScreen)
 			{
 				case 0:
-					strcpy(mMenuText[MENU_FULLSCREEN],"Full Screen Mode:           OFF");
+					strcpy(mMenuText[MENU_FULLSCREEN],"Full screen:                OFF");
 					break;
 				case 1:
-					strcpy(mMenuText[MENU_FULLSCREEN],"Full Screen Mode:           ON");
+					strcpy(mMenuText[MENU_FULLSCREEN],"Full screen:                ON");
 					break;  
 			}
 			break;
-#endif
 			
 		case MENU_LOAD_GLOBAL_SETTINGS:
 			strcpy(mMenuText[MENU_LOAD_GLOBAL_SETTINGS],"Load global settings");
@@ -1167,7 +1165,7 @@ void MainMenuUpdateTextAll(void)
 	MainMenuUpdateText(MENU_FRAMESKIP);
 	MainMenuUpdateText(MENU_FPS);
 	MainMenuUpdateText(MENU_SOUND_SYNC);
-//	MainMenuUpdateText(MENU_FULLSCREEN);
+	MainMenuUpdateText(MENU_FULLSCREEN);
 	MainMenuUpdateText(MENU_LOAD_GLOBAL_SETTINGS);
 	MainMenuUpdateText(MENU_SAVE_GLOBAL_SETTINGS);
 	MainMenuUpdateText(MENU_LOAD_CURRENT_SETTINGS);
@@ -1411,12 +1409,10 @@ s32 MenuRun(s8 *romName)
 					MainMenuUpdateText(MENU_FPS);
 					break;
 
-#if 0
 				case MENU_FULLSCREEN:
 					mMenuOptions->fullScreen^=1;
 					MainMenuUpdateText(MENU_FULLSCREEN);
 					break;
-#endif
 			}
 		}
 

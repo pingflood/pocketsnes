@@ -248,6 +248,11 @@ u32 sal_VideoInit(u32 bpp, u32 color, u32 refreshRate)
 	return SAL_OK;
 }
 
+u32 sal_VideoGetPitch()
+{
+	return mScreen->pitch;
+}
+
 void sal_VideoFlip(s32 vsync)
 {
 	if (SDL_MUSTLOCK(mScreen)) {

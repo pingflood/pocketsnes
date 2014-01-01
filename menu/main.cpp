@@ -13,6 +13,7 @@
 #include "soundux.h"
 #include "snapshot.h"
 #include "savestateio.h"
+#include "scaler.h"
 
 #define SNES_SCREEN_WIDTH  256
 #define SNES_SCREEN_HEIGHT 192
@@ -140,20 +141,32 @@ void S9xLoadSDD1Data (void)
 
 }
 
-   
+u16 IntermediateScreen[SNES_WIDTH * SNES_HEIGHT_EXTENDED];
 
 bool8_32 S9xInitUpdate ()
 {
-	if(mInMenu) return (TRUE);
-	if(mMenuOptions.fullScreen)	GFX.Screen = (uint8 *) sal_VideoGetBuffer();
-	else				GFX.Screen = (uint8 *) sal_VideoGetBuffer()+(320-SNES_WIDTH)+((240-SNES_HEIGHT)*320);
-
-	return (TRUE);
+	return TRUE;
 }
 
 bool8_32 S9xDeinitUpdate (int Width, int Height, bool8_32)
 {
 	if(mInMenu) return TRUE;
+
+	if (mMenuOptions.fullScreen)
+	{
+		upscale_p((uint32_t*) sal_VideoGetBuffer(), (uint32_t*) IntermediateScreen, SNES_WIDTH);
+	}
+	else
+	{
+		u32 y, pitch = sal_VideoGetPitch();
+		u8 *src = (u8*) IntermediateScreen, *dst = (u8*) sal_VideoGetBuffer() + ((SAL_SCREEN_WIDTH - SNES_WIDTH) / 2 + (((SAL_SCREEN_HEIGHT - SNES_HEIGHT) / 2) * SAL_SCREEN_WIDTH)) * sizeof(u16);
+		for (y = 0; y < SNES_HEIGHT; y++)
+		{
+			memcpy(dst, src, SNES_WIDTH * sizeof(u16));
+			src += SNES_WIDTH * sizeof(u16);
+			dst += pitch;
+		}
+	}
 
 	u32 newTimer;
 	if (mMenuOptions.showFps) 
@@ -574,9 +587,8 @@ int SnesInit()
 	Settings.C4 = TRUE;
 	Settings.SDD1 = TRUE;
 
-	GFX.Pitch = 320 * 2;
-	GFX.RealPitch = 320 * 2;
-	GFX.Screen = (uint8 *) sal_VideoGetBuffer();
+	GFX.Screen = (uint8*) IntermediateScreen;
+	GFX.RealPitch = GFX.Pitch = 256 * sizeof(u16);
 	
 	GFX.SubScreen = (uint8 *)malloc(GFX.RealPitch * 480 * 2); 
 	GFX.ZBuffer =  (uint8 *)malloc(GFX.RealPitch * 480 * 2); 
