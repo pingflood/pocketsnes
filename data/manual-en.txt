@@ -39,7 +39,7 @@ The second option in the menu, "Select ROM", brings up a directory browser. This
 Pressing B exits the directory browser entirely. To return to the parent directory, use the <..> (two dots) entry near the top of the direcctory browser.
 
 - Setting the default ROM path -
-Once you're in the directory you wish to set as the default ROM path for future runs of PocketSNES, use the Save Default Directory option at the top of the directory browser. If this directory does not exist when you launch PocketSNES again, it may show you nothing, not even a way to return to your Linux home directory. In that case, you may need to delete the file containing the default ROM path. See 'Files' for more information. 
+Once you're in the directory you wish to set as the default ROM path for future runs of PocketSNES, use the "Save default directory" option at the top of the directory browser. If this directory does not exist when you launch PocketSNES again, it may show you nothing, not even a way to return to your Linux home directory. In that case, you may need to delete the file containing the default ROM path. See 'Files' for more information. 
 
 == Playing a game ==
 While playing a game, the default button bindings allow the use of everything on your device that has the same position as on the Super Nintendo Entertainment System controller. Your device's D-pad controls the SNES's D-pad; its A, B, L, R, Start and Select buttons controls the SNES's A, B, L, R, Start and Select buttons.
@@ -51,10 +51,10 @@ Saved data is only written a short period of time after saving in a SNES game's 
 == Settings ==
 To properly leave PocketSNES and save all pending SRAM data after emulating a ROM, or to change settings for emulation, you need to enter the PocketSNES Main Menu by pressing both Start and Select.
 
-After changing settings, make sure to use the "Save global settings" or "Save settings for current game" option.
+After changing settings, make sure to use the "Save global settings" or "Save per-game settings" option.
 
 - Using per-game settings -
-To apply certain settings only for the current ROM, change the settings to your desired value, then choose "Save settings for current game". The settings will be reloaded automatically whenever you emulate a ROM with the same name again. Do not choose "Save global settings" afterwards if you do not intend to use the same settings globally. See 'Files' for more information.
+To apply certain settings only for the current ROM, change the settings to your desired value, then choose "Save per-game settings". The settings will be reloaded automatically whenever you emulate a ROM with the same name again. Do not choose "Save global settings" afterwards if you do not intend to use the same settings globally. See 'Files' for more information.
 
 - Saved States -
 In this menu you can look at the screenshots taken when you created your saved states for the currently-loaded game (to help you decide which one to load, overwrite or delete), load a state, create one, or delete one. The operations all allow you to choose the saved state slot first. You have 10 slots to choose from. See the 'Files' section for more information.

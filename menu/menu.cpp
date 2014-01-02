@@ -191,8 +191,8 @@ void DefaultRomListItems()
 {
 	s32 i;
 
-	strcpy(mRomList[ROM_SELECTOR_SAVE_DEFAULT_DIR].displayName,"Save Default Directory");
-	strcpy(mRomList[ROM_SELECTOR_MAIN_MENU].displayName,"Main Menu");
+	strcpy(mRomList[ROM_SELECTOR_SAVE_DEFAULT_DIR].displayName,"Save default directory");
+	strcpy(mRomList[ROM_SELECTOR_MAIN_MENU].displayName,"Main menu");
 	mRomList[ROM_SELECTOR_DEFAULT_FOCUS].displayName[0]=0;
 }
 
@@ -1017,44 +1017,44 @@ void MainMenuUpdateText(s32 menu_index)
 
 		case MENU_AUTO_SAVE_SRAM:
 			sprintf(mMenuText[MENU_AUTO_SAVE_SRAM],
-						"Save SRAM when changed:     %s",
-						mMenuOptions->autoSaveSram ? "ON" : "OFF");
+						"Save SRAM when changed:    %s",
+						mMenuOptions->autoSaveSram ? " ON" : "OFF");
 			break;
 
 		case MENU_SOUND_SYNC:
 			switch (mMenuOptions->soundSync)
 			{
 				case 0:
-					strcpy(mMenuText[MENU_SOUND_SYNC], "Prefer fluid...             Video");
+					strcpy(mMenuText[MENU_SOUND_SYNC], "Prefer fluid...          Video");
 					break;
 				case 1:
-					strcpy(mMenuText[MENU_SOUND_SYNC], "Prefer fluid...             Vid & aud");
+					strcpy(mMenuText[MENU_SOUND_SYNC], "Prefer fluid...      Vid & aud");
 					break;
 				default:
-					strcpy(mMenuText[MENU_SOUND_SYNC], "Prefer fluid...             Audio");
+					strcpy(mMenuText[MENU_SOUND_SYNC], "Prefer fluid...          Audio");
 					break;
 			}
 
 		case MENU_TRANSPARENCY:
 			sprintf(mMenuText[MENU_TRANSPARENCY],
-						"Transparency:               %s",
-						mMenuOptions->transparency ? "ON" : "OFF");
+						"Transparency:              %s",
+						mMenuOptions->transparency ? " ON" : "OFF");
 			break;
 
 		case MENU_SOUND_ON:
 			sprintf(mMenuText[MENU_SOUND_ON],
-						"Sound:                      %s",
-						mMenuOptions->soundEnabled ? "ON" : "OFF");
+						"Sound:                     %s",
+						mMenuOptions->soundEnabled ? " ON" : "OFF");
 			break;
 		
 		case MENU_SOUND_RATE:		
-			sprintf(mMenuText[MENU_SOUND_RATE],"Sound rate:                 %d",mMenuOptions->soundRate);
+			sprintf(mMenuText[MENU_SOUND_RATE],"Sound rate:              %5d",mMenuOptions->soundRate);
 			break;
 
 		case MENU_SOUND_STEREO:
 			sprintf(mMenuText[MENU_SOUND_STEREO],
-						"Stereo:                     %s",
-						mMenuOptions->stereo ? "ON" : "OFF");
+						"Stereo:                    %s",
+						mMenuOptions->stereo ? " ON" : "OFF");
 			break;
 
 #if 0
@@ -1071,25 +1071,33 @@ void MainMenuUpdateText(s32 menu_index)
 			switch(mMenuOptions->frameSkip)
 			{
 				case 0:
-					strcpy(mMenuText[MENU_FRAMESKIP],"Frameskip:                  AUTO");
+					strcpy(mMenuText[MENU_FRAMESKIP],
+						"Frameskip:                AUTO");
 					break;
 				default:
-					sprintf(mMenuText[MENU_FRAMESKIP],"Frameskip:                  %d",mMenuOptions->frameSkip-1);
+					sprintf(mMenuText[MENU_FRAMESKIP],
+						"Frameskip:                   %1d",mMenuOptions->frameSkip-1);
 					break;
 			}
 			break;
 
 		case MENU_FPS:
-			sprintf(mMenuText[MENU_FPS],
-						"Show FPS:                   %s",
-						mMenuOptions->showFps ? "ON" : "OFF");
+			switch(mMenuOptions->showFps)
+			{
+				case 0:
+					strcpy(mMenuText[MENU_FPS],"Show FPS:                  OFF");
+					break;
+				case 1:
+					strcpy(mMenuText[MENU_FPS],"Show FPS:                   ON");
+					break;  
+			}
 			break;
 
 		case MENU_FULLSCREEN:
 			switch(mMenuOptions->fullScreen)
 			{
 				case 0:
-					strcpy(mMenuText[MENU_FULLSCREEN],"Full screen:                OFF");
+					strcpy(mMenuText[MENU_FULLSCREEN],"Full screen:               OFF");
 					break;
 				case 1:
 					strcpy(mMenuText[MENU_FULLSCREEN],"Full screen:                ON");
@@ -1106,15 +1114,15 @@ void MainMenuUpdateText(s32 menu_index)
 			break;
 			
 		case MENU_LOAD_CURRENT_SETTINGS:
-			strcpy(mMenuText[MENU_LOAD_CURRENT_SETTINGS],"Load settings for current game");
+			strcpy(mMenuText[MENU_LOAD_CURRENT_SETTINGS],"Load per-game settings");
 			break;
 		
 		case MENU_SAVE_CURRENT_SETTINGS:
-			strcpy(mMenuText[MENU_SAVE_CURRENT_SETTINGS],"Save settings for current game");
+			strcpy(mMenuText[MENU_SAVE_CURRENT_SETTINGS],"Save per-game settings");
 			break;
 
 		case MENU_DELETE_CURRENT_SETTINGS:
-			strcpy(mMenuText[MENU_DELETE_CURRENT_SETTINGS],"Delete settings for current game");
+			strcpy(mMenuText[MENU_DELETE_CURRENT_SETTINGS],"Delete per-game settings");
 			break;
 
 		case MENU_SAVE_SRAM:
