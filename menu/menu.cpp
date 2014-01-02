@@ -32,7 +32,7 @@ static s8 mSaveStateName[SAL_MAX_PATH]={""};       // holds the last filename to
 static s8 mRomName[SAL_MAX_PATH]={""};
 static s8 mSystemDir[SAL_MAX_PATH];
 static struct MENU_OPTIONS *mMenuOptions=NULL;
-static u16 mTempFb[SNES_WIDTH*SNES_HEIGHT];
+static u16 mTempFb[SNES_WIDTH*SNES_HEIGHT_EXTENDED];
 
 									
 void DefaultMenuOptions(void)
