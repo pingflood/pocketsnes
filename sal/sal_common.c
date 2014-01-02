@@ -809,9 +809,9 @@ s32 sal_HighlightBar(s32 width, s32 height, s32 x, s32 y)
 	//vertical stride
 	int v_stride = (SAL_SCREEN_Y_STRIDE_DOWN) - (width * SAL_SCREEN_X_STRIDE_RIGHT);
 
+	int percentage_stride = (1 << 16) / width;
 	int percentage = 0;
 	int percentage_inv = (1 << 16);
-	int percentage_stride = (1 << 16) / width;
 
 	int percentage_r_err = 0;
 
@@ -839,12 +839,12 @@ s32 sal_HighlightBar(s32 width, s32 height, s32 x, s32 y)
 			percentage_r_err += (percentage_inv * 31) & 0xFFFF;
 
 			//final colour blend, dont need to do the inverse of g/b because we're only blending red with the background!
-			r = (31 * (percentage_inv - (percentage_r_err & ~0xFFFF))) >> 16;
-			r += (bgr * percentage + (percentage_bg_r_err & ~0xFFFF)) >> 16;
-			g =  (bgg * percentage + (percentage_bg_g_err & ~0xFFFF)) >> 16;
-			b =  (bgb * percentage + (percentage_bg_b_err & ~0xFFFF)) >> 16;
+			r =  ((31 * percentage_inv) + (percentage_r_err & ~0xFFFF)) >> 16;
+			r += ((bgr * percentage) + (percentage_bg_r_err & ~0xFFFF)) >> 16;
+			g =  ((bgg * percentage) + (percentage_bg_g_err & ~0xFFFF)) >> 16;
+			b =  ((bgb * percentage) + (percentage_bg_b_err & ~0xFFFF)) >> 16;
 
-			*blitStart = SAL_RGB(r, g, b);
+			*blitStart = SAL_RGB((r > 31) ? 31 : r, g, b);
 			blitStart += SAL_SCREEN_X_STRIDE_RIGHT;
 
 			percentage += percentage_stride;
