@@ -15,7 +15,6 @@
 #define ROM_SELECTOR_ROM_START			3
 
 static u16 mMenuBackground[SAL_SCREEN_WIDTH * SAL_SCREEN_HEIGHT];
-static u16 mRomPreview[262 * 186];
 
 static s32 mMenutileXscroll=0;
 static s32 mMenutileYscroll=0;
@@ -387,9 +386,10 @@ s32 UpdateRomCache()
 s32 FileSelect()
 {
 	s8 text[SAL_MAX_PATH];
-	s8 text2[SAL_MAX_PATH];
-	s8 textcomp[SAL_MAX_PATH];
-	s8 prvdir[SAL_MAX_PATH];
+	s8 previewPath[SAL_MAX_PATH];
+	s8 previousRom[SAL_MAX_PATH];
+	u16 romPreview[320 * 240];
+	bool8 havePreview = FALSE;
 	s32 action=0;
 	s32 smooth=0;
 	u16 color=0;
@@ -542,14 +542,17 @@ s32 FileSelect()
 
 		// Draw screen:
 		PrintTitle("ROM selection");
-		
-		sprintf(prvdir, "%s/.snes96_snapshots/previews/", getenv("HOME"));
-		sprintf(text2, "%s%s.%s", prvdir, mRomList[focus].displayName,"png");
-		if (mRomList[focus].displayName != textcomp){
-			sprintf(textcomp, "%s", mRomList[focus].displayName);
-			if (sal_ImageLoad(text2, &mRomPreview, 262, 186) != SAL_ERROR){
-				sal_ImageDraw(mRomPreview, 262, 186, 0, 16);
-			}
+
+		if (strcmp(mRomList[focus].displayName, previousRom) != 0) {
+			char dummy[SAL_MAX_PATH], fileNameNoExt[SAL_MAX_PATH];
+			sal_DirectorySplitFilename(mRomList[focus].filename, dummy, fileNameNoExt, dummy);
+			sprintf(previewPath, "%s/previews/%s.%s", sal_DirectoryGetHome(), fileNameNoExt, "png");
+			strcpy(previousRom, mRomList[focus].displayName);
+			havePreview = sal_ImageLoad(previewPath, &romPreview, 320, 240) != SAL_ERROR;
+		}
+
+		if (havePreview) {
+			sal_ImageDraw(romPreview, 320, 240, 0, 0);
 		}
 
 		smooth=smooth*7+(focus<<8); smooth>>=3;
