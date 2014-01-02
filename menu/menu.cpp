@@ -15,7 +15,6 @@
 #define ROM_SELECTOR_ROM_START			3
 
 static u16 mMenuBackground[SAL_SCREEN_WIDTH * SAL_SCREEN_HEIGHT];
-static u16 mHighLightBar[320*16];
 
 static s32 mMenutileXscroll=0;
 static s32 mMenutileYscroll=0;
@@ -1206,11 +1205,8 @@ void MenuInit(const char *systemDir, struct MENU_OPTIONS *menuOptions)
 
 	pix=&mMenuBackground[0];
 	for(x=0;x<SAL_SCREEN_WIDTH * SAL_SCREEN_HEIGHT;x++) *pix++=SAL_RGB(0,0,0);
-	pix=&mHighLightBar[0];
-	for(x=0;x<320*16;x++) *pix++=SAL_RGB(31,31,31);
 
 	sal_ImageLoad("pocketsnes_bg.png", &mMenuBackground, SAL_SCREEN_WIDTH, SAL_SCREEN_HEIGHT);
-	sal_ImageLoad("pocketsnes_bar.png", &mHighLightBar, 320, 16);
 
 	MenuReloadOptions();
 }
