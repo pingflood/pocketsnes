@@ -712,7 +712,7 @@ static s32 SaveStateSelect(s32 mode)
 		}
 
 		PrintTitle("Save States");
-		sal_VideoPrint(12,230-36,"Press UP and DOWN to change save slot",SAL_RGB(31,15,5));
+		sal_VideoPrint(36,4,"UP/DOWN to choose a slot",SAL_RGB(31,8,8));
       
 		if(saveno==-1) 
 		{
@@ -723,9 +723,9 @@ static s32 SaveStateSelect(s32 mode)
 		}
 		else
 		{
-			PrintBar(60-4-36);
+			sal_VideoDrawRect(0, 16, 262, 16, SAL_RGB(31,0,0));
 			sprintf(text,"SLOT %d",saveno);
-			sal_VideoPrint(136,60-36,text,SAL_RGB(31,31,31));
+			sal_VideoPrint(107,20,text,SAL_RGB(31,31,31));
 		}
       
 		switch(action)
@@ -734,46 +734,51 @@ static s32 SaveStateSelect(s32 mode)
 				//sal_VideoPrint(112,145-36,14,"Checking....",(unsigned short)SAL_RGB(31,31,31));
 				break;
 			case 2:
-				sal_VideoPrint(144,145-36,"FREE",SAL_RGB(31,31,31));
+				sal_VideoPrint(115,145-36,"FREE",SAL_RGB(31,31,31));
 				break;
 			case 3:
-				sal_VideoPrint(104,145-36,"Previewing...",SAL_RGB(31,31,31));
+				sal_VideoPrint(75,145-36,"Previewing...",SAL_RGB(31,31,31));
 				break;
 			case 4:
-				sal_VideoPrint(88,145-36,"Previewing failed",SAL_RGB(31,8,8));
+				sal_VideoPrint(59,145-36,"Previewing failed",SAL_RGB(31,8,8));
 				break;
 			case 5: 
-				sal_VideoBitmapScale(0, 0, SNES_WIDTH, SNES_HEIGHT, SAL_SCREEN_WIDTH/2, SAL_SCREEN_HEIGHT/2, SAL_SCREEN_WIDTH/2, &mTempFb[0], (u16*)sal_VideoGetBuffer()+(SAL_SCREEN_WIDTH*(85-36))+((SAL_SCREEN_WIDTH * 2)-SNES_WIDTH)+16);
+			{
+				u32 DestWidth = 205, DestHeight = 154;
+				sal_VideoBitmapScale(0, 0, SNES_WIDTH, SNES_HEIGHT, DestWidth, DestHeight, SAL_SCREEN_WIDTH - DestWidth, &mTempFb[0], (u16*)sal_VideoGetBuffer()+(SAL_SCREEN_WIDTH*(((202 + 16) - DestHeight)/2))+((262 - DestWidth)/2));
 
-				if(mode==1) sal_VideoPrint((320-(strlen(MENU_TEXT_LOAD_SAVESTATE)<<3))>>1,210-36,MENU_TEXT_LOAD_SAVESTATE,SAL_RGB(31,31,31));
-				else if(mode==0) sal_VideoPrint((320-(strlen(MENU_TEXT_OVERWRITE_SAVESTATE)<<3))>>1,210-36,MENU_TEXT_OVERWRITE_SAVESTATE,SAL_RGB(31,31,31));
-				else if(mode==2) sal_VideoPrint((320-(strlen(MENU_TEXT_DELETE_SAVESTATE)<<3))>>1,210-36,MENU_TEXT_DELETE_SAVESTATE,SAL_RGB(31,31,31));
+				sal_VideoDrawRect(0, 186, 262, 16, SAL_RGB(31,0,0));
+
+				if(mode==1) sal_VideoPrint((262-(strlen(MENU_TEXT_LOAD_SAVESTATE)<<3))>>1,190,MENU_TEXT_LOAD_SAVESTATE,SAL_RGB(31,31,31));
+				else if(mode==0) sal_VideoPrint((262-(strlen(MENU_TEXT_OVERWRITE_SAVESTATE)<<3))>>1,190,MENU_TEXT_OVERWRITE_SAVESTATE,SAL_RGB(31,31,31));
+				else if(mode==2) sal_VideoPrint((262-(strlen(MENU_TEXT_DELETE_SAVESTATE)<<3))>>1,190,MENU_TEXT_DELETE_SAVESTATE,SAL_RGB(31,31,31));
 				break;
+			}
 			case 6:
-				sal_VideoPrint(124,145-36,"Saving...",SAL_RGB(31,31,31));
+				sal_VideoPrint(95,145-36,"Saving...",SAL_RGB(31,31,31));
 				break;
 			case 7:
-				sal_VideoPrint(124,145-36,"Saving failed",SAL_RGB(31,8,8));
+				sal_VideoPrint(95,145-36,"Saving failed",SAL_RGB(31,8,8));
 				break;
 			case 8:
-				sal_VideoPrint(116,145-36,"Loading...",SAL_RGB(31,31,31));
+				sal_VideoPrint(87,145-36,"Loading...",SAL_RGB(31,31,31));
 				break;
 				case 9:
-				sal_VideoPrint(116,145-36,"Loading failed",SAL_RGB(31,8,8));
+				sal_VideoPrint(87,145-36,"Loading failed",SAL_RGB(31,8,8));
 				break;
 			case 10:	
-				PrintBar(145-4);
-				sal_VideoPrint(104,145-36,"Return to menu",SAL_RGB(31,31,31));
+				PrintBar(145-36-4);
+				sal_VideoPrint(75,145-36,"Return to menu",SAL_RGB(31,31,31));
 				break;
 			case 12:
-				sal_VideoPrint(124,145-36,"Slot used",SAL_RGB(31,31,31));
-				sal_VideoPrint((320-(strlen(MENU_TEXT_PREVIEW_SAVESTATE)<<3))>>1,165,MENU_TEXT_PREVIEW_SAVESTATE,SAL_RGB(31,31,31));
-				if(mode==1) sal_VideoPrint((320-(strlen(MENU_TEXT_LOAD_SAVESTATE)<<3))>>1,175,MENU_TEXT_LOAD_SAVESTATE,SAL_RGB(31,31,31));
-				else if(mode==0) sal_VideoPrint((320-(strlen(MENU_TEXT_OVERWRITE_SAVESTATE)<<3))>>1,175,MENU_TEXT_OVERWRITE_SAVESTATE,SAL_RGB(31,31,31));
-				else if(mode==2) sal_VideoPrint((320-(strlen(MENU_TEXT_DELETE_SAVESTATE)<<3))>>1,175,MENU_TEXT_DELETE_SAVESTATE,SAL_RGB(31,31,31));
+				sal_VideoPrint(95,145-36,"Slot used",SAL_RGB(31,31,31));
+				sal_VideoPrint((262-(strlen(MENU_TEXT_PREVIEW_SAVESTATE)<<3))>>1,165,MENU_TEXT_PREVIEW_SAVESTATE,SAL_RGB(31,31,31));
+				if(mode==1) sal_VideoPrint((262-(strlen(MENU_TEXT_LOAD_SAVESTATE)<<3))>>1,175,MENU_TEXT_LOAD_SAVESTATE,SAL_RGB(31,31,31));
+				else if(mode==0) sal_VideoPrint((262-(strlen(MENU_TEXT_OVERWRITE_SAVESTATE)<<3))>>1,175,MENU_TEXT_OVERWRITE_SAVESTATE,SAL_RGB(31,31,31));
+				else if(mode==2) sal_VideoPrint((262-(strlen(MENU_TEXT_DELETE_SAVESTATE)<<3))>>1,175,MENU_TEXT_DELETE_SAVESTATE,SAL_RGB(31,31,31));
 				break;
 			case 13:
-				sal_VideoPrint(116,145-36,"Deleting...",SAL_RGB(31,31,31));
+				sal_VideoPrint(87,145-36,"Deleting...",SAL_RGB(31,31,31));
 				break;
 		}
       
