@@ -14,8 +14,7 @@
 #define ROM_SELECTOR_DEFAULT_FOCUS		2
 #define ROM_SELECTOR_ROM_START			3
 
-static u16 mMenuTile[64*64];
-static u16 mMenuHeader[320*48];
+static u16 mMenuBackground[SAL_SCREEN_WIDTH * SAL_SCREEN_HEIGHT];
 static u16 mHighLightBar[320*16];
 
 static s32 mMenutileXscroll=0;
@@ -77,7 +76,6 @@ s32 SaveMenuOptions(const char *path, const char *filename, const char *ext,
 	
 	if (showMessage)
 	{
-		PrintTile();
 		PrintTitle("");
 		sal_VideoPrint(8,120,"Saving...",SAL_RGB(31,31,31));
 		sal_VideoFlip(1);
@@ -98,7 +96,6 @@ s32 DeleteMenuOptions(const char *path, const char *filename,
 	
 	if (showMessage)
 	{
-		PrintTile();
 		PrintTitle("");
 		sal_VideoPrint(8,120,"Deleting...",SAL_RGB(31,31,31));
 		sal_VideoFlip(1);
@@ -139,7 +136,6 @@ s32 MenuMessageBox(const char *message1, const char *message2,
      {
         subaction=select;
      }
-     PrintTile();
      PrintTitle("Message Box");
      sal_VideoPrint(8,50,message1,SAL_RGB(31,31,31));
      sal_VideoPrint(8,60,message2,SAL_RGB(31,31,31));
@@ -174,26 +170,9 @@ s32 MenuMessageBox(const char *message1, const char *message2,
   return(subaction);
 }
 
-void PrintTile()
-{
-	sal_ImageDrawTiled(mMenuTile, MENU_TILE_WIDTH, MENU_TILE_HEIGHT, mMenutileXscroll, mMenutileYscroll, 0, 48);	
-
-	mTileCounter++;
-	if (mTileCounter > 1)
-	{
-		mTileCounter=0;
-		mMenutileXscroll++;
-		if(mMenutileXscroll>=MENU_TILE_WIDTH) mMenutileXscroll=0;
-	  
-		mMenutileYscroll++;
-		if(mMenutileYscroll>=MENU_TILE_HEIGHT) mMenutileYscroll=0;
-	}  
-	return; 
-}
-
 void PrintTitle(const char *title)
 {	
-	sal_ImageDraw(mMenuHeader,MENU_HEADER_WIDTH, MENU_HEADER_HEIGHT,0,0);	
+	sal_ImageDraw(mMenuBackground,SAL_SCREEN_WIDTH, SAL_SCREEN_HEIGHT,0,0);	
 }
 
 void PrintBar(u32 givenY)
@@ -252,7 +231,6 @@ int FileScan()
 	freeRomLists();
 
 #if 0
-	PrintTile();
 	PrintTitle("File Scan");
 	sal_VideoPrint(8,120,"Scanning Directory...",SAL_RGB(31,31,31));
 	sal_VideoFlip(1);
@@ -296,7 +274,6 @@ int FileScan()
 			{
 				//Dir entry read
 #if 0	
-				PrintTile();
 				PrintTitle("File Scan");
 				sprintf(text,"Fetched item %d of %d",x, itemCount-1);
 				sal_VideoPrint(8,120,text,SAL_RGB(31,31,31));
@@ -334,7 +311,6 @@ int FileScan()
 		}
 
 #if 0
-		PrintTile();
 		PrintTitle("File Scan");
 		sal_VideoPrint(8,120,"Sorting items...",SAL_RGB(31,31,31));
 		sal_VideoFlip(1);
@@ -396,7 +372,6 @@ int FileScan()
 s32 UpdateRomCache()
 {
 	s8 filename[SAL_MAX_PATH];
-	PrintTile();
 	PrintTitle("CRC Lookup");
 	sal_VideoPrint(8,120,"Saving cache to disk...",SAL_RGB(31,31,31));
 	sal_VideoFlip(1);
@@ -562,7 +537,6 @@ s32 FileSelect()
 		}
 
 		// Draw screen:
-		PrintTile();
 		PrintTitle("ROM selection");
 
 		smooth=smooth*7+(focus<<8); smooth>>=3;
@@ -578,8 +552,8 @@ s32 FileSelect()
       
 			y=(i<<4)-(smooth>>4);
 			x=0;
-			y+=112;
-			if (y<=48 || y>=232) continue;
+			y+=112 - 28;
+			if (y<=48 - 28 || y>=232 - 36) continue;
            
 			if (i==focus)
 			{
@@ -606,8 +580,7 @@ s32 FileSelect()
 			
 		}
 
-		PrintBar(228-4);
-		sal_VideoPrint(0,228,mRomDir,SAL_RGB(31,31,31));
+		sal_VideoPrint(0,4,mRomDir,SAL_RGB(31,8,8));
 
 		sal_VideoFlip(1);
 		usleep(10000);
@@ -737,9 +710,8 @@ static s32 SaveStateSelect(s32 mode)
 			if(MenuMessageBox("Are you sure you want to delete","this save?","",MENU_MESSAGE_BOX_MODE_YESNO)==SAL_OK) action=13;  //delete slot with no preview
 		}
 
-		PrintTile();
 		PrintTitle("Save States");
-		sal_VideoPrint(12,230,"Press UP and DOWN to change save slot",SAL_RGB(31,15,5));
+		sal_VideoPrint(12,230-36,"Press UP and DOWN to change save slot",SAL_RGB(31,15,5));
       
 		if(saveno==-1) 
 		{
@@ -750,57 +722,57 @@ static s32 SaveStateSelect(s32 mode)
 		}
 		else
 		{
-			PrintBar(60-4);
+			PrintBar(60-4-36);
 			sprintf(text,"SLOT %d",saveno);
-			sal_VideoPrint(136,60,text,SAL_RGB(31,31,31));
+			sal_VideoPrint(136,60-36,text,SAL_RGB(31,31,31));
 		}
       
 		switch(action)
 		{
 			case 1:
-				//sal_VideoPrint(112,145,14,"Checking....",(unsigned short)SAL_RGB(31,31,31));
+				//sal_VideoPrint(112,145-36,14,"Checking....",(unsigned short)SAL_RGB(31,31,31));
 				break;
 			case 2:
-				sal_VideoPrint(144,145,"FREE",SAL_RGB(31,31,31));
+				sal_VideoPrint(144,145-36,"FREE",SAL_RGB(31,31,31));
 				break;
 			case 3:
-				sal_VideoPrint(104,145,"Previewing...",SAL_RGB(31,31,31));
+				sal_VideoPrint(104,145-36,"Previewing...",SAL_RGB(31,31,31));
 				break;
 			case 4:
-				sal_VideoPrint(88,145,"Previewing failed",SAL_RGB(31,8,8));
+				sal_VideoPrint(88,145-36,"Previewing failed",SAL_RGB(31,8,8));
 				break;
 			case 5: 
-				sal_VideoBitmapScale(0, 0, SNES_WIDTH, SNES_HEIGHT, 320/2, 240/2, 320/2, &mTempFb[0], (u16*)sal_VideoGetBuffer()+(320*85)+(640-SNES_WIDTH)+16);
+				sal_VideoBitmapScale(0, 0, SNES_WIDTH, SNES_HEIGHT, SAL_SCREEN_WIDTH/2, SAL_SCREEN_HEIGHT/2, SAL_SCREEN_WIDTH/2, &mTempFb[0], (u16*)sal_VideoGetBuffer()+(SAL_SCREEN_WIDTH*(85-36))+((SAL_SCREEN_WIDTH * 2)-SNES_WIDTH)+16);
 
-				if(mode==1) sal_VideoPrint((320-(strlen(MENU_TEXT_LOAD_SAVESTATE)<<3))>>1,210,MENU_TEXT_LOAD_SAVESTATE,SAL_RGB(31,31,31));
-				else if(mode==0) sal_VideoPrint((320-(strlen(MENU_TEXT_OVERWRITE_SAVESTATE)<<3))>>1,210,MENU_TEXT_OVERWRITE_SAVESTATE,SAL_RGB(31,31,31));
-				else if(mode==2) sal_VideoPrint((320-(strlen(MENU_TEXT_DELETE_SAVESTATE)<<3))>>1,210,MENU_TEXT_DELETE_SAVESTATE,SAL_RGB(31,31,31));
+				if(mode==1) sal_VideoPrint((320-(strlen(MENU_TEXT_LOAD_SAVESTATE)<<3))>>1,210-36,MENU_TEXT_LOAD_SAVESTATE,SAL_RGB(31,31,31));
+				else if(mode==0) sal_VideoPrint((320-(strlen(MENU_TEXT_OVERWRITE_SAVESTATE)<<3))>>1,210-36,MENU_TEXT_OVERWRITE_SAVESTATE,SAL_RGB(31,31,31));
+				else if(mode==2) sal_VideoPrint((320-(strlen(MENU_TEXT_DELETE_SAVESTATE)<<3))>>1,210-36,MENU_TEXT_DELETE_SAVESTATE,SAL_RGB(31,31,31));
 				break;
 			case 6:
-				sal_VideoPrint(124,145,"Saving...",SAL_RGB(31,31,31));
+				sal_VideoPrint(124,145-36,"Saving...",SAL_RGB(31,31,31));
 				break;
 			case 7:
-				sal_VideoPrint(124,145,"Saving failed",SAL_RGB(31,8,8));
+				sal_VideoPrint(124,145-36,"Saving failed",SAL_RGB(31,8,8));
 				break;
 			case 8:
-				sal_VideoPrint(116,145,"Loading...",SAL_RGB(31,31,31));
+				sal_VideoPrint(116,145-36,"Loading...",SAL_RGB(31,31,31));
 				break;
 				case 9:
-				sal_VideoPrint(116,145,"Loading failed",SAL_RGB(31,8,8));
+				sal_VideoPrint(116,145-36,"Loading failed",SAL_RGB(31,8,8));
 				break;
 			case 10:	
 				PrintBar(145-4);
-				sal_VideoPrint(104,145,"Return to menu",SAL_RGB(31,31,31));
+				sal_VideoPrint(104,145-36,"Return to menu",SAL_RGB(31,31,31));
 				break;
 			case 12:
-				sal_VideoPrint(124,145,"Slot used",SAL_RGB(31,31,31));
+				sal_VideoPrint(124,145-36,"Slot used",SAL_RGB(31,31,31));
 				sal_VideoPrint((320-(strlen(MENU_TEXT_PREVIEW_SAVESTATE)<<3))>>1,165,MENU_TEXT_PREVIEW_SAVESTATE,SAL_RGB(31,31,31));
 				if(mode==1) sal_VideoPrint((320-(strlen(MENU_TEXT_LOAD_SAVESTATE)<<3))>>1,175,MENU_TEXT_LOAD_SAVESTATE,SAL_RGB(31,31,31));
 				else if(mode==0) sal_VideoPrint((320-(strlen(MENU_TEXT_OVERWRITE_SAVESTATE)<<3))>>1,175,MENU_TEXT_OVERWRITE_SAVESTATE,SAL_RGB(31,31,31));
 				else if(mode==2) sal_VideoPrint((320-(strlen(MENU_TEXT_DELETE_SAVESTATE)<<3))>>1,175,MENU_TEXT_DELETE_SAVESTATE,SAL_RGB(31,31,31));
 				break;
 			case 13:
-				sal_VideoPrint(116,145,"Deleting...",SAL_RGB(31,31,31));
+				sal_VideoPrint(116,145-36,"Deleting...",SAL_RGB(31,31,31));
 				break;
 		}
       
@@ -878,7 +850,6 @@ void RenderMenu(const char *menuName, s32 menuCount, s32 menuSmooth, s32 menufoc
 	
 	s32 i=0;
 	u16 color=0;
-	PrintTile();
 	PrintTitle(menuName);
 
     	for (i=0;i<menuCount;i++)
@@ -887,9 +858,9 @@ void RenderMenu(const char *menuName, s32 menuCount, s32 menuSmooth, s32 menufoc
 
       		y=(i<<4)-(menuSmooth>>4);
 		x=8;
-      		y+=112;
+      		y+=112 - 28;
 
-      		if (y<=48 || y>=232) continue;
+      		if (y<=48 - 28 || y>=232 - 36) continue;
       
       		if (i==menufocus)
       		{
@@ -1219,15 +1190,12 @@ void MenuInit(const char *systemDir, struct MENU_OPTIONS *menuOptions)
 		strcpy(mRomDir,systemDir);
 	}
 
-	pix=&mMenuTile[0];
-	for(x=0;x<64*64;x++) *pix++=0;
-	pix=&mMenuHeader[0];
-	for(x=0;x<320*48;x++) *pix++=0;
+	pix=&mMenuBackground[0];
+	for(x=0;x<SAL_SCREEN_WIDTH * SAL_SCREEN_HEIGHT;x++) *pix++=SAL_RGB(0,0,0);
 	pix=&mHighLightBar[0];
-	for(x=0;x<320*16;x++) *pix++=0xFFFF;
+	for(x=0;x<320*16;x++) *pix++=SAL_RGB(31,31,31);
 
-	sal_ImageLoad("pocketsnes_tile.png", &mMenuTile, 64, 64);
-	sal_ImageLoad("pocketsnes_header.png", &mMenuHeader, 320, 48);
+	sal_ImageLoad("pocketsnes_bg.png", &mMenuBackground, SAL_SCREEN_WIDTH, SAL_SCREEN_HEIGHT);
 	sal_ImageLoad("pocketsnes_bar.png", &mHighLightBar, 320, 16);
 
 	MenuReloadOptions();
