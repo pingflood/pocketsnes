@@ -61,7 +61,7 @@ void sal_VideoBitmapScale(int startx, int starty, int viswidth, int visheight, i
 
   do
   {
-    u16 *buffer_mem=&src[(y>>16)*320];
+    u16 *buffer_mem=&src[(y>>16)*viswidth];
     W=newwidth; x=startx<<16;
     do {
       *dst++=buffer_mem[x>>16];

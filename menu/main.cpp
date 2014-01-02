@@ -12,7 +12,6 @@
 #include "gfx.h"
 #include "soundux.h"
 #include "snapshot.h"
-#include "savestateio.h"
 #include "scaler.h"
 
 #define SNES_SCREEN_WIDTH  256
@@ -216,49 +215,6 @@ const char *S9xGetFilename (const char *ex)
 	return (dir);
 }
 
-static u8 *mTempState=NULL;
-static
-void LoadStateMem()
-{
-	SetSaveStateIoModeMemory(&mTempState);
-	S9xUnfreezeGame("blah");
-}
-
-static 
-void SaveStateMem()
-{
-	SetSaveStateIoModeMemory(&mTempState);
-
-	S9xFreezeGame("blah");
-}
-
-void HandleQuickStateRequests()
-{
-	if(mVolumeTimer>0) mVolumeTimer--;
-	if(mVolumeDisplayTimer>0) mVolumeDisplayTimer--;
-
-	if(mQuickStateTimer>0)
-	{
-		mQuickStateTimer--;
-		return;
-	}
-
-	if(mSaveRequested)
-	{
-		mSaveRequested=0;
-		SaveStateMem();
-		mQuickStateTimer = 60;
-	}
-
-	if(mLoadRequested)
-	{
-		mLoadRequested=0;
-		LoadStateMem();
-		mQuickStateTimer = 60;
-	}
-
-	
-}
 uint32 S9xReadJoypad (int which1)
 {
 	uint32 val=0x80000000;
@@ -273,28 +229,7 @@ uint32 S9xReadJoypad (int which1)
 		return val;
 	}
 
-	
 #if 0
-	if ((joy & SAL_INPUT_L)&&(joy & SAL_INPUT_R)&&(joy & SAL_INPUT_LEFT))
-	{
-		if (mQuickStateTimer==0)
-		{
-			mSaveRequested=1;
-			strcpy(mQuickStateDisplay,"Saved!");
-		}
-		return val;
-	}
-
-	if ((joy & SAL_INPUT_L)&&(joy & SAL_INPUT_R)&&(joy & SAL_INPUT_RIGHT))
-	{
-		if (mQuickStateTimer==0)
-		{
-			mLoadRequested=1;
-			strcpy(mQuickStateDisplay,"Loaded!");
-		}
-		return val;
-	}
-
 	if ((joy & SAL_INPUT_L)&&(joy & SAL_INPUT_R)&&(joy & SAL_INPUT_UP))
 	{
 		if(mVolumeTimer==0)
@@ -487,13 +422,11 @@ int Run(int sound)
 				S9xMainLoop ();
 
 				sal_AudioGenerate(sal_AudioGetSamplesPerFrame() - SamplesDoneThisFrame);
-//				HandleQuickStateRequests();
 			}
 			if (done>=aim) break; // Up to date now
 			if (mEnterMenu) break;
 		}
 		done=aim; // Make sure up to date
-		HandleQuickStateRequests();
   	}
 
 	if (sound)
@@ -723,8 +656,6 @@ int mainEntry(int argc, char* argv[])
 
 		if(event==EVENT_LOAD_ROM)
 		{
-			if(mTempState) free(mTempState);
-			mTempState=NULL;
 			if (mRomName[0] != 0)
 			{
 				MenuMessageBox("Saving SRAM...","","",MENU_MESSAGE_BOX_MODE_MSG);
@@ -777,9 +708,6 @@ int mainEntry(int argc, char* argv[])
 
 	MenuMessageBox("Saving SRAM...","","",MENU_MESSAGE_BOX_MODE_MSG);
 	PSNESForceSaveSRAM();
-
-	if(mTempState) free(mTempState);
-	mTempState=NULL;
 	
 	S9xGraphicsDeinit();
 	S9xDeinitAPU();

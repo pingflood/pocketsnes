@@ -156,6 +156,11 @@ u32 sal_InputPoll()
 	return sal_Input(1);
 }
 
+const char* sal_DirectoryGetTemp(void)
+{
+	return "/tmp";
+}
+
 void sal_CpuSpeedSet(u32 mhz)
 {
 

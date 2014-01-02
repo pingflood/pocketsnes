@@ -6,7 +6,6 @@
 #include "gfx.h"
 #include "memmap.h"
 #include "soundux.h"
-#include "savestateio.h"
 
 #define MAX_DISPLAY_CHARS			40
 
@@ -35,7 +34,7 @@ static s8 mSaveStateName[SAL_MAX_PATH]={""};       // holds the last filename to
 static s8 mRomName[SAL_MAX_PATH]={""};
 static s8 mSystemDir[SAL_MAX_PATH];
 static struct MENU_OPTIONS *mMenuOptions=NULL;
-static u16 mTempFb[SAL_SCREEN_WIDTH*SAL_SCREEN_HEIGHT];
+static u16 mTempFb[SNES_WIDTH*SNES_HEIGHT];
 
 									
 void DefaultMenuOptions(void)
@@ -658,36 +657,39 @@ static void ScanSaveStates(s8 *romname)
 	strcpy(mSaveStateName,romname);  // save the last scanned romname
 }
 
-static u8 *mTempState=NULL;
-
 static
-void LoadStateMem()
+void LoadStateTemp()
 {
-	SetSaveStateIoModeMemory(&mTempState);
-	S9xUnfreezeGame("blah");
+	char name[SAL_MAX_PATH];
+	sprintf(name, "%s%s%s", sal_DirectoryGetTemp(), SAL_DIR_SEP, ".svt");
+	S9xUnfreezeGame(name);
 }
 
 static 
-void SaveStateMem()
+void SaveStateTemp()
 {
-	SetSaveStateIoModeMemory(&mTempState);
+	char name[SAL_MAX_PATH];
+	sprintf(name, "%s%s%s", sal_DirectoryGetTemp(), SAL_DIR_SEP, ".svt");
+	S9xFreezeGame(name);
+}
 
-	S9xFreezeGame("blah");
+static
+void DeleteStateTemp()
+{
+	char name[SAL_MAX_PATH];
+	sprintf(name, "%s%s%s", sal_DirectoryGetTemp(), SAL_DIR_SEP, ".svt");
+	sal_FileDelete(name);
 }
 
 static
 void LoadStateFile(s8 *filename)
 {
-	SetSaveStateIoModeFile();
-
 	S9xUnfreezeGame(filename);
 }
 
 static 
 void SaveStateFile(s8 *filename)
 {
-	SetSaveStateIoModeFile();
-
 	S9xFreezeGame(filename);
 }
 
@@ -705,7 +707,8 @@ static s32 SaveStateSelect(s32 mode)
 		// display error message and exit
 		return(0);
 	}
-	SaveStateMem();
+	// Allow the emulator to back out of loading a saved state for previewing.
+	SaveStateTemp();
 	ScanSaveStates(mRomName);
 	sal_InputIgnore();
 
@@ -816,18 +819,23 @@ static s32 SaveStateSelect(s32 mode)
 				}
 				break;
 			case 3:
+			{
 				LoadStateFile(mSaveState[saveno].fullFilename);
 				Settings.APUEnabled = 0;
 				Settings.NextAPUEnabled = Settings.APUEnabled;					
 				S9xSetSoundMute (TRUE);
 				GFX.Screen = (uint8 *) &mTempFb[0];
 				IPPU.RenderThisFrame=TRUE;
+				unsigned int fullScreenSave = mMenuOptions->fullScreen;
+				mMenuOptions->fullScreen = 0;
 				S9xMainLoop ();
+				mMenuOptions->fullScreen = fullScreenSave;
 				action=5;
 				break;
+			}
 			case 6:
 				//Reload state in case user has been previewing
-				LoadStateMem();
+				LoadStateTemp();
 				SaveStateFile(mSaveState[saveno].fullFilename);
 				mSaveState[saveno].inUse=1;
 				action=1;
@@ -856,11 +864,10 @@ static s32 SaveStateSelect(s32 mode)
 	}
 	if (action!=100)
 	{
-		LoadStateMem();
+		LoadStateTemp();
 	}
-	if(mTempState) free(mTempState);
-	mTempState=NULL;
 	GFX.Screen = (uint8 *) sal_VideoGetBuffer();
+	DeleteStateTemp();
 	sal_InputIgnore();
 	return(action);
 }
