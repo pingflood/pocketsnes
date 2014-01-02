@@ -177,7 +177,8 @@ void PrintTitle(const char *title)
 
 void PrintBar(u32 givenY)
 {
-	sal_ImageDraw(mHighLightBar,HIGHLIGHT_BAR_WIDTH, HIGHLIGHT_BAR_HEIGHT,0,givenY);
+	//sal_ImageDraw(mHighLightBar,HIGHLIGHT_BAR_WIDTH, HIGHLIGHT_BAR_HEIGHT,0,givenY);
+	sal_HighlightBar( 262, HIGHLIGHT_BAR_HEIGHT, 0, givenY);
 }
 
 void freeRomLists()

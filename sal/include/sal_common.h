@@ -126,5 +126,6 @@ s32 sal_DirectoryRead(struct SAL_DIR *d, struct SAL_DIRECTORY_ENTRY *dir);
 s32 sal_ImageLoad(const char *fname, void *dest, u32 width, u32 height);
 s32 sal_ImageDrawTiled(u16 *image, u32 width, u32 height, s32 xScroll, s32 yScroll, s32 x, s32 y);
 s32 sal_ImageDraw(u16 *image, u32 width, u32 height, s32 x, s32 y);
+s32 sal_HighlightBar(s32 width, s32 height, s32 x, s32 y);
 
 #endif /* __SAL_COMMON_H__ */

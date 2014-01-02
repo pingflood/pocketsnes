@@ -801,6 +801,70 @@ s32 sal_ImageDraw(u16 *image, u32 width, u32 height, s32 x, s32 y)
 	return SAL_OK;
 }
 
+s32 sal_HighlightBar(s32 width, s32 height, s32 x, s32 y)
+{
+	u16 *fbStart = (u16*)sal_VideoGetBuffer();
+	u16 *blitStart = fbStart + (SAL_SCREEN_Y_STRIDE_DOWN * y) + (SAL_SCREEN_X_STRIDE_RIGHT * x);
+
+	//vertical stride
+	int v_stride = (SAL_SCREEN_Y_STRIDE_DOWN) - (width * SAL_SCREEN_X_STRIDE_RIGHT);
+
+	int percentage = 0;
+	int percentage_inv = (1 << 16);
+	int percentage_stride = (1 << 16) / width;
+
+	int percentage_r_err = 0;
+
+	int percentage_bg_r_err = 0;
+	int percentage_bg_g_err = 0;
+	int percentage_bg_b_err = 0;
+
+	int x2, y2;
+	for (y2=0; y2 < height; y2++)
+	{
+		for (x2=0; x2 < width; x2++)
+		{
+			int bg_col = *blitStart;
+			int r, g, b, bgr, bgg, bgb;
+
+			//extract background colours
+			bgr = bg_col >> 11;
+			bgg = (bg_col >> 6) & 0x1F;
+			bgb = bg_col & 0x1F;
+
+			//propagate the error
+			percentage_bg_r_err += (percentage * bgr) & 0xFFFF;
+			percentage_bg_g_err += (percentage * bgg) & 0xFFFF;
+			percentage_bg_b_err += (percentage * bgb) & 0xFFFF;
+			percentage_r_err += (percentage_inv * 31) & 0xFFFF;
+
+			//final colour blend, dont need to do the inverse of g/b because we're only blending red with the background!
+			r = (31 * (percentage_inv - (percentage_r_err & ~0xFFFF))) >> 16;
+			r += (bgr * percentage + (percentage_bg_r_err & ~0xFFFF)) >> 16;
+			g =  (bgg * percentage + (percentage_bg_g_err & ~0xFFFF)) >> 16;
+			b =  (bgb * percentage + (percentage_bg_b_err & ~0xFFFF)) >> 16;
+
+			*blitStart = SAL_RGB(r, g, b);
+			blitStart += SAL_SCREEN_X_STRIDE_RIGHT;
+
+			percentage += percentage_stride;
+			percentage_inv -= percentage_stride;
+
+			//If the error is > 1 (in fix16.16), cut it down to size
+			percentage_r_err &= 0xFFFF;
+			percentage_bg_r_err &= 0xFFFF;
+			percentage_bg_g_err &= 0xFFFF;
+			percentage_bg_b_err &= 0xFFFF;
+		}
+
+		blitStart += v_stride;
+		percentage = 0;
+		percentage_inv = (1 << 16);
+	}
+
+	return SAL_OK;
+}
+
 s32 sal_ImageLoad(const char *fname, void *dest, u32 width, u32 height)
 {
 	FILE *fp;
