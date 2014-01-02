@@ -25,8 +25,8 @@ INCLUDE = -I pocketsnes \
 		-I menu -I pocketsnes/linux -I pocketsnes/snes9x
 
 CFLAGS = $(INCLUDE) -DRC_OPTIMIZED -D__LINUX__ -D__DINGUX__ \
-		 -g -O3 -pipe -ffunction-sections -ffast-math $(SDL_CFLAGS) \
-		 #-flto -fwhole-program #-fsigned-char
+		 -g -O3 -pipe -ffast-math $(SDL_CFLAGS) \
+		 -flto
 
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
 
