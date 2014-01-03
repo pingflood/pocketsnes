@@ -523,23 +523,6 @@ s32 FileSelect()
 			}
 	    	}
 
-		if (keys&INP_BUTTON_MENU_DELETE)
-		{
-			if(focus>ROM_SELECTOR_DEFAULT_FOCUS)
-			{
-				//delete current rom
-				if (mRomList[focus].type != SAL_FILE_TYPE_DIRECTORY)
-				{
-					sprintf(text,"%s",mRomList[focus].displayName);
-
-					if(MenuMessageBox("Are you sure you want to delete",text,"",MENU_MESSAGE_BOX_MODE_YESNO)==SAL_OK)
-					{
-						//deleterom(focus);
-					}
-				}
-			}
-		}
-
 		// Draw screen:
 		PrintTitle("ROM selection");
 
