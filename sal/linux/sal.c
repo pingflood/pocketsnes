@@ -258,6 +258,15 @@ u32 sal_VideoGetPitch()
 	return mScreen->pitch;
 }
 
+void sal_VideoBitmapDim(u16* img, u32 pixelCount)
+{
+	u32 i;
+	for (i = 0; i < pixelCount; i += 2)
+		*(u32 *) &img[i] = (*(u32 *) &img[i] & 0xF7DEF7DE) >> 1;
+	if (pixelCount & 1)
+		img[i - 1] = (img[i - 1] & 0xF7DE) >> 1;
+}
+
 void sal_VideoFlip(s32 vsync)
 {
 	if (SDL_MUSTLOCK(mScreen)) {

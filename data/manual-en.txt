@@ -112,6 +112,9 @@ The default ROM path is saved separately from the global configuration, at ~/.sn
 - Per-game data -
 Per-game data files are saved with the name of the file containing the SNES ROM, with their extension replaced. If the SNES ROM was loaded from a ZIP archive, then the data files use the name of the ZIP archive, not the name of the file inside the archive. All files are saved into ~/.snes96_snapshots (where ~ represents $HOME).
 
+- Game preview files -
+PocketSNES can show an image in the background of the directory selector when the selection bar is under a ROM with a certain name. A file in ~/.snes96_snapshots/previews named the same as the ROM is loaded and shown. It must be a PNG file, 24 bits per pixel (RGB 888, no alpha) and be 262 by 186 pixels.
+
 - Per-game configuration -
 The per-game configuration saves overrides made to the defaults for single games. They use the extension 'opt'.
 

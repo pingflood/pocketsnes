@@ -388,7 +388,7 @@ s32 FileSelect()
 	s8 text[SAL_MAX_PATH];
 	s8 previewPath[SAL_MAX_PATH];
 	s8 previousRom[SAL_MAX_PATH];
-	u16 romPreview[320 * 240];
+	u16 romPreview[262 * 186];
 	bool8 havePreview = FALSE;
 	s32 action=0;
 	s32 smooth=0;
@@ -531,11 +531,14 @@ s32 FileSelect()
 			sal_DirectorySplitFilename(mRomList[focus].filename, dummy, fileNameNoExt, dummy);
 			sprintf(previewPath, "%s/previews/%s.%s", sal_DirectoryGetHome(), fileNameNoExt, "png");
 			strcpy(previousRom, mRomList[focus].displayName);
-			havePreview = sal_ImageLoad(previewPath, &romPreview, 320, 240) != SAL_ERROR;
+			havePreview = sal_ImageLoad(previewPath, &romPreview, 262, 186) != SAL_ERROR;
+			if (havePreview) {
+				sal_VideoBitmapDim(romPreview, 262 * 186);
+			}
 		}
 
 		if (havePreview) {
-			sal_ImageDraw(romPreview, 320, 240, 0, 0);
+			sal_ImageDraw(romPreview, 262, 186, 0, 16);
 		}
 
 		smooth=smooth*7+(focus<<8); smooth>>=3;

@@ -52,6 +52,7 @@ u32 sal_VideoGetBpp();
 void sal_VideoClear(u32 color);
 void sal_VideoClearAll(u32 color);
 void sal_VideoDrawRect(s32 x, s32 y, s32 width, s32 height, u32 color);
+void sal_VideoBitmapDim(u16* img, u32 pixelCount);
 void sal_VideoPrint(s32 x, s32 y, const char *buffer, u32 color);
 u32 sal_VideoGetPitch();
 void sal_VideoFlip(s32 vsync);
