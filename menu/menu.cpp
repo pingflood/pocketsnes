@@ -724,7 +724,7 @@ static s32 SaveStateSelect(s32 mode)
 		}
 		else
 		{
-			sal_VideoDrawRect(0, 16, 262, 16, SAL_RGB(31,0,0));
+			sal_VideoDrawRect(0, 16, 262, 16, SAL_RGB(22,0,0));
 			sprintf(text,"SLOT %d",saveno);
 			sal_VideoPrint(107,20,text,SAL_RGB(31,31,31));
 		}
@@ -748,7 +748,7 @@ static s32 SaveStateSelect(s32 mode)
 				u32 DestWidth = 205, DestHeight = 154;
 				sal_VideoBitmapScale(0, 0, SNES_WIDTH, SNES_HEIGHT, DestWidth, DestHeight, SAL_SCREEN_WIDTH - DestWidth, &mTempFb[0], (u16*)sal_VideoGetBuffer()+(SAL_SCREEN_WIDTH*(((202 + 16) - DestHeight)/2))+((262 - DestWidth)/2));
 
-				sal_VideoDrawRect(0, 186, 262, 16, SAL_RGB(31,0,0));
+				sal_VideoDrawRect(0, 186, 262, 16, SAL_RGB(22,0,0));
 
 				if(mode==1) sal_VideoPrint((262-(strlen(MENU_TEXT_LOAD_SAVESTATE)<<3))>>1,190,MENU_TEXT_LOAD_SAVESTATE,SAL_RGB(31,31,31));
 				else if(mode==0) sal_VideoPrint((262-(strlen(MENU_TEXT_OVERWRITE_SAVESTATE)<<3))>>1,190,MENU_TEXT_OVERWRITE_SAVESTATE,SAL_RGB(31,31,31));
