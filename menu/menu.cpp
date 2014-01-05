@@ -237,8 +237,7 @@ int FileScan()
 #endif
 	if(sal_DirectoryGetItemCount(mRomDir,&itemCount)==SAL_ERROR)
 	{
-		MenuMessageBox(sal_LastErrorGet(),"","",MENU_MESSAGE_BOX_MODE_PAUSE);
-		itemCount=0;
+		return SAL_ERROR;
 	}
 
 	mRomCount=ROM_SELECTOR_ROM_START+itemCount;
@@ -305,9 +304,7 @@ int FileScan()
 		}
 		else
 		{
-			//Failed to open dir - display error
-			MenuMessageBox("Failed to open rom directory","","",MENU_MESSAGE_BOX_MODE_PAUSE);
-			mRomCount=ROM_SELECTOR_DEFAULT_FOCUS;
+			return SAL_ERROR;
 		}
 
 #if 0
@@ -400,7 +397,17 @@ s32 FileSelect()
 	u32 keys=0;
 	s32 size=0, check=SAL_OK;
 	
-	FileScan();
+	if (FileScan() != SAL_OK)
+	{
+		strcpy(mRomDir, sal_DirectoryGetUser());
+		if (FileScan() != SAL_OK)
+		{
+			MenuMessageBox("Home directory inaccessible","","",MENU_MESSAGE_BOX_MODE_PAUSE);
+			mRomCount=ROM_SELECTOR_DEFAULT_FOCUS;
+			menuExit = 1;
+			return 0;
+		}
+	}
 
 	smooth=focus<<8;
 	sal_InputIgnore();

@@ -35,6 +35,8 @@ s32 sal_DirectoryGetItemCount(const char *path, s32 *returnItemCount)
 		}
 
 	}
+	else
+		return SAL_ERROR;
 
 	*returnItemCount=count;
 	return SAL_OK;

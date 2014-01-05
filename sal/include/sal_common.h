@@ -111,6 +111,7 @@ s32 sal_FileGetSize(const char *filename, u32 *filesize);
 u32 sal_FileGetCRC(u8 *data, u32 size);
 
 const char * sal_DirectoryGetHome(void);
+const char * sal_DirectoryGetUser(void);
 const char * sal_DirectoryGetTemp(void);
 void sal_DirectorySplitFilename(const char *wholeFilename, s8* path, s8 *filename, s8 *ext);
 void sal_DirectoryGetParent(s8 *path);

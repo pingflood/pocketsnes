@@ -664,6 +664,11 @@ const char * sal_DirectoryGetHome(void)
 	return home;
 }
 
+const char * sal_DirectoryGetUser(void)
+{
+	return getenv("HOME");
+}
+
 void sal_DirectorySplitFilename(const char *wholeFilename, s8* path, s8 *filename, s8 *ext)
 {
 	u32 len=(u32)strlen(wholeFilename);
