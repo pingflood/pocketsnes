@@ -38,6 +38,7 @@ static u32 mSaveRequested=0;
 static u32 mQuickStateTimer=0;
 static u32 mVolumeTimer=0;
 static u32 mVolumeDisplayTimer=0;
+static u32 mFramesCleared=0;
 static u32 mInMenu=0;
 
 static int S9xCompareSDD1IndexEntries (const void *p1, const void *p2)
@@ -153,6 +154,14 @@ bool8_32 S9xInitUpdate ()
 bool8_32 S9xDeinitUpdate (int Width, int Height, bool8_32)
 {
 	if(mInMenu) return TRUE;
+
+	// After returning from the menu, clear the background of 3 frames.
+	// This prevents remnants of the menu from appearing.
+	if (mFramesCleared < 3)
+	{
+		sal_VideoClear(0);
+		mFramesCleared++;
+	}
 
 	if (mMenuOptions.fullScreen)
 	{
@@ -692,10 +701,7 @@ int mainEntry(int argc, char* argv[])
 
 			sal_AudioSetVolume(mMenuOptions.volume,mMenuOptions.volume);
 			sal_CpuSpeedSet(mMenuOptions.cpuSpeed);	
-			sal_VideoClear(0);
-			sal_VideoFlip(1);
-			sal_VideoClear(0);
-			sal_VideoFlip(1);
+			mFramesCleared = 0;
 			if(mMenuOptions.soundEnabled) 	
 				RunSound();
 			else	RunNoSound();

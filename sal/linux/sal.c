@@ -227,7 +227,13 @@ u32 sal_VideoInit(u32 bpp, u32 color, u32 refreshRate)
 	mRefreshRate=refreshRate;
 
 	//Set up the screen
-	mScreen = SDL_SetVideoMode( SAL_SCREEN_WIDTH, SAL_SCREEN_HEIGHT, bpp, SDL_HWSURFACE | SDL_DOUBLEBUF);
+	mScreen = SDL_SetVideoMode( SAL_SCREEN_WIDTH, SAL_SCREEN_HEIGHT, bpp, SDL_HWSURFACE |
+#ifdef SDL_TRIPLEBUF
+		SDL_TRIPLEBUF
+#else
+		SDL_DOUBLEBUF
+#endif
+		);
 
     	//If there was an error in setting up the screen
     	if( mScreen == NULL )
