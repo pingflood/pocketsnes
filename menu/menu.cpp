@@ -1505,7 +1505,7 @@ s32 MenuRun(s8 *romName)
 		usleep(10000);
 	}
 	
-  sal_InputIgnore();
+  sal_InputWaitForRelease();
 
   return action;
 }
