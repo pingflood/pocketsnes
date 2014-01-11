@@ -81,7 +81,7 @@ The default value of this option is 44100 Hz.
 The default value of this option is AUTO.
 
 - Full Screen -
-"OFF" shows the SNES screen with square pixels (256x224; PAR 1:1, DAR 8:7). "ON" shows the SNES screen scaled up to the resolution of your device (320x240; PAR 7:6, DAR 4:3). NTSC TVs on the market at the time the SNES was popular would show the image with a display aspect ratio (DAR) of 4:3, agreeing with the implementation of full-screen scaling on 4:3 devices.
+"OFF" shows the SNES screen with square pixels (256x224; PAR 1:1, DAR 8:7). "FAST" and "SMOOTH" show the SNES screen scaled up to the resolution of your device (320x240; PAR 7:6, DAR 4:3), with 'SMOOTH' resembling bilinear interpolation performed in software. NTSC TVs on the market at the time the SNES was popular would show the image with a display aspect ratio (DAR) of 4:3, agreeing with the implementation of full-screen scaling on 4:3 devices.
 
 The default value of this option is OFF.
 
