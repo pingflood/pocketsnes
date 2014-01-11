@@ -328,9 +328,9 @@ const char *S9xBasename (const char *f)
 
 void PSNESForceSaveSRAM (void)
 {
-	if(mRomName[0] != 0 && Memory.SaveSRAM ((s8*)S9xGetFilename (".srm")))
+	if(mRomName[0] != 0)
 	{
-		sync();
+		Memory.SaveSRAM ((s8*)S9xGetFilename (".srm"));
 	}
 }
 
@@ -338,11 +338,7 @@ void S9xSaveSRAM (int showWarning)
 {
 	if (CPU.SRAMModified)
 	{
-		if(Memory.SaveSRAM ((s8*)S9xGetFilename (".srm")))
-		{
-			sync();
-		}
-		else
+		if(!Memory.SaveSRAM ((s8*)S9xGetFilename (".srm")))
 		{
 			MenuMessageBox("Saving SRAM","Failed!","",MENU_MESSAGE_BOX_MODE_PAUSE);
 		}
