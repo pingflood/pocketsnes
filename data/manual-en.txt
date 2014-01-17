@@ -30,7 +30,7 @@ PocketSNES, Super Nintendo Entertainment System emulator
 == The PocketSNES Main Menu ==
 After activating the PocketSNES icon, the PocketSNES Main Menu will appear. From there, you can set global settings and save them even before launching your first game, if needed. Once done changing settings, choose the "Save global settings" option and proceed to selecting a ROM.
 
-To re-enter the Main Menu during a game, press both Start and Select. The first button of the two is sent to the game, but the second is not. You can use this to your advantage by first sending a button to which your current game does not react.
+To re-enter the Main Menu during a game, flick the Power switch.
 
 == Selecting a ROM ==
 The second option in the menu, "Select ROM", brings up a directory browser. This is PocketSNES's own directory browser; it does not use gmenu2x's settings. You can set its default directory for use during future runs. You can use this directory browser to select a ROM to emulate. It accepts any valid SNES ROM file, headered or not, with copier interleaving or not (though un-interleaved dumps are preferred) and with the extension .sfc or .smc, or any ZIP archive containing a valid SNES ROM as its first file.
