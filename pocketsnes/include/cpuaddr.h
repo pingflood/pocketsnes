@@ -207,7 +207,7 @@ static void AbsoluteLong (AccessMode a, InternalOp op)
 #ifdef FAST_LSB_WORD_ACCESS
     Addr = (*(uint32 *) CPU.PC) & 0xffffff;
 #elif defined FAST_ALIGNED_LSB_WORD_ACCESS
-    if (((int) CPU.PC & 1) == 0)
+    if (((intptr_t) CPU.PC & 1) == 0)
         Addr = (*(uint16 *) CPU.PC) + (*(CPU.PC + 2) << 16);
     else
         Addr = *CPU.PC + ((*(uint16 *) (CPU.PC + 1)) << 8);
@@ -322,7 +322,7 @@ static void AbsoluteLongIndexedX (AccessMode a, InternalOp op)
 #ifdef FAST_LSB_WORD_ACCESS
     Addr = (*(uint32 *) CPU.PC + ICPU.Registers.X.W) & 0xffffff;
 #elif defined FAST_ALIGNED_LSB_WORD_ACCESS
-    if (((int) CPU.PC & 1) == 0)
+    if (((intptr_t) CPU.PC & 1) == 0)
         Addr = ((*(uint16 *) CPU.PC) + (*(CPU.PC + 2) << 16) + ICPU.Registers.X.W) & 0xFFFFFF;
     else
         Addr = (*CPU.PC + ((*(uint16 *) (CPU.PC + 1)) << 8) + ICPU.Registers.X.W) & 0xFFFFFF;

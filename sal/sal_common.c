@@ -928,7 +928,7 @@ s32 sal_ImageLoad(const char *fname, void *dest, u32 width, u32 height)
 
 	u32 h;
 	unsigned short *dst = dest;
-	if (info_ptr->pixel_depth != 24)
+	if (png_get_bit_depth(png_ptr, info_ptr) != 24)
 	{
 		sal_LastErrorSet("bg image not 24bpp");
 		png_destroy_read_struct(&png_ptr, info_ptr ? &info_ptr : NULL, (png_infopp)NULL);
@@ -936,7 +936,7 @@ s32 sal_ImageLoad(const char *fname, void *dest, u32 width, u32 height)
 		return SAL_ERROR;
 	}
 	
-	if (height != info_ptr->height)
+	if (height != png_get_image_height(png_ptr, info_ptr))
 	{
 		sal_LastErrorSet("image height invalid");
 		png_destroy_read_struct(&png_ptr, info_ptr ? &info_ptr : NULL, (png_infopp)NULL);
@@ -944,7 +944,7 @@ s32 sal_ImageLoad(const char *fname, void *dest, u32 width, u32 height)
 		return SAL_ERROR;
 	}
 	
-	if (width != info_ptr->width)
+	if (width != png_get_image_width(png_ptr, info_ptr))
 	{
 		sal_LastErrorSet("image width is invalid");
 		png_destroy_read_struct(&png_ptr, info_ptr ? &info_ptr : NULL, (png_infopp)NULL);
