@@ -108,9 +108,10 @@ s32 DeleteMenuOptions(const char *path, const char *filename,
 
 s32 LoadLastSelectedRomPos() // Try to get the last selected rom position from a config file
 {
-	char lastselfile [128];
+	char lastselfile[SAL_MAX_PATH];
 	s32 savedval = ROM_SELECTOR_DEFAULT_FOCUS;
-	sprintf (lastselfile, "%s/lastselected.opt", sal_DirectoryGetHome());
+	strcpy(lastselfile, sal_DirectoryGetHome());
+	sal_DirectoryCombine(lastselfile, "lastselected.opt");
 	FILE * pFile;
 	pFile = fopen (lastselfile,"r+");
 	if (pFile != NULL) {
@@ -122,8 +123,9 @@ s32 LoadLastSelectedRomPos() // Try to get the last selected rom position from a
 
 void SaveLastSelectedRomPos(s32 pospointer) // Save the last selected rom position in a config file
 {
-	char lastselfile [128];
-	sprintf (lastselfile, "%s/lastselected.opt", sal_DirectoryGetHome());
+	char lastselfile[SAL_MAX_PATH];
+	strcpy(lastselfile, sal_DirectoryGetHome());
+	sal_DirectoryCombine(lastselfile, "lastselected.opt");
 	FILE * pFile;
 	pFile = fopen (lastselfile,"w+");
 	fprintf (pFile, "%i", pospointer);
@@ -132,8 +134,9 @@ void SaveLastSelectedRomPos(s32 pospointer) // Save the last selected rom positi
 
 void DelLastSelectedRomPos() // Remove the last selected rom position config file
 {
-	char lastselfile [128];
-	sprintf (lastselfile, "%s/lastselected.opt", sal_DirectoryGetHome());
+	char lastselfile[SAL_MAX_PATH];
+	strcpy(lastselfile, sal_DirectoryGetHome());
+	sal_DirectoryCombine(lastselfile, "lastselected.opt");
 	remove (lastselfile);
 }
 
