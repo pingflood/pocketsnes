@@ -1391,14 +1391,14 @@ void S9xSetSPC7110 (uint8 data, uint16 Address)
 				}
 				if(0x0F==rtc_f9.index)
 				{
-					if(data&0x01&&!(rtc_f9.reg[0x0F]&0x01))
+					if((data & 0x01) &&!(rtc_f9.reg[0x0F]&0x01))
 					{
 						S9xUpdateRTC();
 						rtc_f9.reg[0]=0;
 						rtc_f9.reg[1]=0;
 						rtc_f9.last_used=time(NULL);
 					}
-					if(data&0x02&&!(rtc_f9.reg[0x0F]&0x02))
+					if((data & 0x02) &&!(rtc_f9.reg[0x0F]&0x02))
 					{
 						S9xUpdateRTC();
 						rtc_f9.last_used=time(NULL);

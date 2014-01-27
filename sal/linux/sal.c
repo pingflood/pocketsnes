@@ -56,6 +56,7 @@ static u32 sal_Input(int held)
 		CASE(LEFT, LEFT);
 		CASE(RIGHT, RIGHT);
 		CASE(HOME, MENU);
+		default: break;
 	}
 
 	mInputRepeat = inputHeld;

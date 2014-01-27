@@ -1,7 +1,7 @@
 
 # Define the applications properties here:
 
-TARGET = PocketSNES.dylib
+TARGET = PocketSNES
 
 CC  := $(CROSS_COMPILE)clang
 CXX := $(CROSS_COMPILE)clang++
@@ -30,7 +30,7 @@ CFLAGS = $(INCLUDE) -DRC_OPTIMIZED -D__LINUX__ -D__DINGUX__ \
 
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti -std=c++0x -stdlib=libc++
 
-LDFLAGS = -dynamiclib $(CXXFLAGS) -lpthread -lz -lpng -lm $(SDL_LIBS)
+LDFLAGS = $(CXXFLAGS) -lpthread -lz -lpng -lm $(SDL_LIBS)
 
 # Find all source files
 SOURCE = pocketsnes/snes9x menu sal/linux sal
