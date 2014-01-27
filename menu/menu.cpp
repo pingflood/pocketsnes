@@ -106,6 +106,40 @@ s32 DeleteMenuOptions(const char *path, const char *filename,
 	return SAL_OK;
 }
 
+s32 LoadLastSelectedRomPos() // Try to get the last selected rom position from a config file
+{
+	char lastselfile[SAL_MAX_PATH];
+	s32 savedval = ROM_SELECTOR_DEFAULT_FOCUS;
+	strcpy(lastselfile, sal_DirectoryGetHome());
+	sal_DirectoryCombine(lastselfile, "lastselected.opt");
+	FILE * pFile;
+	pFile = fopen (lastselfile,"r+");
+	if (pFile != NULL) {
+		fscanf (pFile, "%i", &savedval);
+		fclose (pFile);
+	}
+	return savedval;
+}
+
+void SaveLastSelectedRomPos(s32 pospointer) // Save the last selected rom position in a config file
+{
+	char lastselfile[SAL_MAX_PATH];
+	strcpy(lastselfile, sal_DirectoryGetHome());
+	sal_DirectoryCombine(lastselfile, "lastselected.opt");
+	FILE * pFile;
+	pFile = fopen (lastselfile,"w+");
+	fprintf (pFile, "%i", pospointer);
+	fclose (pFile);
+}
+
+void DelLastSelectedRomPos() // Remove the last selected rom position config file
+{
+	char lastselfile[SAL_MAX_PATH];
+	strcpy(lastselfile, sal_DirectoryGetHome());
+	sal_DirectoryCombine(lastselfile, "lastselected.opt");
+	remove (lastselfile);
+}
+
 void MenuPause()
 {
 	sal_InputWaitForPress();
@@ -408,6 +442,8 @@ s32 FileSelect()
 			return 0;
 		}
 	}
+	
+	focus = LoadLastSelectedRomPos(); //try to load a saved position in the romlist
 
 	smooth=focus<<8;
 	sal_InputIgnore();
@@ -471,6 +507,7 @@ s32 FileSelect()
 			switch(focus)
 			{
 				case ROM_SELECTOR_SAVE_DEFAULT_DIR: //Save default directory
+					DelLastSelectedRomPos(); //delete any previously saved position in the romlist
 					SaveMenuOptions(mSystemDir, DEFAULT_ROM_DIR_FILENAME, DEFAULT_ROM_DIR_EXT, mRomDir, strlen(mRomDir), 1);
 					break;
 
@@ -519,6 +556,7 @@ s32 FileSelect()
 					else
 					{
 						// user has selected a rom, so load it
+						SaveLastSelectedRomPos(focus); // save the current position in the romlist
 						strcpy(mRomName, mRomDir);
 						sal_DirectoryCombine(mRomName,mRomList[focus].filename);
 						mQuickSavePresent=0;  // reset any quick saves
