@@ -45,7 +45,7 @@ s32 sal_AudioInit(s32 rate, s32 bits, s32 stereo, s32 Hz)
 	audiospec.format = AUDIO_S16;
 
 	audiospec.samples = (rate / Hz);
-	if (!stereo && audiospec.samples & 1)
+	if (!stereo && (audiospec.samples & 1))
 		audiospec.samples--;
 
 	 
@@ -80,7 +80,7 @@ void sal_AudioClose(void)
 	SDL_CloseAudio();
 }
 
-u32 sal_AudioGenerate(u32 samples)
+void sal_AudioGenerate(u32 samples)
 {
 	u32 SamplesAvailable, LocalReadPos = ReadPos /* isolate a bit against races */;
 	if (LocalReadPos <= WritePos)

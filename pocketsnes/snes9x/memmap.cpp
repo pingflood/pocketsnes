@@ -2484,7 +2484,7 @@ void CMemory::TalesROMMap (bool8 Interleaved)
 
 	if((strncmp("TALES",(char*)Map[8]+0xFFC0, 5)==0))
 	{
-		if(((*(Map[8]+0xFFDE))==(*(Map[0x808]+0xFFDE))))
+		if((*(Map[8]+0xFFDE))==(*(Map[0x808]+0xFFDE)))
 		{
 			Settings.DisplayColor=BUILD_PIXEL(31,0,0);
 			SET_UI_COLOR(255,0,0);

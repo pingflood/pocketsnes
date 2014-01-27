@@ -66,7 +66,7 @@ s32 sal_AudioInit(s32 rate, s32 bits, s32 stereo, s32 Hz);
 void sal_AudioPause(void);
 void sal_AudioResume(void);
 void sal_AudioClose(void);
-u32 sal_AudioGenerate(u32 samples);
+void sal_AudioGenerate(u32 samples);
 u32 sal_AudioGetFramesBuffered();
 u32 sal_AudioGetMaxFrames();
 u32 sal_AudioGetSamplesPerFrame();
