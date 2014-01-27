@@ -98,12 +98,12 @@ bool8 S9xOpenSnapshotFile (const char *fname, bool8 read_only, STREAM *file)
 {
 	if (read_only)
 	{
-		if (*file = OPEN_STREAM(fname,"rb")) 
+		if ((*file = OPEN_STREAM(fname,"rb")))
 			return(TRUE);
 	}
 	else
 	{
-		if (*file = OPEN_STREAM(fname,"w+b")) 
+		if ((*file = OPEN_STREAM(fname,"w+b")))
 			return(TRUE);
 	}
 
@@ -424,7 +424,7 @@ int Run(int sound)
 				done++;
 				if (mMenuOptions.frameSkip == 0) //Auto
 					IPPU.RenderThisFrame = (done >= aim);
-				else if (IPPU.RenderThisFrame = (--skip <= 0))
+				else if ((IPPU.RenderThisFrame = (--skip <= 0)))
 					skip = mMenuOptions.frameSkip;
 
 				//Run SNES for one glorious frame

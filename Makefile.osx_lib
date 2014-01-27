@@ -22,7 +22,8 @@ endif
 INCLUDE = -I pocketsnes \
 		-I sal/linux/include -I sal/include \
 		-I pocketsnes/include \
-		-I menu -I pocketsnes/linux -I pocketsnes/snes9x
+		-I menu -I pocketsnes/linux -I pocketsnes/snes9x \
+		-I /Library/Frameworks/SDL.framework/headers
 
 CFLAGS = $(INCLUDE) -DRC_OPTIMIZED -D__LINUX__ -D__DINGUX__ \
 		 -g -O3 -pipe -ffast-math $(SDL_CFLAGS) \
