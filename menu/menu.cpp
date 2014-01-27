@@ -108,10 +108,9 @@ s32 DeleteMenuOptions(const char *path, const char *filename,
 
 s32 LoadLastSelectedRomPos() // Try to get the last selected rom position from a config file
 {
-	char* home = getenv("HOME");
 	char lastselfile [128];
 	s32 savedval = ROM_SELECTOR_DEFAULT_FOCUS;
-	sprintf (lastselfile, "%s/.snes96_snapshots/lastselected.opt", home);
+	sprintf (lastselfile, "%s/lastselected.opt", sal_DirectoryGetHome());
 	FILE * pFile;
 	pFile = fopen (lastselfile,"r+");
 	if (pFile != NULL) {
@@ -123,9 +122,8 @@ s32 LoadLastSelectedRomPos() // Try to get the last selected rom position from a
 
 void SaveLastSelectedRomPos(s32 pospointer) // Save the last selected rom position in a config file
 {
-	char* home = getenv("HOME");
 	char lastselfile [128];
-	sprintf (lastselfile, "%s/.snes96_snapshots/lastselected.opt", home);
+	sprintf (lastselfile, "%s/lastselected.opt", sal_DirectoryGetHome());
 	FILE * pFile;
 	pFile = fopen (lastselfile,"w+");
 	fprintf (pFile, "%i", pospointer);
@@ -134,9 +132,8 @@ void SaveLastSelectedRomPos(s32 pospointer) // Save the last selected rom positi
 
 void DelLastSelectedRomPos() // Remove the last selected rom position config file
 {
-	char* home = getenv("HOME");
 	char lastselfile [128];
-	sprintf (lastselfile, "%s/.snes96_snapshots/lastselected.opt", home);
+	sprintf (lastselfile, "%s/lastselected.opt", sal_DirectoryGetHome());
 	remove (lastselfile);
 }
 
