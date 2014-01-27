@@ -325,21 +325,21 @@ static FreezeData SnapPPU [] = {
 
 static FreezeData SnapDMA [] = {
 #define O(N) \
-    {OFFSET (TransferDirection) + N * sizeof (struct SDMA), 1, INT_V}, \
-    {OFFSET (AAddressFixed) + N * sizeof (struct SDMA), 1, INT_V}, \
-    {OFFSET (AAddressDecrement) + N * sizeof (struct SDMA), 1, INT_V}, \
-    {OFFSET (TransferMode) + N * sizeof (struct SDMA), 1, INT_V}, \
-    {OFFSET (ABank) + N * sizeof (struct SDMA), 1, INT_V}, \
-    {OFFSET (AAddress) + N * sizeof (struct SDMA), 2, INT_V}, \
-    {OFFSET (Address) + N * sizeof (struct SDMA), 2, INT_V}, \
-    {OFFSET (BAddress) + N * sizeof (struct SDMA), 1, INT_V}, \
-    {OFFSET (TransferBytes) + N * sizeof (struct SDMA), 2, INT_V}, \
-    {OFFSET (HDMAIndirectAddressing) + N * sizeof (struct SDMA), 1, INT_V}, \
-    {OFFSET (IndirectAddress) + N * sizeof (struct SDMA), 2, INT_V}, \
-    {OFFSET (IndirectBank) + N * sizeof (struct SDMA), 1, INT_V}, \
-    {OFFSET (Repeat) + N * sizeof (struct SDMA), 1, INT_V}, \
-    {OFFSET (LineCount) + N * sizeof (struct SDMA), 1, INT_V}, \
-    {OFFSET (FirstLine) + N * sizeof (struct SDMA), 1, INT_V}
+    {(int) (OFFSET (TransferDirection) + N * sizeof (struct SDMA)), 1, INT_V}, \
+    {(int) (OFFSET (AAddressFixed) + N * sizeof (struct SDMA)), 1, INT_V}, \
+    {(int) (OFFSET (AAddressDecrement) + N * sizeof (struct SDMA)), 1, INT_V}, \
+    {(int) (OFFSET (TransferMode) + N * sizeof (struct SDMA)), 1, INT_V}, \
+    {(int) (OFFSET (ABank) + N * sizeof (struct SDMA)), 1, INT_V}, \
+    {(int) (OFFSET (AAddress) + N * sizeof (struct SDMA)), 2, INT_V}, \
+    {(int) (OFFSET (Address) + N * sizeof (struct SDMA)), 2, INT_V}, \
+    {(int) (OFFSET (BAddress) + N * sizeof (struct SDMA)), 1, INT_V}, \
+    {(int) (OFFSET (TransferBytes) + N * sizeof (struct SDMA)), 2, INT_V}, \
+    {(int) (OFFSET (HDMAIndirectAddressing) + N * sizeof (struct SDMA)), 1, INT_V}, \
+    {(int) (OFFSET (IndirectAddress) + N * sizeof (struct SDMA)), 2, INT_V}, \
+    {(int) (OFFSET (IndirectBank) + N * sizeof (struct SDMA)), 1, INT_V}, \
+    {(int) (OFFSET (Repeat) + N * sizeof (struct SDMA)), 1, INT_V}, \
+    {(int) (OFFSET (LineCount) + N * sizeof (struct SDMA)), 1, INT_V}, \
+    {(int) (OFFSET (FirstLine) + N * sizeof (struct SDMA)), 1, INT_V}
 	
     O(0), O(1), O(2), O(3), O(4), O(5), O(6), O(7)
 #undef O
