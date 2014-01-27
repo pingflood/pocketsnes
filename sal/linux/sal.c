@@ -1,11 +1,9 @@
 
 #include <stdio.h>
 #include <dirent.h>
-#include <SDL/SDL.h>
+#include <SDL.h>
 #include <sys/time.h>
 #include "sal.h"
-
-#include <SDL/SDL.h>
 
 #define PALETTE_BUFFER_LENGTH	256*2*4
 
