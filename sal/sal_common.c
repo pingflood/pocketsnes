@@ -928,7 +928,8 @@ s32 sal_ImageLoad(const char *fname, void *dest, u32 width, u32 height)
 
 	u32 h;
 	unsigned short *dst = dest;
-	if (png_get_bit_depth(png_ptr, info_ptr) != 24)
+	
+	if (png_get_bit_depth(png_ptr, info_ptr) != 8 || png_get_color_type(png_ptr, info_ptr) != PNG_COLOR_TYPE_RGB)
 	{
 		sal_LastErrorSet("bg image not 24bpp");
 		png_destroy_read_struct(&png_ptr, info_ptr ? &info_ptr : NULL, (png_infopp)NULL);
