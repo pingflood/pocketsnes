@@ -1471,7 +1471,7 @@ s32 MenuRun(s8 *romName)
 					{
 						action=EVENT_LOAD_ROM;
 						strcpy(romName,mRomName);
-//						MenuReloadOptions();
+						MenuReloadOptions();
 						menuExit=1;
 					}
 					break;
