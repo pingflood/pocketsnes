@@ -165,21 +165,40 @@ bool8_32 S9xDeinitUpdate (int Width, int Height, bool8_32)
 
 	if (mMenuOptions.fullScreen == 1)
 	{
-		upscale_p((uint32_t*) sal_VideoGetBuffer(), (uint32_t*) IntermediateScreen, SNES_WIDTH);
+		if (Memory.FillRAM[0x2133] & 4) {
+			upscale_256x240_to_320x240((uint32_t*) sal_VideoGetBuffer(), (uint32_t*) IntermediateScreen, SNES_WIDTH);
+		} else {
+			upscale_p((uint32_t*) sal_VideoGetBuffer(), (uint32_t*) IntermediateScreen, SNES_WIDTH);
+		}
 	}
 	if (mMenuOptions.fullScreen == 2)
 	{
-		upscale_256x224_to_320x240_bilinearish((uint32_t*) sal_VideoGetBuffer() + 160, (uint32_t*) IntermediateScreen, SNES_WIDTH);
+		if (Memory.FillRAM[0x2133] & 4) {
+			upscale_256x240_to_320x240_bilinearish((uint32_t*) sal_VideoGetBuffer() + 160, (uint32_t*) IntermediateScreen, SNES_WIDTH);
+		} else {
+			upscale_256x224_to_320x240_bilinearish((uint32_t*) sal_VideoGetBuffer() + 160, (uint32_t*) IntermediateScreen, SNES_WIDTH);
+		}
 	}
 	if (mMenuOptions.fullScreen == 0)
 	{
-		u32 y, pitch = sal_VideoGetPitch();
-		u8 *src = (u8*) IntermediateScreen, *dst = (u8*) sal_VideoGetBuffer() + ((SAL_SCREEN_WIDTH - SNES_WIDTH) / 2 + (((SAL_SCREEN_HEIGHT - SNES_HEIGHT) / 2) * SAL_SCREEN_WIDTH)) * sizeof(u16);
-		for (y = 0; y < SNES_HEIGHT; y++)
-		{
-			memcpy(dst, src, SNES_WIDTH * sizeof(u16));
-			src += SNES_WIDTH * sizeof(u16);
-			dst += pitch;
+		if (Memory.FillRAM[0x2133] & 4) {
+			u32 y, pitch = sal_VideoGetPitch();
+			u8 *src = (u8*) IntermediateScreen, *dst = (u8*) sal_VideoGetBuffer() + ((SAL_SCREEN_WIDTH - SNES_WIDTH) / 2 + (((SAL_SCREEN_HEIGHT - SNES_HEIGHT_EXTENDED) / 2) * SAL_SCREEN_WIDTH)) * sizeof(u16);
+			for (y = 0; y < SNES_HEIGHT_EXTENDED; y++)
+			{
+				memcpy(dst, src, SNES_WIDTH * sizeof(u16));
+				src += SNES_WIDTH * sizeof(u16);
+				dst += pitch;
+			}
+		} else {
+			u32 y, pitch = sal_VideoGetPitch();
+			u8 *src = (u8*) IntermediateScreen, *dst = (u8*) sal_VideoGetBuffer() + ((SAL_SCREEN_WIDTH - SNES_WIDTH) / 2 + (((SAL_SCREEN_HEIGHT - SNES_HEIGHT) / 2) * SAL_SCREEN_WIDTH)) * sizeof(u16);
+			for (y = 0; y < SNES_HEIGHT; y++)
+			{
+				memcpy(dst, src, SNES_WIDTH * sizeof(u16));
+				src += SNES_WIDTH * sizeof(u16);
+				dst += pitch;
+			}
 		}
 	}
 
