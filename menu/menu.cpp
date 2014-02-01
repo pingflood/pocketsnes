@@ -678,11 +678,14 @@ static void ScanSaveStates(s8 *romname)
 }
 
 static
-void LoadStateTemp()
+bool8 LoadStateTemp()
 {
 	char name[SAL_MAX_PATH];
+	bool8 ret;
 	sprintf(name, "%s%s%s", sal_DirectoryGetTemp(), SAL_DIR_SEP, ".svt");
-	S9xUnfreezeGame(name);
+	if (!(ret = S9xUnfreezeGame(name)))
+		fprintf(stderr, "Failed to read saved state at %s: %s\n", name, strerror(errno));
+	return ret;
 }
 
 static 
@@ -690,7 +693,8 @@ void SaveStateTemp()
 {
 	char name[SAL_MAX_PATH];
 	sprintf(name, "%s%s%s", sal_DirectoryGetTemp(), SAL_DIR_SEP, ".svt");
-	S9xFreezeGame(name);
+	if (!S9xFreezeGame(name))
+		fprintf(stderr, "Failed to write saved state at %s: %s\n", name, strerror(errno));
 }
 
 static
@@ -702,15 +706,19 @@ void DeleteStateTemp()
 }
 
 static
-void LoadStateFile(s8 *filename)
+bool8 LoadStateFile(s8 *filename)
 {
-	S9xUnfreezeGame(filename);
+	bool8 ret;
+	if (!(ret = S9xUnfreezeGame(filename)))
+		fprintf(stderr, "Failed to read saved state at %s: %s\n", filename, strerror(errno));
+	return ret;
 }
 
 static 
 void SaveStateFile(s8 *filename)
 {
-	S9xFreezeGame(filename);
+	if (!S9xFreezeGame(filename))
+		fprintf(stderr, "Failed to write saved state at %s: %s\n", filename, strerror(errno));
 }
 
 static s32 SaveStateSelect(s32 mode)
@@ -809,7 +817,7 @@ static s32 SaveStateSelect(s32 mode)
 			case 8:
 				sal_VideoPrint(87,145-36,"Loading...",SAL_RGB(31,31,31));
 				break;
-				case 9:
+			case 9:
 				sal_VideoPrint(87,145-36,"Loading failed",SAL_RGB(31,8,8));
 				break;
 			case 10:	
@@ -844,17 +852,22 @@ static s32 SaveStateSelect(s32 mode)
 				break;
 			case 3:
 			{
-				LoadStateFile(mSaveState[saveno].fullFilename);
-				Settings.APUEnabled = 0;
-				Settings.NextAPUEnabled = Settings.APUEnabled;					
-				S9xSetSoundMute (TRUE);
-				GFX.Screen = (uint8 *) &mTempFb[0];
-				IPPU.RenderThisFrame=TRUE;
-				unsigned int fullScreenSave = mMenuOptions->fullScreen;
-				mMenuOptions->fullScreen = 0;
-				S9xMainLoop ();
-				mMenuOptions->fullScreen = fullScreenSave;
-				action=5;
+				if (LoadStateFile(mSaveState[saveno].fullFilename))
+				{
+					// Loaded OK. Preview it by running the state for one frame.
+					Settings.APUEnabled = 0;
+					Settings.NextAPUEnabled = Settings.APUEnabled;					
+					S9xSetSoundMute (TRUE);
+					GFX.Screen = (uint8 *) &mTempFb[0];
+					IPPU.RenderThisFrame=TRUE;
+					unsigned int fullScreenSave = mMenuOptions->fullScreen;
+					mMenuOptions->fullScreen = 0;
+					S9xMainLoop ();
+					mMenuOptions->fullScreen = fullScreenSave;
+					action=5;
+				}
+				else
+					action=4; // did not load correctly; report an error
 				break;
 			}
 			case 6:
@@ -868,8 +881,10 @@ static s32 SaveStateSelect(s32 mode)
 				action=1;
 				break;
 			case 8:
-				LoadStateFile(mSaveState[saveno].fullFilename);
-				action=100;  // loaded ok so exit
+				if (LoadStateFile(mSaveState[saveno].fullFilename))
+					action=100;  // loaded ok so exit
+				else
+					action=9; // did not load correctly; report an error
 				break;
 			case 9:
 				action=1;
