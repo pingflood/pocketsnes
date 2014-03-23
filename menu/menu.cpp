@@ -42,7 +42,7 @@ void DefaultMenuOptions(void)
 	mMenuOptions->volume=25; 
 	mMenuOptions->cpuSpeed=336; 
 	mMenuOptions->country=0;
-	mMenuOptions->showFps=1;
+	mMenuOptions->showFps=0;
 	mMenuOptions->soundRate=44100;
 	mMenuOptions->stereo=1;
 	mMenuOptions->fullScreen=0;
