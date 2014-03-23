@@ -47,7 +47,7 @@ void DefaultMenuOptions(void)
 	mMenuOptions->stereo=1;
 	mMenuOptions->fullScreen=0;
 	mMenuOptions->transparency=1;
-	mMenuOptions->autoSaveSram=0;
+	mMenuOptions->autoSaveSram=1;
 	mMenuOptions->soundSync=1;
 }
 
