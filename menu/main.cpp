@@ -210,11 +210,11 @@ bool8_32 S9xDeinitUpdate (int Width, int Height, bool8_32)
 		if(newTimer-mLastTimer>Memory.ROMFramesPerSecond)
 		{
 			mLastTimer=newTimer;
-			sprintf(mFpsDisplay,"FPS: %d / %d", mFps, Memory.ROMFramesPerSecond);
+			sprintf(mFpsDisplay,"%2d/%2d", mFps, Memory.ROMFramesPerSecond);
 			mFps=0;
 		}
 		
-		sal_VideoDrawRect(0,0,13*8,8,SAL_RGB(0,0,0));
+		sal_VideoDrawRect(0,0,5*8,8,SAL_RGB(0,0,0));
 		sal_VideoPrint(0,0,mFpsDisplay,SAL_RGB(31,31,31));
 	}
 
