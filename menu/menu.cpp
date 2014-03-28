@@ -320,7 +320,9 @@ int FileScan()
 					if(
 						sal_StringCompare(ext,"zip") == 0 ||
 						sal_StringCompare(ext,"smc") == 0 ||
-						sal_StringCompare(ext,"sfc") == 0)
+						sal_StringCompare(ext,"sfc") == 0 ||
+						sal_StringCompare(ext,"fig") == 0 /* Super WildCard dump */ ||
+						sal_StringCompare(ext,"swc") == 0 /* Super WildCard dump */)
 					{
 						fileCount++;
 						x++;
