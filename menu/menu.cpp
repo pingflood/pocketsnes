@@ -433,6 +433,8 @@ s32 FileSelect()
 	u32 keys=0;
 	s32 size=0, check=SAL_OK;
 	
+	previousRom[0] = '\0';
+	
 	if (FileScan() != SAL_OK)
 	{
 		strcpy(mRomDir, sal_DirectoryGetUser());
