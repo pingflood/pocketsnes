@@ -456,7 +456,7 @@ void DrawLargePixelHalfWidth (uint32 Tile, uint32 Offset,
 }
 #endif
 
-static void WRITE_4PIXELS16 (uint32 Offset, uint8 *Pixels, uint16 *ScreenColors)
+static inline void WRITE_4PIXELS16 (uint32 Offset, uint8 *Pixels, uint16 *ScreenColors)
 {
 #if defined(__MIPSEL) && defined(__GNUC__) && !defined(NO_ASM)
 	uint16 *Screen = (uint16 *) GFX.S + Offset;
@@ -543,7 +543,7 @@ static void WRITE_4PIXELS16 (uint32 Offset, uint8 *Pixels, uint16 *ScreenColors)
 #endif
 }
 
-static void WRITE_4PIXELS16_FLIPPED (uint32 Offset, uint8 *Pixels, uint16 *ScreenColors)
+static inline void WRITE_4PIXELS16_FLIPPED (uint32 Offset, uint8 *Pixels, uint16 *ScreenColors)
 {
 #if defined(__MIPSEL) && defined(__GNUC__) && !defined(NO_ASM)
 	uint16 *Screen = (uint16 *) GFX.S + Offset;
