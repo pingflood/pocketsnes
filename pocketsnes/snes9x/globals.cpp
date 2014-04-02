@@ -316,22 +316,6 @@ int NoiseFreq [32] = {
     5300, 6400, 8000, 10700, 16000, 32000
 };
 
-uint32 HeadMask [4] = {
-#ifdef LSB_FIRST
-    0xffffffff, 0xffffff00, 0xffff0000, 0xff000000
-#else
-    0xffffffff, 0x00ffffff, 0x0000ffff, 0x000000ff
-#endif
-};
-
-uint32 TailMask [5] = {
-#ifdef LSB_FIRST
-    0x00000000, 0x000000ff, 0x0000ffff, 0x00ffffff, 0xffffffff
-#else
-    0x00000000, 0xff000000, 0xffff0000, 0xffffff00, 0xffffffff
-#endif
-};
-
 START_EXTERN_C
 uint8 APUROM [64] =
 {
