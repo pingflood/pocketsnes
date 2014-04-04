@@ -425,6 +425,7 @@ int Run(int sound)
 						mMenuOptions.stereo, sal_AudioGetSamplesPerFrame() * sal_AudioGetBytesPerSample());
 			S9xSetPlaybackRate(mMenuOptions.soundRate);
 			LastAudioRate = mMenuOptions.soundRate;
+			LastStereo = mMenuOptions.stereo;
 		}
 		S9xSetSoundMute (FALSE);
 		sal_AudioResume();
