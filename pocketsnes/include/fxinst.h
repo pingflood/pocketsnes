@@ -265,8 +265,6 @@ struct FxRegs_s
     uint32	vScreenRealHeight;	/* 128, 160, 192 or 256 */
     uint32	vPrevScreenHeight;
     uint32	vScreenSize;
-    void	(*pfPlot)();
-    void	(*pfRpix)();
     
     uint8 *	pvRamBank;		/* Pointer to current RAM-bank */
     uint8 *	pvRomBank;		/* Pointer to current ROM-bank */
@@ -284,11 +282,11 @@ struct FxRegs_s
 };
 
 #define  FxRegs_s_null { \
-   {0},    0,      0,      0,      0,   0,    0,   0,    0,    0, \
-  NULL, NULL,      0,      0,      0,   0,    0,   0,    0,    0, \
-     0,    0,      0,      0,   NULL,   0, NULL,   0, NULL,    0, \
-     0, NULL, {NULL},    {0},      0,   0,    0,   0, NULL, NULL, \
-  NULL, NULL,   NULL, {NULL}, {NULL},   0, NULL, {0},    0,    0, \
+   {0},    0,        0,      0,      0,   0,    0,   0,    0,    0, \
+  NULL, NULL,        0,      0,      0,   0,    0,   0,    0,    0, \
+     0,    0,        0,      0,   NULL,   0, NULL,   0, NULL,    0, \
+     0, NULL,   {NULL},    {0},      0,   0,    0,   0, NULL, NULL, \
+  NULL, {NULL}, {NULL},      0,   NULL, {0},    0,   0, \
 }
 
 /* GSU registers */

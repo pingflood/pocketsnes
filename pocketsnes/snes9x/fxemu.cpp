@@ -303,13 +303,9 @@ static void fx_readRegisterSpace()
     if(GSU.pvScreenBase + GSU.vScreenSize > GSU.pvRam + (GSU.nRamBanks * 65536))
 	GSU.pvScreenBase =  GSU.pvRam + (GSU.nRamBanks * 65536) - GSU.vScreenSize;
 #endif
-    GSU.pfPlot = fx_apfPlotTable[GSU.vMode];
-    GSU.pfRpix = fx_apfPlotTable[GSU.vMode + 5];
 
-    fx_ppfOpcodeTable[0x04c] = GSU.pfPlot;
-    fx_ppfOpcodeTable[0x14c] = GSU.pfRpix;
-    fx_ppfOpcodeTable[0x24c] = GSU.pfPlot;
-    fx_ppfOpcodeTable[0x34c] = GSU.pfRpix;
+    fx_ppfOpcodeTable[0x24c] = fx_ppfOpcodeTable[0x04c] = fx_apfPlotTable[GSU.vMode];
+    fx_ppfOpcodeTable[0x14c] = fx_ppfOpcodeTable[0x34c] = fx_apfPlotTable[GSU.vMode + 5];
 
     fx_computeScreenPointers ();
 
