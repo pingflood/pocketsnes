@@ -95,10 +95,6 @@
 /* The FxChip Emulator's internal variables */
 struct FxRegs_s GSU = FxRegs_s_null;
 
-uint32 (**fx_ppfFunctionTable)(uint32) = 0;
-void (**fx_ppfPlotTable)() = 0;
-void (**fx_ppfOpcodeTable)() = 0;
-
 #if 0
 void fx_setCache()
 {
@@ -304,8 +300,8 @@ static void fx_readRegisterSpace()
 	GSU.pvScreenBase =  GSU.pvRam + (GSU.nRamBanks * 65536) - GSU.vScreenSize;
 #endif
 
-    fx_ppfOpcodeTable[0x24c] = fx_ppfOpcodeTable[0x04c] = fx_apfPlotTable[GSU.vMode];
-    fx_ppfOpcodeTable[0x14c] = fx_ppfOpcodeTable[0x34c] = fx_apfPlotTable[GSU.vMode + 5];
+    fx_apfOpcodeTable[0x24c] = fx_apfOpcodeTable[0x04c] = fx_apfPlotTable[GSU.vMode];
+    fx_apfOpcodeTable[0x14c] = fx_apfOpcodeTable[0x34c] = fx_apfPlotTable[GSU.vMode + 5];
 
     fx_computeScreenPointers ();
 
@@ -485,35 +481,6 @@ static void fx_writeRegisterSpace()
 void FxReset(struct FxInit_s *psFxInfo)
 {
     int i;
-    static uint32 (**appfFunction[])(uint32) = {
-	&fx_apfFunctionTable[0],
-#if 0
-	&fx_a_apfFunctionTable[0],
-	&fx_r_apfFunctionTable[0],
-	&fx_ar_apfFunctionTable[0],
-#endif	
-    };
-    static void (**appfPlot[])() = {
-	&fx_apfPlotTable[0],
-#if 0
-	&fx_a_apfPlotTable[0],
-	&fx_r_apfPlotTable[0],
-	&fx_ar_apfPlotTable[0],
-#endif	
-    };
-    static void (**appfOpcode[])() = {
-	&fx_apfOpcodeTable[0],
-#if 0	
-	&fx_a_apfOpcodeTable[0],
-	&fx_r_apfOpcodeTable[0],
-	&fx_ar_apfOpcodeTable[0],
-#endif	
-    };
-
-    /* Get function pointers for the current emulation mode */
-    fx_ppfFunctionTable = appfFunction[psFxInfo->vFlags & 0x3];
-    fx_ppfPlotTable = appfPlot[psFxInfo->vFlags & 0x3];
-    fx_ppfOpcodeTable = appfOpcode[psFxInfo->vFlags & 0x3];
     
     /* Clear all internal variables */
     memset((uint8*)&GSU,0,sizeof(struct FxRegs_s));
@@ -614,69 +581,18 @@ int FxEmulate(uint32 nInstructions)
     {
 	CF(G);
 	fx_writeRegisterSpace();
-#if 0
-	GSU.vIllegalAddress = (GSU.vPrgBankReg << 24) | R15;
-	return FX_ERROR_ILLEGAL_ADDRESS;
-#else
 	return 0;
-#endif
     }
 
     /* Execute GSU session */
     CF(IRQ);
 
-    if(GSU.bBreakPoint)
-	vCount = fx_ppfFunctionTable[FX_FUNCTION_RUN_TO_BREAKPOINT](nInstructions);
-    else
-	vCount = fx_ppfFunctionTable[FX_FUNCTION_RUN](nInstructions);
+    vCount = fx_run(nInstructions);
 
     /* Store GSU registers */
     fx_writeRegisterSpace();
 
     /* Check for error code */
-    if(GSU.vErrorCode)
-	return GSU.vErrorCode;
-    else
-	return vCount;
-}
-
-/* Breakpoints */
-void FxBreakPointSet(uint32 vAddress)
-{
-    GSU.bBreakPoint = TRUE;
-    GSU.vBreakPoint = USEX16(vAddress);
-}
-void FxBreakPointClear()
-{
-    GSU.bBreakPoint = FALSE;
-}
-
-/* Step by step execution */
-int FxStepOver(uint32 nInstructions)
-{
-    uint32 vCount;
-    fx_readRegisterSpace();
-
-    /* Check if the start address is valid */
-    if(!fx_checkStartAddress())
-    {
-	CF(G);
-#if 0
-	GSU.vIllegalAddress = (GSU.vPrgBankReg << 24) | R15;
-	return FX_ERROR_ILLEGAL_ADDRESS;
-#else
-	return 0;
-#endif
-    }
-    
-    if( PIPE >= 0xf0 )
-	GSU.vStepPoint = USEX16(R15+3);
-    else if( (PIPE >= 0x05 && PIPE <= 0x0f) || (PIPE >= 0xa0 && PIPE <= 0xaf) )
-	GSU.vStepPoint = USEX16(R15+2);
-    else
-	GSU.vStepPoint = USEX16(R15+1);
-    vCount = fx_ppfFunctionTable[FX_FUNCTION_STEP_OVER](nInstructions);
-    fx_writeRegisterSpace();
     if(GSU.vErrorCode)
 	return GSU.vErrorCode;
     else
@@ -693,30 +609,3 @@ int FxGetIllegalAddress()
 {
     return GSU.vIllegalAddress;
 }
-
-/* Access to internal registers */
-uint32 FxGetColorRegister()
-{
-    return GSU.vColorReg & 0xff;
-}
-
-uint32 FxGetPlotOptionRegister()
-{
-    return GSU.vPlotOptionReg & 0x1f;
-}
-
-uint32 FxGetSourceRegisterIndex()
-{
-    return GSU.pvSreg - GSU.avReg;
-}
-
-uint32 FxGetDestinationRegisterIndex()
-{
-    return GSU.pvDreg - GSU.avReg;
-}
-
-uint8 FxPipe()
-{
-    return GSU.vPipe;
-}
-
