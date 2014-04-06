@@ -246,10 +246,6 @@ struct FxRegs_s
     int32	vErrorCode;
     uint32	vIllegalAddress;
     
-    uint8	bBreakPoint;
-    uint32	vBreakPoint;
-    uint32	vStepPoint;
-    
     uint8 *	pvRegisters;	/* 768 bytes located in the memory at address 0x3000 */
     uint32	nRamBanks;	/* Number of 64kb-banks in FxRam (Don't confuse it with SNES-Ram!!!) */
     uint8 *	pvRam;		/* Pointer to FxRam */
@@ -276,17 +272,15 @@ struct FxRegs_s
     uint8	bCacheActive;
     uint8 *	pvCache;		/* Pointer to the GSU cache */
     uint8 	avCacheBackup[512];	/* Backup of ROM when the cache has replaced it */
-    uint32	vCounter;
-    uint32	vInstCount;
     uint32	vSCBRDirty;		/* if SCBR is written, our cached screen pointers need updating */
 };
 
 #define  FxRegs_s_null { \
-   {0},    0,        0,      0,      0,   0,    0,   0,    0,    0, \
-  NULL, NULL,        0,      0,      0,   0,    0,   0,    0,    0, \
-     0,    0,        0,      0,   NULL,   0, NULL,   0, NULL,    0, \
-     0, NULL,   {NULL},    {0},      0,   0,    0,   0, NULL, NULL, \
-  NULL, {NULL}, {NULL},      0,   NULL, {0},    0,   0, \
+   {0},    0,   0,    0, 0,    0,    0,    0,      0,      0, \
+  NULL, NULL,   0,    0, 0,    0,    0,    0,      0,      0, \
+     0, NULL,   0, NULL, 0, NULL,    0,    0,   NULL, {NULL}, \
+   {0},    0,   0,    0, 0, NULL, NULL, NULL, {NULL}, {NULL}, \
+     0, NULL, {0},    0, \
 }
 
 /* GSU registers */
