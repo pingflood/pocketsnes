@@ -115,8 +115,6 @@ int gsu_bank [512] = {0};
 static void fx_stop()
 {
     CF(G);
-    GSU.vCounter = 0;
-    GSU.vInstCount = GSU.vCounter;
 
     /* Check if we need to generate an IRQ */
     if(!(GSU.pvRegisters[GSU_CFGR] & 0x80))
@@ -1613,18 +1611,24 @@ static void fx_sm_r15() { FX_SM(15); }
 
 /*** GSU executions functions ***/
 
-uint32 fx_run(uint32 nInstructions)
+void fx_run(uint32 nInstructions)
 {
-    GSU.vCounter = nInstructions;
+    uint32 vCounter = nInstructions;
     READR14;
-    while( TF(G) && (GSU.vCounter-- > 0) )
-	FX_STEP;
+    while( TF(G) && (vCounter-- > 0) )
+    {
+	/* Execute instruction from the pipe, and fetch next byte to the pipe */
+	uint32 vOpcode = (uint32) PIPE;
+	FETCHPIPE;
+	(*fx_apfOpcodeTable[ (GSU.vStatusReg & 0x300) | vOpcode ])();
+	if (vOpcode == 0 /* fx_stop opcode, all alternatives */)
+		return;
+    }
  /*
 #ifndef FX_ADDRESS_CHECK
     GSU.vPipeAdr = USEX16(R15-1) | (USEX8(GSU.vPrgBankReg)<<16);
 #endif
 */
-    return (nInstructions - GSU.vInstCount);
 }
 
 /*** Special table for the different plot configurations ***/

@@ -569,10 +569,8 @@ static uint8 fx_checkStartAddress()
 }
 
 /* Execute until the next stop instruction */
-int FxEmulate(uint32 nInstructions)
+void FxEmulate(uint32 nInstructions)
 {
-    uint32 vCount;
-
     /* Read registers and initialize GSU session */
     fx_readRegisterSpace();
 
@@ -581,22 +579,16 @@ int FxEmulate(uint32 nInstructions)
     {
 	CF(G);
 	fx_writeRegisterSpace();
-	return 0;
+	return;
     }
 
     /* Execute GSU session */
     CF(IRQ);
 
-    vCount = fx_run(nInstructions);
+    fx_run(nInstructions);
 
     /* Store GSU registers */
     fx_writeRegisterSpace();
-
-    /* Check for error code */
-    if(GSU.vErrorCode)
-	return GSU.vErrorCode;
-    else
-	return vCount;
 }
 
 /* Errors */
