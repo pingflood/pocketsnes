@@ -39,7 +39,7 @@ The second option in the menu, "Select ROM", brings up a directory browser. This
 Pressing B exits the directory browser entirely. To return to the parent directory, use the <..> (two dots) entry near the top of the direcctory browser.
 
 - Setting the default ROM path -
-Once you're in the directory you wish to set as the default ROM path for future runs of PocketSNES, use the "Save default directory" option at the top of the directory browser. If this directory does not exist when you launch PocketSNES again, it may show you nothing, not even a way to return to your Linux home directory. In that case, you may need to delete the file containing the default ROM path. See 'Files' for more information. 
+Once you're in the directory you wish to set as the default ROM path for future runs of PocketSNES, use the "Save default directory" option at the top of the directory browser.
 
 == Playing a game ==
 While playing a game, the default button bindings allow the use of everything on your device that has the same position as on the Super Nintendo Entertainment System controller. Your device's D-pad controls the SNES's D-pad; its A, B, L, R, Start and Select buttons controls the SNES's A, B, L, R, Start and Select buttons.
