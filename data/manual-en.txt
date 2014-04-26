@@ -33,7 +33,7 @@ After activating the PocketSNES icon, the PocketSNES Main Menu will appear. From
 To re-enter the Main Menu during a game, flick the Power switch.
 
 == Selecting a ROM ==
-The second option in the menu, "Select ROM", brings up a directory browser. This is PocketSNES's own directory browser; it does not use gmenu2x's settings. You can set its default directory for use during future runs. You can use this directory browser to select a ROM to emulate. It accepts any valid SNES ROM file, headered or not, with copier interleaving or not (though un-interleaved dumps are preferred) and with the extension .sfc or .smc, or any ZIP archive containing a valid SNES ROM as its first file.
+The second option in the menu, "Select ROM", brings up a directory browser. This is PocketSNES's own directory browser; it does not use gmenu2x's settings. You can set its default directory for use during future runs. You can use this directory browser to select a ROM to emulate. It accepts any valid SNES ROM file, headered or not, with copier interleaving or not (though un-interleaved dumps are preferred) and with the extension .sfc, .smc or .fig, or any ZIP archive containing a valid SNES ROM as its first file.
 
 - Returning to the parent directory -
 Pressing B exits the directory browser entirely. To return to the parent directory, use the <..> (two dots) entry near the top of the direcctory browser.
@@ -65,7 +65,7 @@ The "Save SRAM" option allows you to request immediate saving of the SRAM to a f
 - Save SRAM when Changed -
 The "Save SRAM when changed" option allows you to request saving of the SRAM to a file 1 second after the current game writes to it. In some games which use SRAM to store their level state, such as Kirby Super Star, enabling this option may cause severe slowdowns. If you wish, make a per-game override of this option to disable it in that case.
 
-The default value of this option is OFF. Regardless of the value of this option, save RAM is written when properly exiting the emulator with the "Exit PocketSNES" option and when switching to a different ROM.
+The default value of this option is ON. Regardless of the value of this option, save RAM is written when properly exiting the emulator with the "Exit PocketSNES" option and when switching to a different ROM.
 
 - Sound -
 Produces or mutes sound. Does not affect the emulation of the SNES APU, but does speed up emulation as a whole if disabled because synthesising the sound can be CPU-expensive.
