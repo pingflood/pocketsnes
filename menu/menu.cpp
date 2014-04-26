@@ -1029,6 +1029,7 @@ void ShowCredits()
 	strcpy(mMenuText[3],"PocketSNES created by Scott Ramsby");
 	strcpy(mMenuText[4],"Initial port to the Dingoo by Reesy");
 	strcpy(mMenuText[5],"Ported to OpenDingux by pcercuei");
+	strcpy(mMenuText[5],"Optimisations and fixes by Nebuleon");
 
 	sal_InputIgnore();
 	while (!menuExit)
