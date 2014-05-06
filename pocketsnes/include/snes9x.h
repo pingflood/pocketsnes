@@ -394,7 +394,6 @@ struct SSettings{
 	uint16 DisplayColor;
     int    SoundDriver;
     int    AIDOShmId;
-    bool8  SDD1Pack;
 	bool8  NoPatch;
 	bool8  ForceInterleaveGD24;
 #ifdef DEBUG_MAXCOUNT

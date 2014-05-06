@@ -101,6 +101,7 @@ typedef short			int16_32;
 #define VAR_CYCLES
 #define SPC700_SHUTDOWN
 #define USE_SA1
+#define SDD1_DECOMP
 #define LSB_FIRST
 #define STATIC static
 #define FASTCALL

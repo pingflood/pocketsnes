@@ -1715,8 +1715,6 @@ bool8 CMemory::LoadSRAM (const char *filename)
 		S9xHardResetSRTC ();
 		return (FALSE);
     }
-    if (Settings.SDD1)
-		S9xSDD1LoadLoggedData ();
 	
     return (TRUE);
 }
@@ -1735,9 +1733,6 @@ bool8 CMemory::SaveSRAM (const char *filename)
 		size += SRTC_SRAM_PAD;
 		S9xSRTCPreSaveState ();
     }
-	
-    if (Settings.SDD1)
-		S9xSDD1SaveLoggedData ();
 	
     if (size > 0x20000)
 		size = 0x20000;
