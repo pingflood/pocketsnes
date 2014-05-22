@@ -1021,7 +1021,7 @@ s32 SaveStateMenu(void)
 
 void ShowCredits()
 {
-	s32 menuExit=0,menuCount=6,menufocus=0,menuSmooth=0;
+	s32 menuExit=0,menuCount=7,menufocus=0,menuSmooth=0;
 	u32 keys=0;
 
 	strcpy(mMenuText[0],"PocketSNES - built " __DATE__);
@@ -1030,7 +1030,7 @@ void ShowCredits()
 	strcpy(mMenuText[3],"PocketSNES created by Scott Ramsby");
 	strcpy(mMenuText[4],"Initial port to the Dingoo by Reesy");
 	strcpy(mMenuText[5],"Ported to OpenDingux by pcercuei");
-	strcpy(mMenuText[5],"Optimisations and fixes by Nebuleon");
+	strcpy(mMenuText[6],"Optimisations and fixes by Nebuleon");
 
 	sal_InputIgnore();
 	while (!menuExit)
