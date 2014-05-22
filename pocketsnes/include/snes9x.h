@@ -89,7 +89,7 @@
 #ifndef _SNES9X_H_
 #define _SNES9X_H_
 
-#define VERSION "1.43-dev"
+#define VERSION "1.43+SDD1"
 
 #include <stdio.h>
 #include <stdlib.h>
