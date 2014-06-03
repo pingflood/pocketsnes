@@ -717,9 +717,6 @@ int mainEntry(int argc, char* argv[])
 				sal_VideoSetScaling(SNES_WIDTH,SNES_HEIGHT);
 			}
 
-			if(mMenuOptions.transparency)	Settings.Transparency = TRUE;
-			else Settings.Transparency = FALSE;
-
 			sal_AudioSetVolume(mMenuOptions.volume,mMenuOptions.volume);
 			sal_CpuSpeedSet(mMenuOptions.cpuSpeed);	
 			mFramesCleared = 0;
