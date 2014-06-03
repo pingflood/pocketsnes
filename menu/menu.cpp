@@ -47,7 +47,6 @@ void DefaultMenuOptions(void)
 	mMenuOptions->soundRate=44100;
 	mMenuOptions->stereo=1;
 	mMenuOptions->fullScreen=0;
-	mMenuOptions->transparency=1;
 	mMenuOptions->autoSaveSram=1;
 	mMenuOptions->soundSync=1;
 }
@@ -1108,12 +1107,6 @@ void MainMenuUpdateText(s32 menu_index)
 					break;
 			}
 
-		case MENU_TRANSPARENCY:
-			sprintf(mMenuText[MENU_TRANSPARENCY],
-						"Transparency:              %s",
-						mMenuOptions->transparency ? " ON" : "OFF");
-			break;
-
 		case MENU_SOUND_ON:
 			sprintf(mMenuText[MENU_SOUND_ON],
 						"Sound:                     %s",
@@ -1218,7 +1211,6 @@ void MainMenuUpdateTextAll(void)
 	MainMenuUpdateText(MENU_RESET_GAME);
 	MainMenuUpdateText(MENU_EXIT_APP);
 	MainMenuUpdateText(MENU_RETURN);
-	MainMenuUpdateText(MENU_TRANSPARENCY);
 //	MainMenuUpdateText(MENU_CPU_SPEED);
 	MainMenuUpdateText(MENU_SOUND_ON);
 	MainMenuUpdateText(MENU_SOUND_STEREO);
@@ -1361,11 +1353,6 @@ s32 MenuRun(s8 *romName)
 				case MENU_SOUND_STEREO:
 					mMenuOptions->stereo^=1;
 					MainMenuUpdateText(MENU_SOUND_STEREO);
-					break;
-
-				case MENU_TRANSPARENCY:
-					mMenuOptions->transparency^=1;
-					MainMenuUpdateText(MENU_TRANSPARENCY);
 					break;
 
 				case MENU_AUTO_SAVE_SRAM:
