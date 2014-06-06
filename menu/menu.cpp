@@ -454,60 +454,9 @@ s32 FileSelect()
 	while (menuExit==0)
 	{
 		keys=sal_InputPollRepeat();
-
-		// Change which rom is focused on:
-		if (keys & SAL_INPUT_UP)
-		{
-			focus--; // Up
-		}
-		if (keys & SAL_INPUT_DOWN)
-		{
-			focus++; // Down
-		}
-
-		if (keys & INP_BUTTON_MENU_CANCEL) {
-			action=0;
-			menuExit=1;
-		}
-   
-		if (keys & SAL_INPUT_LEFT || keys & SAL_INPUT_RIGHT)
-		{
-			if (keys & SAL_INPUT_LEFT) 
-			{
-				focus-=12;
-				smooth=(focus<<8)-1;
-			}      
-			else if (keys & SAL_INPUT_RIGHT)
-			{
-				focus+=12;
-				smooth=(focus<<8)-1;
-			}
-			
-			if (focus>mRomCount-1) 
-			{
-				focus=mRomCount-1;
-				smooth=(focus<<8)-1;
-			}
-			else if (focus<0)
-			{
-				focus=0;
-				smooth=(focus<<8)-1;
-			}
-		}
-
-		if (focus>mRomCount-1) 
-		{
-			focus=0;
-			smooth=(focus<<8)-1;
-		}
-		else if (focus<0)
-		{
-			focus=mRomCount-1;
-			smooth=(focus<<8)-1;
-		}
 		
-		if (keys&INP_BUTTON_MENU_SELECT)
-	    	{
+		if (keys & INP_BUTTON_MENU_SELECT)
+		{
 			switch(focus)
 			{
 				case ROM_SELECTOR_SAVE_DEFAULT_DIR: //Save default directory
@@ -570,7 +519,47 @@ s32 FileSelect()
 					sal_InputIgnore();
 					break;
 			}
-	    	}
+		}
+		else if (keys & INP_BUTTON_MENU_CANCEL) {
+			sal_InputWaitForRelease();
+
+			action=0;
+			menuExit=1;
+		}
+		else if ((keys & (SAL_INPUT_UP | SAL_INPUT_DOWN))
+		      && (keys & (SAL_INPUT_UP | SAL_INPUT_DOWN)) != (SAL_INPUT_UP | SAL_INPUT_DOWN))
+		{
+			if (keys & SAL_INPUT_UP)
+				focus--; // Up
+			else if (keys & SAL_INPUT_DOWN)
+				focus++; // Down
+		}
+		else if ((keys & (SAL_INPUT_LEFT | SAL_INPUT_RIGHT))
+		      && (keys & (SAL_INPUT_LEFT | SAL_INPUT_RIGHT)) != (SAL_INPUT_LEFT | SAL_INPUT_RIGHT))
+		{
+			if (keys & SAL_INPUT_LEFT)
+				focus-=12;
+			else if (keys & SAL_INPUT_RIGHT)
+				focus+=12;
+			
+			if (focus>mRomCount-1)
+				focus=mRomCount-1;
+			else if (focus<0)
+				focus=0;
+
+			smooth=(focus<<8)-1;
+		}
+
+		if (focus>mRomCount-1)
+		{
+			focus=0;
+			smooth=(focus<<8)-1;
+		}
+		else if (focus<0)
+		{
+			focus=mRomCount-1;
+			smooth=(focus<<8)-1;
+		}
 
 		// Draw screen:
 		PrintTitle("ROM selection");
@@ -971,25 +960,32 @@ s32 SaveStateMenu(void)
 
 		keys=sal_InputPollRepeat();
 
-		// Change which rom is focused on:
-		if (keys & SAL_INPUT_UP) menufocus--; // Up
-		if (keys & SAL_INPUT_DOWN) menufocus++; // Down
-    
-		if (keys&INP_BUTTON_MENU_CANCEL) menuExit=1;
-    
-		if (menufocus>menuCount-1)
+		if (keys & INP_BUTTON_MENU_CANCEL)
 		{
-			menufocus=0;
-			menuSmooth=(menufocus<<8)-1;
-		}   
-		else if (menufocus<0) 
-		{
-			menufocus=menuCount-1;
-			menuSmooth=(menufocus<<8)-1;
-		}
+			while (keys)
+			{
+				// Draw screen:
+				menuSmooth=menuSmooth*7+(menufocus<<8); menuSmooth>>=3;
+				RenderMenu("Save States", menuCount,menuSmooth,menufocus);
+				sal_VideoFlip(1);
 
-		if (keys&INP_BUTTON_MENU_SELECT)
+				keys=sal_InputPoll();
+			}
+		
+			menuExit=1;
+		}
+		else if (keys & INP_BUTTON_MENU_SELECT)
 		{
+			while (keys)
+			{
+				// Draw screen:
+				menuSmooth=menuSmooth*7+(menufocus<<8); menuSmooth>>=3;
+				RenderMenu("Save States", menuCount,menuSmooth,menufocus);
+				sal_VideoFlip(1);
+
+				keys=sal_InputPoll();
+			}
+
 			switch(menufocus)
 			{
 				case SAVESTATE_MENU_LOAD:
@@ -1009,7 +1005,26 @@ s32 SaveStateMenu(void)
 				case SAVESTATE_MENU_RETURN:
 					menuExit=1;
 					break;
-			}	
+			}
+		}
+		else if ((keys & (SAL_INPUT_UP | SAL_INPUT_DOWN))
+		      && (keys & (SAL_INPUT_UP | SAL_INPUT_DOWN)) != (SAL_INPUT_UP | SAL_INPUT_DOWN))
+		{
+			if (keys & SAL_INPUT_UP)
+				menufocus--; // Up
+			else if (keys & SAL_INPUT_DOWN)
+				menufocus++; // Down
+
+			if (menufocus>menuCount-1)
+			{
+				menufocus=0;
+				menuSmooth=(menufocus<<8)-1;
+			}
+			else if (menufocus<0)
+			{
+				menufocus=menuCount-1;
+				menuSmooth=(menufocus<<8)-1;
+			}
 		}
 
 		usleep(10000);
@@ -1317,10 +1332,110 @@ s32 MenuRun(s8 *romName)
 
 		keys=sal_InputPollRepeat();
 
-		if (keys & SAL_INPUT_UP) menufocus--; // Up
-		if (keys & SAL_INPUT_DOWN) menufocus++; // Down
-    
-		if (keys&INP_BUTTON_MENU_CANCEL) 
+		if (keys & INP_BUTTON_MENU_SELECT)
+		{
+			while (keys)
+			{
+				// Draw screen:
+				menuSmooth=menuSmooth*7+(menufocus<<8); menuSmooth>>=3;
+				RenderMenu("Main Menu", menuCount,menuSmooth,menufocus);
+				sal_VideoFlip(1);
+
+				keys=sal_InputPoll();
+
+				usleep(10000);
+			}
+
+			switch(menufocus)
+			{
+				case MENU_ROM_SELECT:
+					subaction=FileSelect();
+					if (subaction==1)
+					{
+						action=EVENT_LOAD_ROM;
+						strcpy(romName,mRomName);
+						MenuReloadOptions();
+						menuExit=1;
+					}
+					break;
+				case MENU_LOAD_GLOBAL_SETTINGS:
+					LoadMenuOptions(mSystemDir, MENU_OPTIONS_FILENAME, MENU_OPTIONS_EXT, (char*)mMenuOptions, sizeof(struct MENU_OPTIONS), 1);
+					MainMenuUpdateTextAll();
+					break;
+				case MENU_SAVE_GLOBAL_SETTINGS:
+					SaveMenuOptions(mSystemDir, MENU_OPTIONS_FILENAME, MENU_OPTIONS_EXT, (char*)mMenuOptions, sizeof(struct MENU_OPTIONS), 1);
+					break;
+
+				case MENU_LOAD_CURRENT_SETTINGS:
+					if(mRomName[0]!=0)
+					{
+						LoadMenuOptions(mSystemDir, mRomName, MENU_OPTIONS_EXT, (char*)mMenuOptions, sizeof(struct MENU_OPTIONS), 1);
+
+						MainMenuUpdateTextAll();
+					}
+					break;
+				case MENU_SAVE_CURRENT_SETTINGS:
+					if(mRomName[0]!=0)
+					{
+						SaveMenuOptions(mSystemDir, mRomName, MENU_OPTIONS_EXT, (char*)mMenuOptions, sizeof(struct MENU_OPTIONS), 1);
+					}
+					break;
+
+				case MENU_DELETE_CURRENT_SETTINGS:
+					if(mRomName[0]!=0)
+					{
+						DeleteMenuOptions(mSystemDir, mRomName, MENU_OPTIONS_EXT, 1);
+					}
+					break;
+
+				case MENU_STATE:
+					if(mRomName[0]!=0)
+					{
+						subaction=SaveStateMenu();
+						if (subaction==100)
+						{
+							action=EVENT_RUN_ROM;
+							menuExit=1;
+						}
+					}
+					MainMenuUpdateTextAll();
+					break;
+
+				case MENU_SAVE_SRAM:
+					if(mRomName[0]!=0)
+					{
+						MenuMessageBox("","","Saving SRAM...",MENU_MESSAGE_BOX_MODE_MSG);
+						S9xSaveSRAM(1);
+					}
+					break;
+
+				case MENU_CREDITS:
+					ShowCredits();
+					MainMenuUpdateTextAll();
+					break;
+
+				case MENU_RESET_GAME:
+					if(mRomName[0]!=0)
+					{
+						action=EVENT_RESET_ROM;
+						menuExit=1;
+					}
+					break;
+				case MENU_RETURN:
+					if(mRomName[0]!=0)
+					{
+						action=EVENT_RUN_ROM;
+						menuExit=1;
+					}
+					break;
+				case MENU_EXIT_APP:
+					action=EVENT_EXIT_APP;
+					menuExit=1;
+					break;
+				
+			}
+		}
+		else if (keys & INP_BUTTON_MENU_CANCEL)
 		{
 			if(mRomName[0]!=0)
 			{
@@ -1328,20 +1443,27 @@ s32 MenuRun(s8 *romName)
 				menuExit=1;
 			}
 		}
-    
-		if (menufocus>menuCount-1)
+		else if ((keys & (SAL_INPUT_UP | SAL_INPUT_DOWN))
+		      && (keys & (SAL_INPUT_UP | SAL_INPUT_DOWN)) != (SAL_INPUT_UP | SAL_INPUT_DOWN))
 		{
-			menufocus=0;
-			menuSmooth=(menufocus<<8)-1;
-		}   
-		else if (menufocus<0) 
-		{
-			menufocus=menuCount-1;
-			menuSmooth=(menufocus<<8)-1;
-		}
+			if (keys & SAL_INPUT_UP)
+				menufocus--; // Up
+			else if (keys & SAL_INPUT_DOWN)
+				menufocus++; // Down
 
-		if (keys & SAL_INPUT_LEFT||
-			keys & SAL_INPUT_RIGHT)
+			if (menufocus>menuCount-1)
+			{
+				menufocus=0;
+				menuSmooth=(menufocus<<8)-1;
+			}
+			else if (menufocus<0)
+			{
+				menufocus=menuCount-1;
+				menuSmooth=(menufocus<<8)-1;
+			}
+		}
+		else if ((keys & (SAL_INPUT_LEFT | SAL_INPUT_RIGHT))
+		      && (keys & (SAL_INPUT_LEFT | SAL_INPUT_RIGHT)) != (SAL_INPUT_LEFT | SAL_INPUT_RIGHT))
 		{
 			switch(menufocus)
 			{
@@ -1467,98 +1589,6 @@ s32 MenuRun(s8 *romName)
 					MainMenuUpdateText(MENU_FULLSCREEN);
 					break;
 			}
-		}
-
-		if (keys&INP_BUTTON_MENU_SELECT)
-		{
-			switch(menufocus)
-			{
-				case MENU_ROM_SELECT:
-					subaction=FileSelect();
-					if (subaction==1)
-					{
-						action=EVENT_LOAD_ROM;
-						strcpy(romName,mRomName);
-						MenuReloadOptions();
-						menuExit=1;
-					}
-					break;
-				case MENU_LOAD_GLOBAL_SETTINGS:
-					LoadMenuOptions(mSystemDir, MENU_OPTIONS_FILENAME, MENU_OPTIONS_EXT, (char*)mMenuOptions, sizeof(struct MENU_OPTIONS), 1);
-					MainMenuUpdateTextAll();
-					break;
-				case MENU_SAVE_GLOBAL_SETTINGS:
-					SaveMenuOptions(mSystemDir, MENU_OPTIONS_FILENAME, MENU_OPTIONS_EXT, (char*)mMenuOptions, sizeof(struct MENU_OPTIONS), 1);
-					break;
-
-				case MENU_LOAD_CURRENT_SETTINGS:
-					if(mRomName[0]!=0)
-					{
-						LoadMenuOptions(mSystemDir, mRomName, MENU_OPTIONS_EXT, (char*)mMenuOptions, sizeof(struct MENU_OPTIONS), 1);
-
-						MainMenuUpdateTextAll();
-					}
-					break;
-				case MENU_SAVE_CURRENT_SETTINGS:
-					if(mRomName[0]!=0)
-					{
-						SaveMenuOptions(mSystemDir, mRomName, MENU_OPTIONS_EXT, (char*)mMenuOptions, sizeof(struct MENU_OPTIONS), 1);
-					}
-					break;
-
-				case MENU_DELETE_CURRENT_SETTINGS:
-					if(mRomName[0]!=0)
-					{
-						DeleteMenuOptions(mSystemDir, mRomName, MENU_OPTIONS_EXT, 1);
-					}
-					break;
-
-				case MENU_STATE:
-					if(mRomName[0]!=0)
-					{
-						subaction=SaveStateMenu();
-						if (subaction==100)
-						{
-							action=EVENT_RUN_ROM;
-							menuExit=1;
-						}
-					}
-					MainMenuUpdateTextAll();
-					break;
-
-				case MENU_SAVE_SRAM:
-					if(mRomName[0]!=0)
-					{
-						MenuMessageBox("","","Saving SRAM...",MENU_MESSAGE_BOX_MODE_MSG);
-						S9xSaveSRAM(1);
-					}
-					break;
-
-				case MENU_CREDITS:
-					ShowCredits();
-					MainMenuUpdateTextAll();
-					break;
-
-				case MENU_RESET_GAME:
-					if(mRomName[0]!=0)
-					{
-						action=EVENT_RESET_ROM;
-						menuExit=1;
-					}
-					break;
-				case MENU_RETURN:
-					if(mRomName[0]!=0)
-					{
-						action=EVENT_RUN_ROM;
-						menuExit=1;
-					}
-					break;
-				case MENU_EXIT_APP:
-					action=EVENT_EXIT_APP;
-					menuExit=1;
-					break;
-				
-			}	
 		}
 
 		usleep(10000);
