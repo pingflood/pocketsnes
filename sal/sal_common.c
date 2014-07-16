@@ -231,29 +231,40 @@ void sal_VideoPrint(s32 x, s32 y, const char *buffer, u32 color)
 static 
 void sal_VideoClear16(u16 color)
 {
-	s32 x,y;
+	s32 x,y,w,h,pitch;
 	u16 *pix=(u16*)sal_VideoGetBuffer();
-	for (y=0;y<SAL_SCREEN_HEIGHT;y++)
+
+	w = sal_VideoGetWidth();
+	h = sal_VideoGetHeight();
+	pitch = sal_VideoGetPitch();
+
+	for (y=0;y<h;y++)
 	{
-		for (x=0;x<SAL_SCREEN_WIDTH;x++)
+		for (x=0;x<w;x++)
 		{
 			*pix++ = color;
 		}
+		pix = (u16*) ((u8*) pix + pitch - w * sizeof(u16));
 	}
 }
 
 static 
 void sal_VideoClear8(u8 color)
 {
-	s32 x,y;
+	s32 x,y,w,h,pitch;
 	u8 *pix=(u8*)sal_VideoGetBuffer();
 
-	for (y=0;y<SAL_SCREEN_HEIGHT;y++)
+	w = sal_VideoGetWidth();
+	h = sal_VideoGetHeight();
+	pitch = sal_VideoGetPitch();
+
+	for (y=0;y<h;y++)
 	{
-		for (x=0;x<SAL_SCREEN_WIDTH;x++)
+		for (x=0;x<w;x++)
 		{
 			*pix++ = color;
 		}
+		pix += pitch - w;
 	}
 }
 

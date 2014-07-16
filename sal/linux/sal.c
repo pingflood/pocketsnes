@@ -209,22 +209,11 @@ s32 sal_Init(void)
 	return SAL_OK;
 }
 
-u32 sal_VideoInit(u32 bpp, u32 color, u32 refreshRate)
+u32 sal_VideoInit(u32 bpp)
 {
 	SDL_ShowCursor(0);
-
-	if (mScreen)
-	{
-		if (mBpp == bpp)
-		{
-			return SAL_OK;
-		}
-		SDL_VideoQuit();
-		mScreen=NULL;
-	}
 	
 	mBpp=bpp;
-	mRefreshRate=refreshRate;
 
 	//Set up the screen
 	mScreen = SDL_SetVideoMode( SAL_SCREEN_WIDTH, SAL_SCREEN_HEIGHT, bpp, SDL_HWSURFACE |
@@ -251,17 +240,60 @@ u32 sal_VideoInit(u32 bpp, u32 color, u32 refreshRate)
 			return SAL_ERROR;
 		} 
 	}
-
-	sal_VideoClear(color);
-   
-	sal_VideoFlip(1);
    
 	return SAL_OK;
+}
+
+u32 sal_VideoGetWidth()
+{
+	return mScreen->w;
+}
+
+u32 sal_VideoGetHeight()
+{
+	return mScreen->h;
 }
 
 u32 sal_VideoGetPitch()
 {
 	return mScreen->pitch;
+}
+
+void sal_VideoEnterGame(u32 fullscreenOption, u32 pal, u32 refreshRate)
+{
+#ifdef GCW_ZERO
+	/* Copied from C++ headers which we can't include in C */
+	unsigned int Width = 256 /* SNES_WIDTH */, Height = 224 /* SNES_HEIGHT */;
+	if (pal) Height = 239 /* SNES_HEIGHT_EXTENDED */;
+	if (fullscreenOption != 3)
+	{
+		Width = SAL_SCREEN_WIDTH;
+		Height = SAL_SCREEN_HEIGHT;
+	}
+	if (SDL_MUSTLOCK(mScreen))
+		SDL_UnlockSurface(mScreen);
+	mScreen = SDL_SetVideoMode(Width, Height, mBpp, SDL_HWSURFACE |
+#ifdef SDL_TRIPLEBUF
+		SDL_TRIPLEBUF
+#else
+		SDL_DOUBLEBUF
+#endif
+		);
+	mRefreshRate = refreshRate;
+	if (SDL_MUSTLOCK(mScreen))
+		SDL_LockSurface(mScreen);
+#endif
+}
+
+void sal_VideoExitGame()
+{
+#ifdef GCW_ZERO
+	if (SDL_MUSTLOCK(mScreen))
+		SDL_UnlockSurface(mScreen);
+	mScreen = SDL_SetVideoMode(SAL_SCREEN_WIDTH, SAL_SCREEN_HEIGHT, mBpp, SDL_HWSURFACE | SDL_DOUBLEBUF);
+	if (SDL_MUSTLOCK(mScreen))
+		SDL_LockSurface(mScreen);
+#endif
 }
 
 void sal_VideoBitmapDim(u16* img, u32 pixelCount)
@@ -288,11 +320,6 @@ void *sal_VideoGetBuffer()
 	return (void*)mScreen->pixels;
 }
 
-u32 sal_VideoSetScaling(s32 width, s32 height)
-{
-	return SAL_ERROR;
-}
-
 void sal_VideoPaletteSync() 
 { 	
 	
@@ -304,7 +331,6 @@ void sal_VideoPaletteSet(u32 index, u32 color)
 	*mPaletteCurr++=color;
 	if(mPaletteCurr>mPaletteEnd) mPaletteCurr=&mPaletteBuffer[0];
 }
-
 
 void sal_Reset(void)
 {
