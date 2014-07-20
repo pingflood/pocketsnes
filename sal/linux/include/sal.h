@@ -61,11 +61,6 @@ extern "C" {
 
 #define SAL_SCREEN_WIDTH			320
 #define SAL_SCREEN_HEIGHT			240
-#define SAL_SCREEN_X_STRIDE_LEFT		(0-1)
-#define SAL_SCREEN_X_STRIDE_RIGHT		(1)
-#define SAL_SCREEN_Y_STRIDE_UP			(0-SAL_SCREEN_WIDTH)
-#define SAL_SCREEN_Y_STRIDE_DOWN		(SAL_SCREEN_WIDTH)
-#define SAL_SCREEN_ROTATED			0
 #define SAL_MAX_PATH				256
 #define SAL_DIR_SEP				"/"
 #define SAL_DIR_SEP_BAD				"\\"
