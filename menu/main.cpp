@@ -329,9 +329,41 @@ const char *S9xGetFilenameInc (const char *e)
      return e;
 }
 
+#define MAX_AUDIO_FRAMESKIP 5
+
 void S9xSyncSpeed(void)
 {
-      //S9xMessage (0,0,"sync speed");
+	if (IsPreviewingState())
+		return;
+
+	if (Settings.SkipFrames == AUTO_FRAMERATE)
+	{
+		if (sal_AudioGetFramesBuffered() < sal_AudioGetMinFrames()
+		 && ++IPPU.SkippedFrames < MAX_AUDIO_FRAMESKIP)
+		{
+			IPPU.RenderThisFrame = FALSE;
+		}
+		else
+		{
+			IPPU.RenderThisFrame = TRUE;
+			IPPU.SkippedFrames = 0;
+		}
+	}
+	else
+	{
+		if (++IPPU.SkippedFrames >= Settings.SkipFrames + 1)
+		{
+			IPPU.RenderThisFrame = TRUE;
+			IPPU.SkippedFrames = 0;
+		}
+		else
+		{
+			IPPU.RenderThisFrame = FALSE;
+		}
+	}
+
+	while (sal_AudioGetFramesBuffered() >= sal_AudioGetMaxFrames())
+		usleep(1000);
 }
 
 const char *S9xBasename (const char *f)
@@ -394,15 +426,15 @@ void S9xLoadSRAM (void)
 
 static u32 LastAudioRate = 0;
 static u32 LastStereo = 0;
+static u32 LastHz = 0;
 
 static
 int Run(int sound)
 {
-  	int skip=0, done=0, doneLast=0,aim=0,i;
-	Settings.NextAPUEnabled = Settings.APUEnabled = sound;
+  	int i;
 	Settings.SoundSync = mMenuOptions.soundSync;
+	Settings.SkipFrames = mMenuOptions.frameSkip == 0 ? AUTO_FRAMERATE : mMenuOptions.frameSkip - 1;
 	sal_TimerInit(Settings.FrameTime);
-	done=sal_TimerRead()-1;
 
 	if (sound) {
 		/*
@@ -413,7 +445,7 @@ int Run(int sound)
 		Settings.SixteenBitSound=true;
 #endif
 
-		if (LastAudioRate != mMenuOptions.soundRate || LastStereo != mMenuOptions.stereo)
+		if (LastAudioRate != mMenuOptions.soundRate || LastStereo != mMenuOptions.stereo || LastHz != Memory.ROMFramesPerSecond)
 		{
 			if (LastAudioRate != 0)
 			{
@@ -427,40 +459,27 @@ int Run(int sound)
 			S9xSetPlaybackRate(mMenuOptions.soundRate);
 			LastAudioRate = mMenuOptions.soundRate;
 			LastStereo = mMenuOptions.stereo;
+			LastHz = Memory.ROMFramesPerSecond;
 		}
-		S9xSetSoundMute (FALSE);
-		sal_AudioResume();
+		sal_AudioSetMuted(0);
 
 	} else {
-		S9xSetSoundMute (TRUE);
+		sal_AudioSetMuted(1);
 	}
+	sal_AudioResume();
 
   	while(!mEnterMenu) 
   	{
-		for (i=0;i<10;i++)
-		{
-			aim=sal_TimerRead();
-			if (done < aim)
-			{
-				done++;
-				if (mMenuOptions.frameSkip == 0) //Auto
-					IPPU.RenderThisFrame = (done >= aim);
-				else if ((IPPU.RenderThisFrame = (--skip <= 0)))
-					skip = mMenuOptions.frameSkip;
+		//Run SNES for one glorious frame
+		S9xMainLoop ();
 
-				//Run SNES for one glorious frame
-				S9xMainLoop ();
-
-				sal_AudioGenerate(sal_AudioGetSamplesPerFrame() - SamplesDoneThisFrame);
-			}
-			if (done>=aim) break; // Up to date now
-			if (mEnterMenu) break;
-		}
-		done=aim; // Make sure up to date
+		if (SamplesDoneThisFrame < sal_AudioGetSamplesPerFrame())
+			sal_AudioGenerate(sal_AudioGetSamplesPerFrame() - SamplesDoneThisFrame);
+		SamplesDoneThisFrame = 0;
+		so.err_counter = 0;
   	}
 
-	if (sound)
-		sal_AudioPause();
+	sal_AudioPause();
 
 	mEnterMenu=0;
 	return mEnterMenu;

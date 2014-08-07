@@ -21,6 +21,7 @@ static s32 mMenutileXscroll=0;
 static s32 mMenutileYscroll=0;
 static s32 mTileCounter=0;
 static s32 mQuickSavePresent=0;
+static u32 mPreviewingState=0;
 
 static s8 mMenuText[30][MAX_DISPLAY_CHARS];
 
@@ -714,6 +715,11 @@ void SaveStateFile(s8 *filename)
 		fprintf(stderr, "Failed to write saved state at %s: %s\n", filename, strerror(errno));
 }
 
+u32 IsPreviewingState()
+{
+	return mPreviewingState;
+}
+
 static s32 SaveStateSelect(s32 mode)
 {
 	s8 text[128];
@@ -848,15 +854,16 @@ static s32 SaveStateSelect(s32 mode)
 				if (LoadStateFile(mSaveState[saveno].fullFilename))
 				{
 					// Loaded OK. Preview it by running the state for one frame.
-					Settings.APUEnabled = 0;
-					Settings.NextAPUEnabled = Settings.APUEnabled;					
-					S9xSetSoundMute (TRUE);
+					mPreviewingState = 1;
+					sal_AudioSetMuted(1);
 					GFX.Screen = (uint8 *) &mTempFb[0];
 					IPPU.RenderThisFrame=TRUE;
 					unsigned int fullScreenSave = mMenuOptions->fullScreen;
 					mMenuOptions->fullScreen = 0;
 					S9xMainLoop ();
 					mMenuOptions->fullScreen = fullScreenSave;
+					sal_AudioSetMuted(0);
+					mPreviewingState = 0;
 					action=5;
 				}
 				else

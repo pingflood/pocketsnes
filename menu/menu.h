@@ -162,6 +162,7 @@ void PrintTile();
 void PrintBar(u32 givenY);
 s32 MenuMessageBox(const char *message1, const char *message2,
 			const char *message3, enum MENU_MESSAGE_BOX_MODE mode);
+u32 IsPreviewingState();
 
 
 #endif /* _MENU_H_ */
