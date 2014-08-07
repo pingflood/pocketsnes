@@ -68,9 +68,15 @@ void sal_AudioResume(void);
 void sal_AudioClose(void);
 void sal_AudioGenerate(u32 samples);
 u32 sal_AudioGetFramesBuffered();
+/* Suggested minimal number of frames of audio to be buffered.
+ * Below this, the automatic frameskipper may skip frames. */
+u32 sal_AudioGetMinFrames();
+/* Maximal number of frames of audio to be buffered, beyond which the
+ * emulation should be slowed down. */
 u32 sal_AudioGetMaxFrames();
 u32 sal_AudioGetSamplesPerFrame();
 u32 sal_AudioGetBytesPerSample();
+void sal_AudioSetMuted(u32 muted);
 
 void sal_AudioSetVolume(s32 l, s32 r);
 u32 sal_AudioRatePrevious(u32 currRate);

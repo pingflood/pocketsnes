@@ -3,7 +3,7 @@
 
 #include <sal.h>
 
-#define BUFFER_FRAMES 2
+#define BUFFER_FRAMES 3
 // 48000 Hz maximum; 1/50 of a second; 3 frames to hold (2 plus a bit extra)
 #define BUFFER_SAMPLES (48000 / 50 * (BUFFER_FRAMES + 1))
 
@@ -14,28 +14,37 @@ volatile static unsigned int ReadPos, WritePos;
 // 2 channels per sample (stereo); 2 bytes per sample-channel (16-bit)
 static uint8_t Buffer[BUFFER_SAMPLES * 2 * 2];
 static u32 SamplesPerFrame, BytesPerSample;
+static u32 Muted; // S9xSetAudioMute(TRUE) gets undone after SNES Global Mute ends
 
 static void sdl_audio_callback (void *userdata, Uint8 *stream, int len)
 {
-	u32 SamplesRequested = len / BytesPerSample, SamplesBuffered, LocalWritePos = WritePos /* isolate a bit against races */;
-	if (ReadPos <= LocalWritePos)
-		SamplesBuffered = LocalWritePos - ReadPos;
+	u32 SamplesRequested = len / BytesPerSample, SamplesBuffered,
+	    LocalWritePos = WritePos /* isolate a bit against races with the main thread */,
+	    LocalReadPos = ReadPos /* keep a non-volatile copy at hand */;
+	if (LocalReadPos <= LocalWritePos)
+		SamplesBuffered = LocalWritePos - LocalReadPos;
 	else
-		SamplesBuffered = BUFFER_SAMPLES - (ReadPos - LocalWritePos);
+		SamplesBuffered = BUFFER_SAMPLES - (LocalReadPos - LocalWritePos);
 
 	if (SamplesRequested > SamplesBuffered)
-		return;
-
-	if (ReadPos + SamplesRequested > BUFFER_SAMPLES)
 	{
-		memcpy(stream, &Buffer[ReadPos * BytesPerSample], (BUFFER_SAMPLES - ReadPos) * BytesPerSample);
-		memcpy(&stream[(BUFFER_SAMPLES - ReadPos) * BytesPerSample], &Buffer[0], (SamplesRequested - (BUFFER_SAMPLES - ReadPos)) * BytesPerSample);
+		return;
+	}
+
+	if (Muted)
+	{
+		memset(stream, 0, len);
+	}
+	else if (LocalReadPos + SamplesRequested > BUFFER_SAMPLES)
+	{
+		memcpy(stream, &Buffer[LocalReadPos * BytesPerSample], (BUFFER_SAMPLES - LocalReadPos) * BytesPerSample);
+		memcpy(&stream[(BUFFER_SAMPLES - LocalReadPos) * BytesPerSample], &Buffer[0], (SamplesRequested - (BUFFER_SAMPLES - LocalReadPos)) * BytesPerSample);
 	}
 	else
 	{
-		memcpy(stream, &Buffer[ReadPos * BytesPerSample], len);
+		memcpy(stream, &Buffer[LocalReadPos * BytesPerSample], len);
 	}
-	ReadPos = (ReadPos + SamplesRequested) % BUFFER_SAMPLES;
+	ReadPos = (LocalReadPos + SamplesRequested) % BUFFER_SAMPLES;
 }
 
 s32 sal_AudioInit(s32 rate, s32 bits, s32 stereo, s32 Hz)
@@ -82,35 +91,44 @@ void sal_AudioClose(void)
 
 void sal_AudioGenerate(u32 samples)
 {
-	u32 SamplesAvailable, LocalReadPos = ReadPos /* isolate a bit against races */;
-	if (LocalReadPos <= WritePos)
-		SamplesAvailable = BUFFER_SAMPLES - (WritePos - LocalReadPos);
+	u32 SamplesAvailable,
+	    LocalReadPos = ReadPos /* isolate a bit against races with the audio thread */,
+	    LocalWritePos = WritePos /* keep a non-volatile copy at hand */;
+	if (LocalReadPos <= LocalWritePos)
+		SamplesAvailable = BUFFER_SAMPLES - (LocalWritePos - LocalReadPos);
 	else
-		SamplesAvailable = LocalReadPos - WritePos;
+		SamplesAvailable = LocalReadPos - LocalWritePos;
 	if (samples >= SamplesAvailable)
 	{
 		samples = SamplesAvailable - 1;
 	}
-	if (samples > BUFFER_SAMPLES - WritePos)
+	if (samples > BUFFER_SAMPLES - LocalWritePos)
 	{
-		sal_AudioGenerate(BUFFER_SAMPLES - WritePos);
-		sal_AudioGenerate(samples - (BUFFER_SAMPLES - WritePos));
+		sal_AudioGenerate(BUFFER_SAMPLES - LocalWritePos);
+		sal_AudioGenerate(samples - (BUFFER_SAMPLES - LocalWritePos));
 	}
 	else
 	{
-		S9xMixSamples(&Buffer[WritePos * BytesPerSample], samples * audiospec.channels);
-		WritePos = (WritePos + samples) % BUFFER_SAMPLES;
+		S9xMixSamples(&Buffer[LocalWritePos * BytesPerSample], samples * audiospec.channels);
+		WritePos = (LocalWritePos + samples) % BUFFER_SAMPLES;
 	}
 }
 
 u32 sal_AudioGetFramesBuffered()
 {
-	u32 SamplesBuffered, LocalReadPos = ReadPos /* isolate a bit against races */;
-	if (LocalReadPos <= WritePos)
-		SamplesBuffered = WritePos - LocalReadPos;
+	u32 SamplesBuffered,
+	    LocalReadPos = ReadPos /* isolate a bit against races with the audio thread */,
+	    LocalWritePos = WritePos /* keep a non-volatile copy at hand */;
+	if (LocalReadPos <= LocalWritePos)
+		SamplesBuffered = LocalWritePos - LocalReadPos;
 	else
-		SamplesBuffered = BUFFER_SAMPLES - (LocalReadPos - WritePos);
+		SamplesBuffered = BUFFER_SAMPLES - (LocalReadPos - LocalWritePos);
 	return SamplesBuffered / SamplesPerFrame;
+}
+
+u32 sal_AudioGetMinFrames()
+{
+	return BUFFER_FRAMES - 1;
 }
 
 u32 sal_AudioGetMaxFrames()
@@ -130,4 +148,9 @@ u32 sal_AudioGetBytesPerSample()
 
 void sal_AudioSetVolume(s32 l, s32 r)
 {
+}
+
+void sal_AudioSetMuted(u32 muted)
+{
+	Muted = muted;
 }
