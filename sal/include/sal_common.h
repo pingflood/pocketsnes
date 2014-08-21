@@ -57,6 +57,9 @@ void sal_VideoPrint(s32 x, s32 y, const char *buffer, u32 color);
 u32 sal_VideoGetWidth();
 u32 sal_VideoGetHeight();
 void sal_VideoEnterGame(u32 fullscreenOption, u32 pal, u32 fps);
+/* Called by the main code when the height changes from 239 to 224, or from
+ * 224 to 239. */
+void sal_VideoSetPAL(u32 fullscreenOption, u32 pal);
 void sal_VideoExitGame();
 u32 sal_VideoGetPitch();
 void sal_VideoFlip(s32 vsync);
