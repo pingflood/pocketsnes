@@ -1220,9 +1220,11 @@ void MainMenuUpdateText(s32 menu_index)
 			strcpy(mMenuText[MENU_SAVE_SRAM],"Save SRAM");
 			break;
 
+#ifndef NO_ROM_BROWSER
 		case MENU_ROM_SELECT:
 			strcpy(mMenuText[MENU_ROM_SELECT],"Select ROM");
 			break;
+#endif
 	}
 }
 
@@ -1251,7 +1253,9 @@ void MainMenuUpdateTextAll(void)
 	MainMenuUpdateText(MENU_CREDITS);
 	MainMenuUpdateText(MENU_AUTO_SAVE_SRAM);
 	MainMenuUpdateText(MENU_SAVE_SRAM);
+#ifndef NO_ROM_BROWSER
 	MainMenuUpdateText(MENU_ROM_SELECT);
+#endif
 }
 
 void MenuReloadOptions()
@@ -1355,6 +1359,7 @@ s32 MenuRun(s8 *romName)
 
 			switch(menufocus)
 			{
+#ifndef NO_ROM_BROWSER
 				case MENU_ROM_SELECT:
 					subaction=FileSelect();
 					if (subaction==1)
@@ -1365,6 +1370,7 @@ s32 MenuRun(s8 *romName)
 						menuExit=1;
 					}
 					break;
+#endif
 				case MENU_LOAD_GLOBAL_SETTINGS:
 					LoadMenuOptions(mSystemDir, MENU_OPTIONS_FILENAME, MENU_OPTIONS_EXT, (char*)mMenuOptions, sizeof(struct MENU_OPTIONS), 1);
 					MainMenuUpdateTextAll();
