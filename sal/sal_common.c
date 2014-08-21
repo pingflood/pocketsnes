@@ -77,19 +77,15 @@ static void sal_VideoDrawRect8(s32 x, s32 y, s32 width, s32 height, u8 color)
 	u8 *pixy = (u8*)sal_VideoGetBuffer();
 	u8 *pixx;
 	s32 h,w;
-#if SAL_SCREEN_ROTATED == 1
-	pixy+=((SAL_SCREEN_HEIGHT-1)*SAL_SCREEN_Y_STRIDE_UP);
-#endif
-	pixy+=(y*SAL_SCREEN_Y_STRIDE_DOWN)+(x*SAL_SCREEN_X_STRIDE_RIGHT);	//get start pixel
+	pixy = pixy + y * sal_VideoGetPitch() + x;
 	for(h=0;h<height;h++)
 	{
 		pixx=pixy;		
 		for(w=0; w<width; w++)
 		{
-			*pixx = color;
-			pixx+=SAL_SCREEN_X_STRIDE_RIGHT;
+			*pixx++ = color;
 		}
-		pixy+=SAL_SCREEN_Y_STRIDE_DOWN;
+		pixy+=sal_VideoGetPitch();
 	}
 }
 
@@ -98,19 +94,15 @@ static void sal_VideoDrawRect16(s32 x, s32 y, s32 width, s32 height, u16 color)
 	u16 *pixy = (u16*)sal_VideoGetBuffer();
 	u16 *pixx;
 	s32 h,w;
-#if SAL_SCREEN_ROTATED == 1
-	pixy+=((SAL_SCREEN_HEIGHT-1)*SAL_SCREEN_Y_STRIDE_UP);
-#endif
-	pixy+=(y*SAL_SCREEN_Y_STRIDE_DOWN)+(x*SAL_SCREEN_X_STRIDE_RIGHT);	//get start pixel
+	pixy = ((u16*) ((u8*) pixy + y * sal_VideoGetPitch())) + x;
 	for(h=0;h<height;h++)
 	{
 		pixx=pixy;		
 		for(w=0; w<width; w++)
 		{
-			*pixx = color;
-			pixx+=SAL_SCREEN_X_STRIDE_RIGHT;
+			*pixx++ = color;
 		}
-		pixy+=SAL_SCREEN_Y_STRIDE_DOWN;
+		pixy = (u16*) ((u8*) pixy + sal_VideoGetPitch());
 	}
 }
 
@@ -124,13 +116,10 @@ static void sal_VideoPrint8(s32 x, s32 y, const char *buffer, u8 color)
 {
 	s32 m,b;
 	u8 *pix = (u8*)sal_VideoGetBuffer();
-#if SAL_SCREEN_ROTATED == 1
-	pix+=((SAL_SCREEN_HEIGHT-1)*SAL_SCREEN_Y_STRIDE_UP);
-#endif
 	s32 len=0;
-	s32 maxLen=(SAL_SCREEN_WIDTH>>3)-(x>>3);
+	s32 maxLen=(sal_VideoGetWidth()>>3)-(x>>3);
 
-	pix+=(y*SAL_SCREEN_Y_STRIDE_DOWN)+(x*SAL_SCREEN_X_STRIDE_RIGHT);	//get start pixel
+	pix = pix + y * sal_VideoGetPitch() + x;
 	while(1) 
 	{
 		s8 letter = *buffer++;
@@ -150,21 +139,21 @@ static void sal_VideoPrint8(s32 x, s32 y, const char *buffer, u8 color)
 			//process 32bits of data in 8bit chunks
 			for (b=0; b<4; b++)
 			{
-				if(mask&(1<<0)) pix[SAL_SCREEN_X_STRIDE_RIGHT*0] = color;
-				if(mask&(1<<1)) pix[SAL_SCREEN_X_STRIDE_RIGHT*1] = color;
-				if(mask&(1<<2)) pix[SAL_SCREEN_X_STRIDE_RIGHT*2] = color;
-				if(mask&(1<<3)) pix[SAL_SCREEN_X_STRIDE_RIGHT*3] = color;
-				if(mask&(1<<4)) pix[SAL_SCREEN_X_STRIDE_RIGHT*4] = color;
-				if(mask&(1<<5)) pix[SAL_SCREEN_X_STRIDE_RIGHT*5] = color;
-				if(mask&(1<<6)) pix[SAL_SCREEN_X_STRIDE_RIGHT*6] = color;
-				if(mask&(1<<7)) pix[SAL_SCREEN_X_STRIDE_RIGHT*7] = color;
-				pix+=SAL_SCREEN_Y_STRIDE_DOWN; //move to next line
+				if(mask&(1<<0)) pix[0] = color;
+				if(mask&(1<<1)) pix[1] = color;
+				if(mask&(1<<2)) pix[2] = color;
+				if(mask&(1<<3)) pix[3] = color;
+				if(mask&(1<<4)) pix[4] = color;
+				if(mask&(1<<5)) pix[5] = color;
+				if(mask&(1<<6)) pix[6] = color;
+				if(mask&(1<<7)) pix[7] = color;
+				pix+=sal_VideoGetPitch(); //move to next line
 				mask>>=8; //shift mask data ready for next loop
 			}
 		}
 		//position pix pointer to start of next char
-		pix+=(SAL_SCREEN_Y_STRIDE_UP<<3);
-		pix+=(SAL_SCREEN_X_STRIDE_RIGHT<<3);
+		pix-=(sal_VideoGetPitch()<<3);
+		pix+=(1<<3);
 
 		len++;
 		if (len>=maxLen-1) break;
@@ -175,13 +164,10 @@ static void sal_VideoPrint16(s32 x, s32 y, const char *buffer, u16 color)
 {
 	s32 m,b;
 	u16 *pix = (u16*)sal_VideoGetBuffer();
-#if SAL_SCREEN_ROTATED == 1
-	pix+=((SAL_SCREEN_HEIGHT-1)*SAL_SCREEN_Y_STRIDE_UP);
-#endif
 	s32 len=0;
-	s32 maxLen=(SAL_SCREEN_WIDTH>>3)-(x>>3);
+	s32 maxLen=(sal_VideoGetWidth()>>3)-(x>>3);
 
-	pix+=(y*SAL_SCREEN_Y_STRIDE_DOWN)+(x*SAL_SCREEN_X_STRIDE_RIGHT);	//get start pixel
+	pix = ((u16*) ((u8*) pix + y * sal_VideoGetPitch())) + x;
 	while(1) 
 	{
 		s8 letter = *buffer++;
@@ -201,21 +187,20 @@ static void sal_VideoPrint16(s32 x, s32 y, const char *buffer, u16 color)
 			//process 32bits of data in 8bit chunks
 			for (b=0; b<4; b++)
 			{
-				if(mask&(1<<0)) pix[SAL_SCREEN_X_STRIDE_RIGHT*0] = color;
-				if(mask&(1<<1)) pix[SAL_SCREEN_X_STRIDE_RIGHT*1] = color;
-				if(mask&(1<<2)) pix[SAL_SCREEN_X_STRIDE_RIGHT*2] = color;
-				if(mask&(1<<3)) pix[SAL_SCREEN_X_STRIDE_RIGHT*3] = color;
-				if(mask&(1<<4)) pix[SAL_SCREEN_X_STRIDE_RIGHT*4] = color;
-				if(mask&(1<<5)) pix[SAL_SCREEN_X_STRIDE_RIGHT*5] = color;
-				if(mask&(1<<6)) pix[SAL_SCREEN_X_STRIDE_RIGHT*6] = color;
-				if(mask&(1<<7)) pix[SAL_SCREEN_X_STRIDE_RIGHT*7] = color;
-				pix+=SAL_SCREEN_Y_STRIDE_DOWN; //move to next line
+				if(mask&(1<<0)) pix[0] = color;
+				if(mask&(1<<1)) pix[1] = color;
+				if(mask&(1<<2)) pix[2] = color;
+				if(mask&(1<<3)) pix[3] = color;
+				if(mask&(1<<4)) pix[4] = color;
+				if(mask&(1<<5)) pix[5] = color;
+				if(mask&(1<<6)) pix[6] = color;
+				if(mask&(1<<7)) pix[7] = color;
+				pix=(u16*) ((u8*) pix + sal_VideoGetPitch()); //move to next line
 				mask>>=8; //shift mask data ready for next loop
 			}
 		}
 		//position pix pointer to start of next char
-		pix+=(SAL_SCREEN_Y_STRIDE_UP<<3);
-		pix+=(SAL_SCREEN_X_STRIDE_RIGHT<<3);
+		pix = (u16*) ((u8*) pix - (sal_VideoGetPitch() << 3)) + (1 << 3);
 
 		len++;
 		if (len>=maxLen-1) break;
@@ -231,29 +216,40 @@ void sal_VideoPrint(s32 x, s32 y, const char *buffer, u32 color)
 static 
 void sal_VideoClear16(u16 color)
 {
-	s32 x,y;
+	s32 x,y,w,h,pitch;
 	u16 *pix=(u16*)sal_VideoGetBuffer();
-	for (y=0;y<SAL_SCREEN_HEIGHT;y++)
+
+	w = sal_VideoGetWidth();
+	h = sal_VideoGetHeight();
+	pitch = sal_VideoGetPitch();
+
+	for (y=0;y<h;y++)
 	{
-		for (x=0;x<SAL_SCREEN_WIDTH;x++)
+		for (x=0;x<w;x++)
 		{
 			*pix++ = color;
 		}
+		pix = (u16*) ((u8*) pix + pitch - w * sizeof(u16));
 	}
 }
 
 static 
 void sal_VideoClear8(u8 color)
 {
-	s32 x,y;
+	s32 x,y,w,h,pitch;
 	u8 *pix=(u8*)sal_VideoGetBuffer();
 
-	for (y=0;y<SAL_SCREEN_HEIGHT;y++)
+	w = sal_VideoGetWidth();
+	h = sal_VideoGetHeight();
+	pitch = sal_VideoGetPitch();
+
+	for (y=0;y<h;y++)
 	{
-		for (x=0;x<SAL_SCREEN_WIDTH;x++)
+		for (x=0;x<w;x++)
 		{
 			*pix++ = color;
 		}
+		pix += pitch - w;
 	}
 }
 
@@ -752,27 +748,23 @@ s32 sal_ImageDrawTiled(u16 *image, u32 width, u32 height, s32 xScroll, s32 yScro
 	s16 x2=0, x3=0;
 	s16 y2=0, y3=0;
 	u16 *fbStart = (u16*)sal_VideoGetBuffer();
-#if SAL_SCREEN_ROTATED == 1
-	fbStart+=((SAL_SCREEN_HEIGHT-1)*SAL_SCREEN_Y_STRIDE_UP);
-#endif
 	u16 *fb;
-	fbStart+=(SAL_SCREEN_Y_STRIDE_DOWN*y)+(SAL_SCREEN_X_STRIDE_RIGHT*x);
+	fbStart = (u16*) ((u8*) fbStart + (y * sal_VideoGetPitch())) + x;
 	u16 *graphics1 = (u16 *)NULL;
 
 	x2=xScroll;
 	y2=(yScroll*width);
 	graphics1 = image+y2;
-	for (y3=y; y3<(SAL_SCREEN_HEIGHT); y3++)
+	for (y3=y; y3<sal_VideoGetHeight(); y3++)
 	{		
 		fb=fbStart;
-		for (x3=0; x3<(SAL_SCREEN_WIDTH-x); x3++)
+		for (x3=0; x3<(sal_VideoGetWidth()-x); x3++)
 		{
-			*fb = graphics1[x2];
-			fb+=SAL_SCREEN_X_STRIDE_RIGHT;
+			*fb++ = graphics1[x2];
 			x2++;
 			x2&=(width-1);
 		}
-		fbStart+=SAL_SCREEN_Y_STRIDE_DOWN;
+		fbStart = (u16*) ((u8*) fbStart + sal_VideoGetPitch());
 		y2+=width;
 		y2&=((height*width)-1);
 		graphics1=image+y2;
@@ -784,23 +776,19 @@ s32 sal_ImageDrawTiled(u16 *image, u32 width, u32 height, s32 xScroll, s32 yScro
 s32 sal_ImageDraw(u16 *image, u32 width, u32 height, s32 x, s32 y)
 {	
 	u16 *fbStart = (u16*)sal_VideoGetBuffer();
-#if SAL_SCREEN_ROTATED == 1
-	fbStart+=((SAL_SCREEN_HEIGHT-1)*SAL_SCREEN_Y_STRIDE_UP);
-#endif
 	u16 *fb;
 	u16 *graphics = (u16*)image;
 	u32 x2,y2;
-	fbStart+=(y*SAL_SCREEN_Y_STRIDE_DOWN)+(x*SAL_SCREEN_X_STRIDE_RIGHT);
+	fbStart = (u16*) ((u8*) fbStart + (y * sal_VideoGetPitch())) + x;
 
 	for (y2=0; y2<height; y2++)
 	{
-		fb=fbStart;		
+		fb=fbStart;
 		for (x2=0; x2<width; x2++)
 		{
-			*fb = *graphics++;
-			fb+=SAL_SCREEN_X_STRIDE_RIGHT;
+			*fb++ = *graphics++;
 		}
-		fbStart+=SAL_SCREEN_Y_STRIDE_DOWN;
+		fbStart = (u16*) ((u8*) fbStart + sal_VideoGetPitch());
 	}
 
 	return SAL_OK;
@@ -809,10 +797,10 @@ s32 sal_ImageDraw(u16 *image, u32 width, u32 height, s32 x, s32 y)
 s32 sal_HighlightBar(s32 width, s32 height, s32 x, s32 y)
 {
 	u16 *fbStart = (u16*)sal_VideoGetBuffer();
-	u16 *blitStart = fbStart + (SAL_SCREEN_Y_STRIDE_DOWN * y) + (SAL_SCREEN_X_STRIDE_RIGHT * x);
+	u16 *blitStart = (u16*) ((u8*) fbStart + y * sal_VideoGetPitch()) + x;
 
 	//vertical stride
-	int v_stride = (SAL_SCREEN_Y_STRIDE_DOWN) - (width * SAL_SCREEN_X_STRIDE_RIGHT);
+	int v_stride = sal_VideoGetPitch() - (width * sizeof(u16));
 
 	int percentage_stride = (1 << 16) / width;
 	int percentage = 0;
@@ -849,8 +837,7 @@ s32 sal_HighlightBar(s32 width, s32 height, s32 x, s32 y)
 			g =  ((bgg * percentage) + (percentage_bg_g_err & ~0xFFFF)) >> 16;
 			b =  ((bgb * percentage) + (percentage_bg_b_err & ~0xFFFF)) >> 16;
 
-			*blitStart = SAL_RGB((r > 31) ? 31 : r, g, b);
-			blitStart += SAL_SCREEN_X_STRIDE_RIGHT;
+			*blitStart++ = SAL_RGB((r > 31) ? 31 : r, g, b);
 
 			percentage += percentage_stride;
 			percentage_inv -= percentage_stride;
@@ -862,7 +849,7 @@ s32 sal_HighlightBar(s32 width, s32 height, s32 x, s32 y)
 			percentage_bg_b_err &= 0xFFFF;
 		}
 
-		blitStart += v_stride;
+		blitStart = (u16*) ((u8*) blitStart + v_stride);
 		percentage = 0;
 		percentage_inv = (1 << 16);
 	}
