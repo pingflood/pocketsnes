@@ -142,7 +142,6 @@ void S9xLoadSDD1Data (void)
 }
 
 u16 IntermediateScreen[SNES_WIDTH * SNES_HEIGHT_EXTENDED];
-bool LastPAL; /* Whether the last frame's height was 239 (true) or 224. */
 
 bool8_32 S9xInitUpdate ()
 {
@@ -164,26 +163,16 @@ bool8_32 S9xDeinitUpdate (int Width, int Height, bool8_32)
 		mFramesCleared++;
 	}
 
-	// If the height changed from 224 to 239, or from 239 to 224,
-	// possibly change the resolution.
-	bool PAL = !!(Memory.FillRAM[0x2133] & 4);
-	if (PAL != LastPAL)
-	{
-		sal_VideoSetPAL(mMenuOptions.fullScreen, PAL);
-		LastPAL = PAL;
-	}
-
 	switch (mMenuOptions.fullScreen)
 	{
 		case 0: /* No scaling */
 		case 3: /* Hardware scaling */
 		{
-			u32 h = PAL ? SNES_HEIGHT_EXTENDED : SNES_HEIGHT;
 			u32 y, pitch = sal_VideoGetPitch();
 			u8 *src = (u8*) IntermediateScreen, *dst = (u8*) sal_VideoGetBuffer()
 				+ ((sal_VideoGetWidth() - SNES_WIDTH) / 2) * sizeof(u16)
-				+ ((sal_VideoGetHeight() - h) / 2) * pitch;
-			for (y = 0; y < h; y++)
+				+ ((sal_VideoGetHeight() - SNES_HEIGHT) / 2) * pitch;
+			for (y = 0; y < SNES_HEIGHT; y++)
 			{
 				memcpy(dst, src, SNES_WIDTH * sizeof(u16));
 				src += SNES_WIDTH * sizeof(u16);
@@ -193,19 +182,11 @@ bool8_32 S9xDeinitUpdate (int Width, int Height, bool8_32)
 		}
 
 		case 1: /* Fast software scaling */
-			if (PAL) {
-				upscale_256x240_to_320x240((uint32_t*) sal_VideoGetBuffer(), (uint32_t*) IntermediateScreen, SNES_WIDTH);
-			} else {
-				upscale_p((uint32_t*) sal_VideoGetBuffer(), (uint32_t*) IntermediateScreen, SNES_WIDTH);
-			}
+			upscale_p((uint32_t*) sal_VideoGetBuffer(), (uint32_t*) IntermediateScreen, SNES_WIDTH);
 			break;
 
 		case 2: /* Smooth software scaling */
-			if (PAL) {
-				upscale_256x240_to_320x240_bilinearish((uint32_t*) sal_VideoGetBuffer() + 160, (uint32_t*) IntermediateScreen, SNES_WIDTH);
-			} else {
-				upscale_256x224_to_320x240_bilinearish((uint32_t*) sal_VideoGetBuffer() + 160, (uint32_t*) IntermediateScreen, SNES_WIDTH);
-			}
+			upscale_256x224_to_320x240_bilinearish((uint32_t*) sal_VideoGetBuffer() + 160, (uint32_t*) IntermediateScreen, SNES_WIDTH);
 			break;
 	}
 
@@ -440,7 +421,7 @@ int Run(int sound)
 {
   	int i;
 
-	sal_VideoEnterGame(mMenuOptions.fullScreen, Memory.FillRAM[0x2133] & 4, Memory.ROMFramesPerSecond);
+	sal_VideoEnterGame(mMenuOptions.fullScreen, Memory.ROMFramesPerSecond);
 
 	Settings.SoundSync = mMenuOptions.soundSync;
 	Settings.SkipFrames = mMenuOptions.frameSkip == 0 ? AUTO_FRAMERATE : mMenuOptions.frameSkip - 1;
