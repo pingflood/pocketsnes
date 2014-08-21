@@ -25,6 +25,7 @@ INCLUDE = -I pocketsnes \
 		-I menu -I pocketsnes/linux -I pocketsnes/snes9x
 
 CFLAGS = $(INCLUDE) -DRC_OPTIMIZED -D__LINUX__ -D__DINGUX__ -DNO_ROM_BROWSER \
+		 -DGCW_ZERO \
 		 -g -O3 -pipe -ffast-math $(SDL_CFLAGS) \
 		 -flto
 

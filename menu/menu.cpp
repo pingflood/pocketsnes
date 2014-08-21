@@ -1193,6 +1193,9 @@ void MainMenuUpdateText(s32 menu_index)
 				case 2:
 					strcpy(mMenuText[MENU_FULLSCREEN],"Full screen:            SMOOTH");
 					break;  
+				case 3:
+					strcpy(mMenuText[MENU_FULLSCREEN],"Full screen:          HARDWARE");
+					break;
 			}
 			break;
 			
@@ -1312,9 +1315,6 @@ s32 MenuRun(s8 *romName)
 	u32 keys=0;
 
 	sal_CpuSpeedSet(MENU_NORMAL_CPU_SPEED);
-
-	sal_VideoInit(16,0,60);
-	sal_VideoSetScaling(320,240);
 
 	if(sal_StringCompare(mRomName,romName)!=0)
 	{
@@ -1590,12 +1590,12 @@ s32 MenuRun(s8 *romName)
 				case MENU_FULLSCREEN:
 					if (keys & SAL_INPUT_RIGHT)
 					{
-						mMenuOptions->fullScreen = (mMenuOptions->fullScreen + 1) % 3;
+						mMenuOptions->fullScreen = (mMenuOptions->fullScreen + 1) % 4;
 					}
 					else
 					{
 						if (mMenuOptions->fullScreen == 0)
-							mMenuOptions->fullScreen = 2;
+							mMenuOptions->fullScreen = 3;
 						else
 							mMenuOptions->fullScreen--;
 					}

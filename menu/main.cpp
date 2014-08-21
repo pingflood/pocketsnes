@@ -163,43 +163,40 @@ bool8_32 S9xDeinitUpdate (int Width, int Height, bool8_32)
 		mFramesCleared++;
 	}
 
-	if (mMenuOptions.fullScreen == 1)
+	switch (mMenuOptions.fullScreen)
 	{
-		if (Memory.FillRAM[0x2133] & 4) {
-			upscale_256x240_to_320x240((uint32_t*) sal_VideoGetBuffer(), (uint32_t*) IntermediateScreen, SNES_WIDTH);
-		} else {
-			upscale_p((uint32_t*) sal_VideoGetBuffer(), (uint32_t*) IntermediateScreen, SNES_WIDTH);
-		}
-	}
-	if (mMenuOptions.fullScreen == 2)
-	{
-		if (Memory.FillRAM[0x2133] & 4) {
-			upscale_256x240_to_320x240_bilinearish((uint32_t*) sal_VideoGetBuffer() + 160, (uint32_t*) IntermediateScreen, SNES_WIDTH);
-		} else {
-			upscale_256x224_to_320x240_bilinearish((uint32_t*) sal_VideoGetBuffer() + 160, (uint32_t*) IntermediateScreen, SNES_WIDTH);
-		}
-	}
-	if (mMenuOptions.fullScreen == 0)
-	{
-		if (Memory.FillRAM[0x2133] & 4) {
+		case 0: /* No scaling */
+		case 3: /* Hardware scaling */
+		{
+			u32 h = (Memory.FillRAM[0x2133] & 4) ? SNES_HEIGHT_EXTENDED : SNES_HEIGHT;
 			u32 y, pitch = sal_VideoGetPitch();
-			u8 *src = (u8*) IntermediateScreen, *dst = (u8*) sal_VideoGetBuffer() + ((SAL_SCREEN_WIDTH - SNES_WIDTH) / 2 + (((SAL_SCREEN_HEIGHT - SNES_HEIGHT_EXTENDED) / 2) * SAL_SCREEN_WIDTH)) * sizeof(u16);
-			for (y = 0; y < SNES_HEIGHT_EXTENDED; y++)
+			u8 *src = (u8*) IntermediateScreen, *dst = (u8*) sal_VideoGetBuffer()
+				+ ((sal_VideoGetWidth() - SNES_WIDTH) / 2) * sizeof(u16)
+				+ ((sal_VideoGetHeight() - h) / 2) * pitch;
+			for (y = 0; y < h; y++)
 			{
 				memcpy(dst, src, SNES_WIDTH * sizeof(u16));
 				src += SNES_WIDTH * sizeof(u16);
 				dst += pitch;
 			}
-		} else {
-			u32 y, pitch = sal_VideoGetPitch();
-			u8 *src = (u8*) IntermediateScreen, *dst = (u8*) sal_VideoGetBuffer() + ((SAL_SCREEN_WIDTH - SNES_WIDTH) / 2 + (((SAL_SCREEN_HEIGHT - SNES_HEIGHT) / 2) * SAL_SCREEN_WIDTH)) * sizeof(u16);
-			for (y = 0; y < SNES_HEIGHT; y++)
-			{
-				memcpy(dst, src, SNES_WIDTH * sizeof(u16));
-				src += SNES_WIDTH * sizeof(u16);
-				dst += pitch;
-			}
+			break;
 		}
+
+		case 1: /* Fast software scaling */
+			if (Memory.FillRAM[0x2133] & 4) {
+				upscale_256x240_to_320x240((uint32_t*) sal_VideoGetBuffer(), (uint32_t*) IntermediateScreen, SNES_WIDTH);
+			} else {
+				upscale_p((uint32_t*) sal_VideoGetBuffer(), (uint32_t*) IntermediateScreen, SNES_WIDTH);
+			}
+			break;
+
+		case 2: /* Smooth software scaling */
+			if (Memory.FillRAM[0x2133] & 4) {
+				upscale_256x240_to_320x240_bilinearish((uint32_t*) sal_VideoGetBuffer() + 160, (uint32_t*) IntermediateScreen, SNES_WIDTH);
+			} else {
+				upscale_256x224_to_320x240_bilinearish((uint32_t*) sal_VideoGetBuffer() + 160, (uint32_t*) IntermediateScreen, SNES_WIDTH);
+			}
+			break;
 	}
 
 	u32 newTimer;
@@ -432,6 +429,9 @@ static
 int Run(int sound)
 {
   	int i;
+
+	sal_VideoEnterGame(mMenuOptions.fullScreen, Memory.FillRAM[0x2133] & 4, Memory.ROMFramesPerSecond);
+
 	Settings.SoundSync = mMenuOptions.soundSync;
 	Settings.SkipFrames = mMenuOptions.frameSkip == 0 ? AUTO_FRAMERATE : mMenuOptions.frameSkip - 1;
 	sal_TimerInit(Settings.FrameTime);
@@ -480,6 +480,8 @@ int Run(int sound)
   	}
 
 	sal_AudioPause();
+
+	sal_VideoExitGame();
 
 	mEnterMenu=0;
 	return mEnterMenu;
@@ -682,7 +684,7 @@ int mainEntry(int argc, char* argv[])
 	s32 event=EVENT_NONE;
 
 	sal_Init();
-	sal_VideoInit(16,SAL_RGB(0,0,0),Memory.ROMFramesPerSecond);
+	sal_VideoInit(16);
 
 	mRomName[0]=0;
 	if (argc >= 2) 
@@ -731,11 +733,6 @@ int mainEntry(int argc, char* argv[])
 
 		if(event==EVENT_RUN_ROM)
 		{
-			if(mMenuOptions.fullScreen)
-			{
-				sal_VideoSetScaling(SNES_WIDTH,SNES_HEIGHT);
-			}
-
 			sal_AudioSetVolume(mMenuOptions.volume,mMenuOptions.volume);
 			sal_CpuSpeedSet(mMenuOptions.cpuSpeed);	
 			mFramesCleared = 0;
