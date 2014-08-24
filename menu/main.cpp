@@ -439,8 +439,10 @@ static
 int Run(int sound)
 {
   	int i;
+	bool PAL = !!(Memory.FillRAM[0x2133] & 4);
 
-	sal_VideoEnterGame(mMenuOptions.fullScreen, Memory.FillRAM[0x2133] & 4, Memory.ROMFramesPerSecond);
+	sal_VideoEnterGame(mMenuOptions.fullScreen, PAL, Memory.ROMFramesPerSecond);
+	LastPAL = PAL;
 
 	Settings.SoundSync = mMenuOptions.soundSync;
 	Settings.SkipFrames = mMenuOptions.frameSkip == 0 ? AUTO_FRAMERATE : mMenuOptions.frameSkip - 1;
