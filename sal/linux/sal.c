@@ -196,7 +196,7 @@ u32 sal_CpuSpeedPreviousFast(u32 currSpeed)
 
 s32 sal_Init(void)
 {
-	if( SDL_Init( SDL_INIT_EVERYTHING ) == -1 )
+	if( SDL_Init( SDL_INIT_VIDEO|SDL_INIT_TIMER|SDL_INIT_JOYSTICK ) == -1 )
 	{
 		return SAL_ERROR;
 	}
@@ -216,12 +216,12 @@ u32 sal_VideoInit(u32 bpp)
 	mBpp=bpp;
 
 	//Set up the screen
-	mScreen = SDL_SetVideoMode( SAL_SCREEN_WIDTH, SAL_SCREEN_HEIGHT, bpp, SDL_HWSURFACE |
+	mScreen = SDL_SetVideoMode( SAL_SCREEN_WIDTH, SAL_SCREEN_HEIGHT, bpp, SDL_HWSURFACE /*|
 #ifdef SDL_TRIPLEBUF
 		SDL_TRIPLEBUF
 #else
 		SDL_DOUBLEBUF
-#endif
+#endif*/
 		);
 
     	//If there was an error in setting up the screen
@@ -232,14 +232,14 @@ u32 sal_VideoInit(u32 bpp)
     	}
 
     	// lock surface if needed 
-	if (SDL_MUSTLOCK(mScreen)) 
-	{ 
-		if (SDL_LockSurface(mScreen) < 0) 
-		{ 
-			sal_LastErrorSet("unable to lock surface"); 
-			return SAL_ERROR;
-		} 
-	}
+	// if (SDL_MUSTLOCK(mScreen)) 
+	// { 
+	// 	if (SDL_LockSurface(mScreen) < 0) 
+	// 	{ 
+	// 		sal_LastErrorSet("unable to lock surface"); 
+	// 		return SAL_ERROR;
+	// 	} 
+	// }
    
 	return SAL_OK;
 }
@@ -260,7 +260,7 @@ u32 sal_VideoGetPitch()
 }
 
 void sal_VideoEnterGame(u32 fullscreenOption, u32 pal, u32 refreshRate)
-{
+{return;
 #ifdef GCW_ZERO
 	/* Copied from C++ headers which we can't include in C */
 	unsigned int Width = 256 /* SNES_WIDTH */,
@@ -294,7 +294,7 @@ void sal_VideoSetPAL(u32 fullscreenOption, u32 pal)
 }
 
 void sal_VideoExitGame()
-{
+{return;
 #ifdef GCW_ZERO
 	if (SDL_MUSTLOCK(mScreen))
 		SDL_UnlockSurface(mScreen);

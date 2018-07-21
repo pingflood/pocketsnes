@@ -185,7 +185,7 @@ bool8_32 S9xDeinitUpdate (int Width, int Height, bool8_32)
 				+ ((sal_VideoGetHeight() - h) / 2) * pitch;
 			for (y = 0; y < h; y++)
 			{
-				memcpy(dst, src, SNES_WIDTH * sizeof(u16));
+				memmove(dst, src, SNES_WIDTH * sizeof(u16));
 				src += SNES_WIDTH * sizeof(u16);
 				dst += pitch;
 			}

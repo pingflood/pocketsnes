@@ -3,6 +3,9 @@
 
 TARGET = PocketSNES
 
+CHAINPREFIX := /opt/rs97-toolchain-musl
+CROSS_COMPILE := $(CHAINPREFIX)/usr/bin/mipsel-linux-
+
 CC  := $(CROSS_COMPILE)gcc
 CXX := $(CROSS_COMPILE)g++
 STRIP := $(CROSS_COMPILE)strip
@@ -11,27 +14,20 @@ SYSROOT := $(shell $(CC) --print-sysroot)
 SDL_CFLAGS := $(shell $(SYSROOT)/usr/bin/sdl-config --cflags)
 SDL_LIBS := $(shell $(SYSROOT)/usr/bin/sdl-config --libs)
 
-ifdef V
-	CMD:=
-	SUM:=@\#
-else
-	CMD:=@
-	SUM:=@echo
-endif
-
 INCLUDE = -I pocketsnes \
 		-I sal/linux/include -I sal/include \
 		-I pocketsnes/include \
 		-I menu -I pocketsnes/linux -I pocketsnes/snes9x
 
-CFLAGS = $(INCLUDE) -DRC_OPTIMIZED -D__LINUX__ -D__DINGUX__ -DNO_ROM_BROWSER \
-		 -DGCW_ZERO \
-		 -g -O3 -pipe -ffast-math $(SDL_CFLAGS) \
-		 -flto
+CFLAGS =  -std=gnu++03 $(INCLUDE) -DRC_OPTIMIZED -D__LINUX__ -D__DINGUX__ -DFOREVER_16_BIT  $(SDL_CFLAGS)
+CFLAGS +=  -O2 -fdata-sections -ffunction-sections -mips32 -march=mips32 -mno-mips16 -fomit-frame-pointer -fno-builtin  \
+            -fno-common -Wno-write-strings -Wno-sign-compare -ffast-math -ftree-vectorize \
+			-funswitch-loops -fno-strict-aliasing
+ 
+CFLAGS += -DMIPS_XBURST -DFAST_LSB_WORD_ACCESS -DNO_ROM_BROWSER
+CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti -fno-math-errno -fno-threadsafe-statics
 
-CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti
-
-LDFLAGS = $(CXXFLAGS) -lpthread -lz -lpng -lm -lgcc $(SDL_LIBS)
+LDFLAGS = $(CXXFLAGS) -lpthread -lz -lpng  $(SDL_LIBS) -flto -Wl,--as-needed -Wl,--gc-sections -s
 
 # Find all source files
 SOURCE = pocketsnes/snes9x menu sal/linux sal
@@ -44,31 +40,16 @@ OBJS    = $(OBJ_CPP) $(OBJ_C)
 .PHONY : all
 all : $(TARGET)
 
-.PHONY: opk
-opk: $(TARGET).opk
-
 $(TARGET) : $(OBJS)
-	$(SUM) "  LD      $@"
 	$(CMD)$(CXX) $(CXXFLAGS) $^ $(LDFLAGS) -o $@
 
-$(TARGET).opk: $(TARGET)
-	$(SUM) "  OPK     $@"
-	$(CMD)rm -rf .opk_data
-	$(CMD)cp -r data .opk_data
-	$(CMD)cp $< .opk_data/pocketsnes.gcw0
-	$(CMD)$(STRIP) .opk_data/pocketsnes.gcw0
-	$(CMD)mksquashfs .opk_data $@ -all-root -noappend -no-exports -no-xattrs -no-progress >/dev/null
-
 %.o: %.c
-	$(SUM) "  CC      $@"
 	$(CMD)$(CC) $(CFLAGS) -c $< -o $@
 
 %.o: %.cpp
-	$(SUM) "  CXX     $@"
 	$(CMD)$(CXX) $(CFLAGS) -c $< -o $@
 
 .PHONY : clean
 clean :
-	$(SUM) "  CLEAN   ."
 	$(CMD)rm -f $(OBJS) $(TARGET)
 	$(CMD)rm -rf .opk_data $(TARGET).opk
