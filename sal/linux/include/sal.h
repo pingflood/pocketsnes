@@ -60,7 +60,7 @@ extern "C" {
 #define SAL_INPUT_MENU		(1<<SAL_INPUT_INDEX_POWER)
 
 #define SAL_SCREEN_WIDTH			320
-#define SAL_SCREEN_HEIGHT			240
+#define SAL_SCREEN_HEIGHT			480
 #define SAL_MAX_PATH				256
 #define SAL_DIR_SEP				"/"
 #define SAL_DIR_SEP_BAD				"\\"

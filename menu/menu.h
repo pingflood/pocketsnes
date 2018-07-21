@@ -35,7 +35,7 @@ enum  MENU_ENUM
 	MENU_SOUND_RATE,
 	MENU_SOUND_STEREO,
 	MENU_FRAMESKIP,
-	MENU_FULLSCREEN,
+	// MENU_FULLSCREEN,
 	MENU_FPS,
 	MENU_SOUND_SYNC,
 //	MENU_CPU_SPEED,
@@ -168,8 +168,3 @@ u32 IsPreviewingState();
 
 
 #endif /* _MENU_H_ */
-
-
-
-
-
