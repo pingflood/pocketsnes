@@ -743,7 +743,7 @@ void S9xSetSA1 (uint8 byte, uint32 address)
 	{
 	    // Char conversion 2 DMA enabled
 	    // memmove converted: Same malloc but constant non-overlapping addresses [Neb]
-	    memcpy (&Memory.ROM [CMemory::MAX_ROM_SIZE - 0x10000] + SA1.in_char_dma * 16,
+	    memmove (&Memory.ROM [CMemory::MAX_ROM_SIZE - 0x10000] + SA1.in_char_dma * 16,
 		     &Memory.FillRAM [0x2240], 16);
 	    SA1.in_char_dma = (SA1.in_char_dma + 1) & 7;
 	    if ((SA1.in_char_dma & 3) == 0)

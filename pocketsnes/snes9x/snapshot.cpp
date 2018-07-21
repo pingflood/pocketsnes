@@ -849,15 +849,15 @@ int S9xUnfreezeFromStream (STREAM stream)
 		UnfreezeStructFromCopy (&ICPU.Registers, SnapRegisters, COUNT (SnapRegisters), local_registers);
 		UnfreezeStructFromCopy (&PPU, SnapPPU, COUNT (SnapPPU), local_ppu);
 		UnfreezeStructFromCopy (DMA, SnapDMA, COUNT (SnapDMA), local_dma);
-		memcpy (Memory.VRAM, local_vram, 0x10000);
-		memcpy (Memory.RAM, local_ram, 0x20000);
-		memcpy (::SRAM, local_sram, 0x20000);
-		memcpy (Memory.FillRAM, local_fillram, 0x8000);
+		memmove (Memory.VRAM, local_vram, 0x10000);
+		memmove (Memory.RAM, local_ram, 0x20000);
+		memmove (::SRAM, local_sram, 0x20000);
+		memmove (Memory.FillRAM, local_fillram, 0x8000);
 		if(local_apu)
 		{
 			UnfreezeStructFromCopy (&APU, SnapAPU, COUNT (SnapAPU), local_apu);
 			UnfreezeStructFromCopy (&IAPU.Registers, SnapAPURegisters, COUNT (SnapAPURegisters), local_apu_registers);
-			memcpy (IAPU.RAM, local_apu_ram, 0x10000);
+			memmove (IAPU.RAM, local_apu_ram, 0x10000);
 			UnfreezeStructFromCopy (&SoundData, SnapSoundData, COUNT (SnapSoundData), local_apu_sounddata);
 		}
 		if(local_sa1)
@@ -1037,7 +1037,7 @@ void FreezeStruct (STREAM stream, const char *name, void *base, FreezeData *fiel
 			break;
 			case uint8_ARRAY_V:
 				// memmove converted: Different mallocs [Neb]
-				memcpy (ptr, (uint8 *) base + fields [i].offset, fields [i].size);
+				memmove (ptr, (uint8 *) base + fields [i].offset, fields [i].size);
 				ptr += fields [i].size;
 				break;
 			case uint16_ARRAY_V:
@@ -1141,7 +1141,7 @@ int UnfreezeStruct (STREAM stream, const char *name, void *base, FreezeData *fie
 			break;
 			case uint8_ARRAY_V:
 				// memmove converted: Different mallocs [Neb]
-				memcpy ((uint8 *) base + fields [i].offset, ptr, fields [i].size);
+				memmove ((uint8 *) base + fields [i].offset, ptr, fields [i].size);
 				ptr += fields [i].size;
 				break;
 			case uint16_ARRAY_V:
@@ -1585,7 +1585,7 @@ bool8 S9xUnfreezeZSNES (const char *filename)
 			APU.Timer [2] = t [46];
 			
 			// memmove converted: Different mallocs [Neb]
-			memcpy (APU.ExtraRAM, &t [48], 64);
+			memmove (APU.ExtraRAM, &t [48], 64);
 			
 			// Internal ZSNES sound DSP state
 			fread (t, 1, 1068, fs);
@@ -1663,7 +1663,7 @@ bool8 S9xUnfreezeZSNES (const char *filename)
 			
 			// memmove converted: Different mallocs [Neb]
 			// DS2 DMA notes: This code path is not used [Neb]
-			memcpy (&Memory.FillRAM [0x3000], t + 692, 2 * 1024);
+			memmove (&Memory.FillRAM [0x3000], t + 692, 2 * 1024);
 			
 			fread (::SRAM, 1, 64 * 1024, fs);
 			fseek (fs, 64 * 1024, SEEK_CUR);

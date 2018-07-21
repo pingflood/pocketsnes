@@ -2983,7 +2983,7 @@ void S9xSuperFXExec ()
 	    /* Copy registers (so we can see if any changed) */
 	    vColr = FxGetColorRegister();
 	    vPor = FxGetPlotOptionRegister();
-	    memcpy(avReg,SuperFX.pvRegisters,0x40);
+	    memmove(avReg,SuperFX.pvRegisters,0x40);
 
 	    /* Print the pipe string */
 	    printf(tmp);

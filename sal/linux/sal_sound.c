@@ -37,12 +37,12 @@ static void sdl_audio_callback (void *userdata, Uint8 *stream, int len)
 	}
 	else if (LocalReadPos + SamplesRequested > BUFFER_SAMPLES)
 	{
-		memcpy(stream, &Buffer[LocalReadPos * BytesPerSample], (BUFFER_SAMPLES - LocalReadPos) * BytesPerSample);
-		memcpy(&stream[(BUFFER_SAMPLES - LocalReadPos) * BytesPerSample], &Buffer[0], (SamplesRequested - (BUFFER_SAMPLES - LocalReadPos)) * BytesPerSample);
+		memmove(stream, &Buffer[LocalReadPos * BytesPerSample], (BUFFER_SAMPLES - LocalReadPos) * BytesPerSample);
+		memmove(&stream[(BUFFER_SAMPLES - LocalReadPos) * BytesPerSample], &Buffer[0], (SamplesRequested - (BUFFER_SAMPLES - LocalReadPos)) * BytesPerSample);
 	}
 	else
 	{
-		memcpy(stream, &Buffer[LocalReadPos * BytesPerSample], len);
+		memmove(stream, &Buffer[LocalReadPos * BytesPerSample], len);
 	}
 	ReadPos = (LocalReadPos + SamplesRequested) % BUFFER_SAMPLES;
 }

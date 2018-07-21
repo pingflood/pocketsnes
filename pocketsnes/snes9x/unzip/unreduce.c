@@ -166,12 +166,12 @@ void unReduce()   /* expand probabilistically reduced data */
                   }
                   else
                     if (w - d < e)      /* (assume unsigned comparison) */
-                      do {              /* slow to avoid memcpy() overlap */
+                      do {              /* slow to avoid memmove() overlap */
                         slide[w++] = slide[d++];
                       } while (--e);
                     else
                     {
-                      memcpy(slide + w, slide + d, e);
+                      memmove(slide + w, slide + d, e);
                       w += e;
                       d += e;
                     }

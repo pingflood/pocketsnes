@@ -155,7 +155,7 @@ extern uint8  Mode7Depths [2];
         for (uint32 y = GFX.StartY; y <= GFX.EndY; y++) \
         { \
             /* memmove converted: Same malloc, non-overlapping addresses [Neb] */ \
-            memcpy (SCREEN + (y * 2 + 1) * GFX.Pitch2, \
+            memmove (SCREEN + (y * 2 + 1) * GFX.Pitch2, \
                     SCREEN + y * 2 * GFX.Pitch2, \
                     GFX.Pitch2); \
             if(DO_DEPTH){ \
@@ -3743,11 +3743,11 @@ void S9xUpdateScreen ()
 			{
 				// memmove converted: Same malloc, different addresses, and identical addresses at line 0 [Neb]
 				// DS2 DMA notes: This code path is unused [Neb]
-				memcpy (GFX.Screen + y * 2 * GFX.Pitch2,
+				memmove (GFX.Screen + y * 2 * GFX.Pitch2,
 					GFX.Screen + y * GFX.Pitch2,
 					GFX.Pitch2);
 				// memmove converted: Same malloc, different addresses [Neb]
-				memcpy (GFX.Screen + (y * 2 + 1) * GFX.Pitch2,
+				memmove (GFX.Screen + (y * 2 + 1) * GFX.Pitch2,
 					GFX.Screen + y * GFX.Pitch2,
 					GFX.Pitch2);
 			}

@@ -144,7 +144,7 @@ static void fx_cache()
 	if(c < (0x10000-512))
 	{
 	    uint8 const* t = &ROM(c);
-	    memcpy(GSU.pvCache,t,512);
+	    memmove(GSU.pvCache,t,512);
 	}
 	else
 	{
@@ -153,8 +153,8 @@ static void fx_cache()
 	    uint32 i = 0x10000 - c;
 	    t1 = &ROM(c);
 	    t2 = &ROM(0);
-	    memcpy(GSU.pvCache,t1,i);
-	    memcpy(&GSU.pvCache[i],t2,512-i);
+	    memmove(GSU.pvCache,t1,i);
+	    memmove(&GSU.pvCache[i],t2,512-i);
 	}
 #endif	
     }

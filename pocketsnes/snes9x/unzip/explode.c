@@ -15,7 +15,7 @@
                                     decoded a bit at a time)
     c2    4 Apr 92  M. Adler        fixed bug for file sizes a multiple of 32k.
     c3   10 Apr 92  M. Adler        added a little memory tracking if DEBUG
-    c4   11 Apr 92  M. Adler        added NOMEMCPY do kill use of memcpy()
+    c4   11 Apr 92  M. Adler        added NOMEMCPY do kill use of memmove()
     c5   21 Apr 92  M. Adler        added the WSIZE #define to allow reducing
                                     the 32K window size for specialized
                                     applications.
@@ -308,11 +308,11 @@ int bb, bl, bd;                 /* number of bits decoded by those */
 #ifndef NOMEMCPY
           if (w - d >= e)       /* (this test assumes unsigned comparison) */
           {
-            memcpy(slide + w, slide + d, e);
+            memmove(slide + w, slide + d, e);
             w += e;
             d += e;
           }
-          else                  /* do it slow to avoid memcpy() overlap */
+          else                  /* do it slow to avoid memmove() overlap */
 #endif /* !NOMEMCPY */
             do {
               slide[w++] = slide[d++];
@@ -430,11 +430,11 @@ int bb, bl, bd;                 /* number of bits decoded by those */
 #ifndef NOMEMCPY
           if (w - d >= e)       /* (this test assumes unsigned comparison) */
           {
-            memcpy(slide + w, slide + d, e);
+            memmove(slide + w, slide + d, e);
             w += e;
             d += e;
           }
-          else                  /* do it slow to avoid memcpy() overlap */
+          else                  /* do it slow to avoid memmove() overlap */
 #endif /* !NOMEMCPY */
             do {
               slide[w++] = slide[d++];
@@ -543,11 +543,11 @@ int bl, bd;             /* number of bits decoded by tl[] and td[] */
 #ifndef NOMEMCPY
           if (w - d >= e)       /* (this test assumes unsigned comparison) */
           {
-            memcpy(slide + w, slide + d, e);
+            memmove(slide + w, slide + d, e);
             w += e;
             d += e;
           }
-          else                  /* do it slow to avoid memcpy() overlap */
+          else                  /* do it slow to avoid memmove() overlap */
 #endif /* !NOMEMCPY */
             do {
               slide[w++] = slide[d++];
@@ -656,11 +656,11 @@ int bl, bd;             /* number of bits decoded by tl[] and td[] */
 #ifndef NOMEMCPY
           if (w - d >= e)       /* (this test assumes unsigned comparison) */
           {
-            memcpy(slide + w, slide + d, e);
+            memmove(slide + w, slide + d, e);
             w += e;
             d += e;
           }
-          else                  /* do it slow to avoid memcpy() overlap */
+          else                  /* do it slow to avoid memmove() overlap */
 #endif /* !NOMEMCPY */
             do {
               slide[w++] = slide[d++];
