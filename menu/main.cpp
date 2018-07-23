@@ -13,6 +13,7 @@
 #include "soundux.h"
 #include "snapshot.h"
 #include "scaler.h"
+#include <time.h>
 
 #define SNES_SCREEN_WIDTH  256
 #define SNES_SCREEN_HEIGHT 192
@@ -148,7 +149,7 @@ bool8_32 S9xInitUpdate ()
 {
 	if (mInMenu) return TRUE;
 
-	GFX.Screen = (u8*) IntermediateScreen; /* replacement needed after loading the saved states menu */
+	GFX.Screen = (u8*) sal_VideoGetBuffer(); //IntermediateScreen; /* replacement needed after loading the saved states menu */
 	return TRUE;
 }
 
@@ -173,47 +174,58 @@ bool8_32 S9xDeinitUpdate (int Width, int Height, bool8_32)
 		LastPAL = PAL;
 	}
 
-	switch (mMenuOptions.fullScreen)
-	{
-		case 0: /* No scaling */
-		case 3: /* Hardware scaling */
-		{
-			u32 h = PAL ? SNES_HEIGHT_EXTENDED : SNES_HEIGHT;
-			u32 y, pitch = sal_VideoGetPitch();
-			u8 *src = (u8*) IntermediateScreen, *dst = (u8*) sal_VideoGetBuffer()
-				+ ((sal_VideoGetWidth() - SNES_WIDTH) / 2) * sizeof(u16)
-				+ ((sal_VideoGetHeight() - h) / 2) * pitch;
-			for (y = 0; y < h; y++)
-			{
-				memmove(dst, src, SNES_WIDTH * sizeof(u16));
-				src += SNES_WIDTH * sizeof(u16);
-				dst += pitch;
-			}
-			break;
-		}
+	// // switch (mMenuOptions.fullScreen)
+	// // {
+	// 	// case 0: /* No scaling */
+	// 	// case 3: /* Hardware scaling */
+	// 	// {
+	// 		u32 h = PAL ? SNES_HEIGHT_EXTENDED : SNES_HEIGHT;
+	// 		u32 y, pitch = sal_VideoGetPitch();
+	// 		u8 *src = (u8*) IntermediateScreen, *dst = (u8*) sal_VideoGetBuffer()
+	// 			+ ((sal_VideoGetWidth() - SNES_WIDTH) / 2) * sizeof(u16);
+	// 			+ ((sal_VideoGetHeight() - h) / 2) * pitch;
+	// 		for (y = 0; y < h; y++)
+	// 		{
+	// 			memmove(dst, src, SNES_WIDTH * sizeof(u16));
+	// 			src += SNES_WIDTH * sizeof(u16);
+	// 			dst += pitch;
+	// 		}
 
-		case 1: /* Fast software scaling */
-			if (PAL) {
-				upscale_256x240_to_320x240((uint32_t*) sal_VideoGetBuffer(), (uint32_t*) IntermediateScreen, SNES_WIDTH);
-			} else {
-				upscale_p((uint32_t*) sal_VideoGetBuffer(), (uint32_t*) IntermediateScreen, SNES_WIDTH);
-			}
-			break;
+	// 		// uint32_t *s = (uint32_t*)IntermediateScreen;
+	// 		// uint32_t *d = (uint32_t*)sal_VideoGetBuffer();
+	// 		// for(uint8_t y = 0; y < h; y++) {
+	// 		// 	memmove(d, s, SNES_WIDTH * sizeof(u16));
+	// 		// 	s += SNES_WIDTH * sizeof(u16);
+	// 		// 	d += SNES_WIDTH * sizeof(u16) * 2;
+	// 		// }
 
-		case 2: /* Smooth software scaling */
-			if (PAL) {
-				upscale_256x240_to_320x240_bilinearish((uint32_t*) sal_VideoGetBuffer() + 160, (uint32_t*) IntermediateScreen, SNES_WIDTH);
-			} else {
-				upscale_256x224_to_320x240_bilinearish((uint32_t*) sal_VideoGetBuffer() + 160, (uint32_t*) IntermediateScreen, SNES_WIDTH);
-			}
-			break;
-	}
 
-	u32 newTimer;
+
+		// 	break;
+		// }
+
+		// case 1: /* Fast software scaling */
+		// 	if (PAL) {
+		// 		upscale_256x240_to_320x240((uint32_t*) sal_VideoGetBuffer(), (uint32_t*) IntermediateScreen, SNES_WIDTH);
+		// 	} else {
+		// 		upscale_p((uint32_t*) sal_VideoGetBuffer(), (uint32_t*) IntermediateScreen, SNES_WIDTH);
+		// 	}
+		// 	break;
+
+		// case 2: /* Smooth software scaling */
+		// 	if (PAL) {
+		// 		upscale_256x240_to_320x240_bilinearish((uint32_t*) sal_VideoGetBuffer() + 160, (uint32_t*) IntermediateScreen, SNES_WIDTH);
+		// 	} else {
+		// 		upscale_256x224_to_320x240_bilinearish((uint32_t*) sal_VideoGetBuffer() + 160, (uint32_t*) IntermediateScreen, SNES_WIDTH);
+		// 	}
+		// 	break;
+	// }
+
+	// u32 newTimer;
 	if (mMenuOptions.showFps) 
 	{
 		mFps++;
-		newTimer=sal_TimerRead();
+		u32 newTimer=sal_TimerRead();
 		if(newTimer-mLastTimer>Memory.ROMFramesPerSecond)
 		{
 			mLastTimer=newTimer;
@@ -221,7 +233,7 @@ bool8_32 S9xDeinitUpdate (int Width, int Height, bool8_32)
 			mFps=0;
 		}
 		
-		sal_VideoDrawRect(0,0,5*8,8,SAL_RGB(0,0,0));
+		// sal_VideoDrawRect(0,0,5*8,8,SAL_RGB(0,0,0));
 		sal_VideoPrint(0,0,mFpsDisplay,SAL_RGB(31,31,31));
 	}
 
@@ -369,8 +381,8 @@ void S9xSyncSpeed(void)
 		}
 	}
 
-	while (sal_AudioGetFramesBuffered() >= sal_AudioGetMaxFrames())
-		usleep(1000);
+	// while (sal_AudioGetFramesBuffered() >= sal_AudioGetMaxFrames())
+		// nanosleep((const struct timespec[]){{0, 1e6L}}, NULL);
 }
 
 const char *S9xBasename (const char *f)
@@ -586,12 +598,12 @@ int SnesInit()
 	Settings.C4 = TRUE;
 	Settings.SDD1 = TRUE;
 
-	GFX.Screen = (uint8*) IntermediateScreen;
-	GFX.RealPitch = GFX.Pitch = 256 * sizeof(u16);
+	GFX.Screen = (u8*) sal_VideoGetBuffer(); //IntermediateScreen;
+	GFX.RealPitch = GFX.Pitch = 320 * 2; //256 * sizeof(u16);
 	
-	GFX.SubScreen = (uint8 *)malloc(GFX.RealPitch * 480 * 2); 
-	GFX.ZBuffer =  (uint8 *)malloc(GFX.RealPitch * 480 * 2); 
-	GFX.SubZBuffer = (uint8 *)malloc(GFX.RealPitch * 480 * 2);
+	GFX.SubScreen = (uint8 *)malloc(GFX.RealPitch * 240 * 2); 
+	GFX.ZBuffer =  (uint8 *)malloc(GFX.RealPitch * 240 * 2); 
+	GFX.SubZBuffer = (uint8 *)malloc(GFX.RealPitch * 240 * 2);
 	GFX.Delta = (GFX.SubScreen - GFX.Screen) >> 1;
 	GFX.PPL = GFX.Pitch >> 1;
 	GFX.PPLx2 = GFX.Pitch;
@@ -777,9 +789,3 @@ int mainEntry(int argc, char* argv[])
 }
 
 }
-
-
-
-
-
-

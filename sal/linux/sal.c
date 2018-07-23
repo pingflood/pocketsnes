@@ -8,6 +8,7 @@
 #define PALETTE_BUFFER_LENGTH	256*2*4
 
 static SDL_Surface *mScreen = NULL;
+static SDL_Surface *rs97Screen = NULL;
 static u32 mSoundThreadFlag=0;
 static u32 mSoundLastCpuSpeed=0;
 static u32 mPaletteBuffer[PALETTE_BUFFER_LENGTH];
@@ -55,7 +56,7 @@ static u32 sal_Input(int held)
 		CASE(DOWN, DOWN);
 		CASE(LEFT, LEFT);
 		CASE(RIGHT, RIGHT);
-		CASE(HOME, MENU);
+		CASE(3, MENU);
 		default: break;
 	}
 
@@ -214,15 +215,22 @@ u32 sal_VideoInit(u32 bpp)
 	SDL_ShowCursor(0);
 	
 	mBpp=bpp;
+	setenv("SDL_NOMOUSE", "1", 1);
 
 	//Set up the screen
-	mScreen = SDL_SetVideoMode( SAL_SCREEN_WIDTH, SAL_SCREEN_HEIGHT, bpp, SDL_HWSURFACE /*|
-#ifdef SDL_TRIPLEBUF
-		SDL_TRIPLEBUF
-#else
-		SDL_DOUBLEBUF
-#endif*/
-		);
+	// mScreen = SDL_SetVideoMode( 320, 480, bpp, SDL_HWSURFACE);
+	rs97Screen = SDL_SetVideoMode(320, 480, 16, SDL_HWSURFACE /* | SDL_DOUBLEBUF*/);
+	mScreen = SDL_CreateRGBSurface(SDL_SWSURFACE, SAL_SCREEN_WIDTH, SAL_SCREEN_HEIGHT, 16, 0, 0, 0, 0);
+	// mScreen = SDL_CreateRGBSurface(SDL_SWSURFACE, 256, 192, 16, 0, 0, 0, 0);
+	// mScreen = SDL_SetVideoMode( SAL_SCREEN_WIDTH, SAL_SCREEN_HEIGHT, bpp, SDL_HWSURFACE); /*|
+
+
+// #ifdef SDL_TRIPLEBUF
+// 		SDL_TRIPLEBUF
+// #else
+// 		SDL_DOUBLEBUF
+// #endif*/
+// 		);
 
     	//If there was an error in setting up the screen
     	if( mScreen == NULL )
@@ -256,7 +264,8 @@ u32 sal_VideoGetHeight()
 
 u32 sal_VideoGetPitch()
 {
-	return mScreen->pitch;
+	// return mScreen->pitch;
+	return rs97Screen->pitch;
 }
 
 void sal_VideoEnterGame(u32 fullscreenOption, u32 pal, u32 refreshRate)
@@ -315,17 +324,22 @@ void sal_VideoBitmapDim(u16* img, u32 pixelCount)
 
 void sal_VideoFlip(s32 vsync)
 {
-	if (SDL_MUSTLOCK(mScreen)) {
-		SDL_UnlockSurface(mScreen); 
-		SDL_Flip(mScreen);
-		SDL_LockSurface(mScreen);
-	} else
-		SDL_Flip(mScreen);
+	// if (SDL_MUSTLOCK(mScreen)) {
+	// 	SDL_UnlockSurface(mScreen); 
+	// 	SDL_Flip(mScreen);
+	// 	SDL_LockSurface(mScreen);
+	// } else
+	// SDL_Flip(mScreen);
+	uint32_t *s = (uint32_t*)mScreen->pixels;
+	uint32_t *d = (uint32_t*)rs97Screen->pixels + 640 * 5 + 15;
+	for(uint8_t y = 0; y < 240; y++, s += 160, d += 320) memmove(d, s, 600);
+
 }
 
 void *sal_VideoGetBuffer()
 {
 	return (void*)mScreen->pixels;
+	// return (void*)rs97Screen->pixels;
 }
 
 void sal_VideoPaletteSync() 
