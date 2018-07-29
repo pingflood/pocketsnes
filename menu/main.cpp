@@ -632,7 +632,7 @@ int SnesInit()
 
 	if (!S9xGraphicsInit ())
 	{
-         	S9xMessage (0,0,"Failed to init graphics");
+		S9xMessage (0,0,"Failed to init graphics");
 		return SAL_ERROR;
 	}
 

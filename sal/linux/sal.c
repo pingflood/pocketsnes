@@ -201,7 +201,7 @@ void sal_VideoBitmapDim(u16* img, u32 pixelCount)
 void sal_VideoFlip(s32 vsync)
 {
 	uint32_t *s = (uint32_t*)mScreen->pixels;
-	uint32_t *d = (uint32_t*)rs97Screen->pixels + 640 * 5 + 15;
+	uint32_t *d = (uint32_t*)rs97Screen->pixels + 320 * 2 + 15;
 	for(uint8_t y = 0; y < 240; y++, s += SAL_SCREEN_WIDTH/2, d += 320) memmove(d, s, SAL_SCREEN_WIDTH*2);
 	// SDL_Flip(mScreen);
 }
