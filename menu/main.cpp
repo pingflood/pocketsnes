@@ -234,6 +234,7 @@ bool8_32 S9xDeinitUpdate (int Width, int Height, bool8_32)
 		}
 		
 		// sal_VideoDrawRect(0,0,5*8,8,SAL_RGB(0,0,0));
+		sal_VideoPrint(1,1,mFpsDisplay,SAL_RGB(0,0,0));
 		sal_VideoPrint(0,0,mFpsDisplay,SAL_RGB(31,31,31));
 	}
 
