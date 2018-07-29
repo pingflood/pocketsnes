@@ -3720,7 +3720,7 @@ void S9xUpdateScreen ()
 		}
         // BJ: And we have to change the height if Interlace gets set,
         //     too.
-		if (0) //IPPU.Interlace && !IPPU.DoubleHeightPixels)
+		if IPPU.Interlace && !IPPU.DoubleHeightPixels)
 		{
 			starty = GFX.StartY * 2;
 			endy = GFX.EndY * 2 + 1;
