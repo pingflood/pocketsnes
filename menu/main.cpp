@@ -551,7 +551,7 @@ int SnesInit()
 	ZeroMemory (&Settings, sizeof (Settings));
 
 	Settings.JoystickEnabled = FALSE;
-	Settings.SoundPlaybackRate = 44100;
+	Settings.SoundPlaybackRate = 22050;
 	Settings.Stereo = TRUE;
 	Settings.SoundBufferSize = 0;
 	Settings.CyclesPercentage = 100;
@@ -599,7 +599,7 @@ int SnesInit()
 	Settings.SDD1 = TRUE;
 
 	GFX.Screen = (u8*) sal_VideoGetBuffer(); //IntermediateScreen;
-	GFX.RealPitch = GFX.Pitch = 320 * 2; //256 * sizeof(u16);
+	GFX.RealPitch = GFX.Pitch = SAL_SCREEN_WIDTH * 2; //256 * sizeof(u16);
 	
 	GFX.SubScreen = (uint8 *)malloc(GFX.RealPitch * 240 * 2); 
 	GFX.ZBuffer =  (uint8 *)malloc(GFX.RealPitch * 240 * 2); 
