@@ -652,7 +652,7 @@ const char * sal_DirectoryGetHome(void)
 	if (!home[0]) {
 		char *env_home = getenv("HOME");
 		strcpy(home, env_home);
-		sal_DirectoryCombine(home, ".snes96_snapshots");
+		sal_DirectoryCombine(home, ".pocketsnes");
 
 		/* Create the directory if it didn't already exist */
 		mkdir(home, 0755);
