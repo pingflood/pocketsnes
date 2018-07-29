@@ -381,8 +381,8 @@ void S9xSyncSpeed(void)
 		}
 	}
 
-	// while (sal_AudioGetFramesBuffered() >= sal_AudioGetMaxFrames())
-		// nanosleep((const struct timespec[]){{0, 1e6L}}, NULL);
+	while (sal_AudioGetFramesBuffered() >= sal_AudioGetMaxFrames())
+		nanosleep((const struct timespec[]){{0, 1e6L}}, NULL);
 }
 
 const char *S9xBasename (const char *f)

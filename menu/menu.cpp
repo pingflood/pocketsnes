@@ -34,7 +34,7 @@ static s8 mSaveStateName[SAL_MAX_PATH]={""};       // holds the last filename to
 static s8 mRomName[SAL_MAX_PATH]={""};
 static s8 mSystemDir[SAL_MAX_PATH];
 static struct MENU_OPTIONS *mMenuOptions=NULL;
-static u16 mTempFb[SNES_WIDTH*SNES_HEIGHT_EXTENDED];
+static u16 mTempFb[SNES_WIDTH*SNES_HEIGHT_EXTENDED*2];
 
 									
 void DefaultMenuOptions(void)
@@ -798,10 +798,8 @@ static s32 SaveStateSelect(s32 mode)
 			case 5: 
 			{
 				u32 DestWidth = 205, DestHeight = 154;
-				sal_VideoBitmapScale(0, 0, SNES_WIDTH, SNES_HEIGHT, DestWidth, DestHeight, SAL_SCREEN_WIDTH - DestWidth, &mTempFb[0], (u16*)sal_VideoGetBuffer()+(SAL_SCREEN_WIDTH*(((202 + 16) - DestHeight)/2))+((262 - DestWidth)/2));
-
-				sal_VideoDrawRect(0, 186, 262, 16, SAL_RGB(22,0,0));
-
+				sal_VideoBitmapScale(0, 0, SNES_HEIGHT, SNES_HEIGHT, DestWidth, DestHeight, SAL_SCREEN_WIDTH - DestWidth, &mTempFb[0], (u16*)sal_VideoGetBuffer()+(SAL_SCREEN_WIDTH*(((202 + 16) - DestHeight)/2))+((262 - DestWidth)/2));
+				// sal_VideoDrawRect(0, 186, 262, 16, SAL_RGB(22,0,0));
 				if(mode==1) sal_VideoPrint((262-(strlen(MENU_TEXT_LOAD_SAVESTATE)<<3))>>1,190,MENU_TEXT_LOAD_SAVESTATE,SAL_RGB(31,31,31));
 				else if(mode==0) sal_VideoPrint((262-(strlen(MENU_TEXT_OVERWRITE_SAVESTATE)<<3))>>1,190,MENU_TEXT_OVERWRITE_SAVESTATE,SAL_RGB(31,31,31));
 				else if(mode==2) sal_VideoPrint((262-(strlen(MENU_TEXT_DELETE_SAVESTATE)<<3))>>1,190,MENU_TEXT_DELETE_SAVESTATE,SAL_RGB(31,31,31));
@@ -857,6 +855,7 @@ static s32 SaveStateSelect(s32 mode)
 					mPreviewingState = 1;
 					sal_AudioSetMuted(1);
 					GFX.Screen = (uint8 *) &mTempFb[0];
+					// GFX.Screen = (uint8 *) sal_VideoGetBuffer();
 					IPPU.RenderThisFrame=TRUE;
 					unsigned int fullScreenSave = mMenuOptions->fullScreen;
 					mMenuOptions->fullScreen = 0;
