@@ -175,8 +175,7 @@ u32 sal_VideoGetPitch()
 
 void sal_VideoEnterGame(u32 fullscreenOption, u32 pal, u32 refreshRate)
 {
-	uint32_t *d = (uint32_t*)rs97Screen->pixels;
-	for(uint32_t x = 0; x < 320*240; x++) *d++ = SAL_RGB(0,0,0);
+	memset(rs97Screen->pixels, 0, 320*480*2);
 }
 
 void sal_VideoSetPAL(u32 fullscreenOption, u32 pal)
@@ -189,8 +188,7 @@ void sal_VideoSetPAL(u32 fullscreenOption, u32 pal)
 
 void sal_VideoExitGame()
 {
-	uint32_t *d = (uint32_t*)rs97Screen->pixels;
-	for(uint32_t x = 0; x < 320*240; x++) *d++ = SAL_RGB(0,0,0);
+	memset(rs97Screen->pixels, 0, 320*480*2);
 }
 
 void sal_VideoBitmapDim(u16* img, u32 pixelCount)

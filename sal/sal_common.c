@@ -213,11 +213,6 @@ static void sal_VideoPrint16(s32 x, s32 y, const char *buffer, u16 color, uint32
 	}
 }
 
-// void sal_VideoPrint(s32 x, s32 y, const char *buffer, u32 color)
-// {
-// 	sal_VideoPrint(x, y, buffer, color, (uint32_t *)sal_VideoGetBuffer())
-// }
-
 void sal_VideoPrint(s32 x, s32 y, const char *buffer, u32 color)
 {
 	if (mBpp==8) sal_VideoPrint8(x,y,buffer,(u8)color, (uint32_t *)sal_VideoGetBuffer());
@@ -757,8 +752,6 @@ void sal_DirectoryCombine(s8 *path, const char *name)
 		i++;
 	}
 }
-
-
 
 s32 sal_ImageDrawTiled(u16 *image, u32 width, u32 height, s32 xScroll, s32 yScroll, s32 x, s32 y)
 {	
