@@ -175,6 +175,8 @@ u32 sal_VideoGetPitch()
 
 void sal_VideoEnterGame(u32 fullscreenOption, u32 pal, u32 refreshRate)
 {
+	uint32_t *d = (uint32_t*)rs97Screen->pixels;
+	for(uint32_t x = 0; x < 320*240; x++) *d++ = SAL_RGB(0,0,0);
 }
 
 void sal_VideoSetPAL(u32 fullscreenOption, u32 pal)
@@ -187,6 +189,8 @@ void sal_VideoSetPAL(u32 fullscreenOption, u32 pal)
 
 void sal_VideoExitGame()
 {
+	uint32_t *d = (uint32_t*)rs97Screen->pixels;
+	for(uint32_t x = 0; x < 320*240; x++) *d++ = SAL_RGB(0,0,0);
 }
 
 void sal_VideoBitmapDim(u16* img, u32 pixelCount)
@@ -201,7 +205,7 @@ void sal_VideoBitmapDim(u16* img, u32 pixelCount)
 void sal_VideoFlip(s32 vsync)
 {
 	uint32_t *s = (uint32_t*)mScreen->pixels;
-	uint32_t *d = (uint32_t*)rs97Screen->pixels + (SAL_SCREEN_WIDTH - SNES_WIDTH) / 4;
+	uint32_t *d = (uint32_t*)rs97Screen->pixels;// + (SAL_SCREEN_WIDTH - SNES_WIDTH) / 4;
 	for(uint8_t y = 0; y < 240; y++, s += SAL_SCREEN_WIDTH/2, d += 320) memmove(d, s, SAL_SCREEN_WIDTH*2);
 	// SDL_Flip(mScreen);
 }
@@ -209,6 +213,11 @@ void sal_VideoFlip(s32 vsync)
 void *sal_VideoGetBuffer()
 {
 	return (void*)mScreen->pixels;
+}
+
+void *sal_RS97VideoGetBuffer()
+{
+	return (void*)rs97Screen->pixels;
 }
 
 void sal_VideoPaletteSync() 

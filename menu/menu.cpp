@@ -798,8 +798,8 @@ static s32 SaveStateSelect(s32 mode)
 			case 5: 
 			{
 				u32 DestWidth = 205, DestHeight = 154;
-				sal_VideoBitmapScale(0, 0, SAL_SCREEN_WIDTH, SNES_HEIGHT, DestWidth, DestHeight, SAL_SCREEN_WIDTH - DestWidth, &mTempFb[0], (u16*)sal_VideoGetBuffer()+(SAL_SCREEN_WIDTH*(((202 + 16) - DestHeight)/2))+((262 - DestWidth)/2));
-				// sal_VideoDrawRect(0, 186, 262, 16, SAL_RGB(22,0,0));
+				sal_VideoBitmapScale(0, 0, SNES_WIDTH, SNES_HEIGHT, DestWidth, DestHeight, SAL_SCREEN_WIDTH - DestWidth, &mTempFb[0], (u16*)sal_VideoGetBuffer()+(SAL_SCREEN_WIDTH*(((202 + 16) - DestHeight)/2))+((262 - DestWidth)/2));
+				sal_VideoDrawRect(0, 186, 262, 16, SAL_RGB(22,0,0));
 				if(mode==1) sal_VideoPrint((262-(strlen(MENU_TEXT_LOAD_SAVESTATE)<<3))>>1,190,MENU_TEXT_LOAD_SAVESTATE,SAL_RGB(31,31,31));
 				else if(mode==0) sal_VideoPrint((262-(strlen(MENU_TEXT_OVERWRITE_SAVESTATE)<<3))>>1,190,MENU_TEXT_OVERWRITE_SAVESTATE,SAL_RGB(31,31,31));
 				else if(mode==2) sal_VideoPrint((262-(strlen(MENU_TEXT_DELETE_SAVESTATE)<<3))>>1,190,MENU_TEXT_DELETE_SAVESTATE,SAL_RGB(31,31,31));
@@ -904,7 +904,7 @@ static s32 SaveStateSelect(s32 mode)
 	{
 		LoadStateTemp();
 	}
-	GFX.Screen = (uint8 *) sal_VideoGetBuffer();
+	GFX.Screen = (uint8 *) sal_RS97VideoGetBuffer();
 	DeleteStateTemp();
 	sal_InputIgnore();
 	return(action);
@@ -1180,23 +1180,23 @@ void MainMenuUpdateText(s32 menu_index)
 			}
 			break;
 
-		// case MENU_FULLSCREEN:
-		// 	switch(mMenuOptions->fullScreen)
-		// 	{
-		// 		case 0:
-		// 			strcpy(mMenuText[MENU_FULLSCREEN],"Full screen:               OFF");
-		// 			break;
-		// 		case 1:
-		// 			strcpy(mMenuText[MENU_FULLSCREEN],"Full screen:              FAST");
-		// 			break;  
-		// 		case 2:
-		// 			strcpy(mMenuText[MENU_FULLSCREEN],"Full screen:            SMOOTH");
-		// 			break;  
-		// 		case 3:
-		// 			strcpy(mMenuText[MENU_FULLSCREEN],"Full screen:          HARDWARE");
-		// 			break;
-		// 	}
-		// 	break;
+		case MENU_FULLSCREEN:
+			switch(mMenuOptions->fullScreen)
+			{
+				case 0:
+					strcpy(mMenuText[MENU_FULLSCREEN],"Full screen:               OFF");
+					break;
+				case 1:
+					strcpy(mMenuText[MENU_FULLSCREEN],"Full screen:              FAST");
+					break;  
+				case 2:
+					strcpy(mMenuText[MENU_FULLSCREEN],"Full screen:            SMOOTH");
+					break;  
+				// case 3:
+				// 	strcpy(mMenuText[MENU_FULLSCREEN],"Full screen:          HARDWARE");
+				// 	break;
+			}
+			break;
 			
 		case MENU_LOAD_GLOBAL_SETTINGS:
 			strcpy(mMenuText[MENU_LOAD_GLOBAL_SETTINGS],"Load global settings");
@@ -1245,7 +1245,7 @@ void MainMenuUpdateTextAll(void)
 	MainMenuUpdateText(MENU_FRAMESKIP);
 	MainMenuUpdateText(MENU_FPS);
 	MainMenuUpdateText(MENU_SOUND_SYNC);
-	// MainMenuUpdateText(MENU_FULLSCREEN);
+	MainMenuUpdateText(MENU_FULLSCREEN);
 	MainMenuUpdateText(MENU_LOAD_GLOBAL_SETTINGS);
 	MainMenuUpdateText(MENU_SAVE_GLOBAL_SETTINGS);
 	MainMenuUpdateText(MENU_LOAD_CURRENT_SETTINGS);
@@ -1586,20 +1586,20 @@ s32 MenuRun(s8 *romName)
 					MainMenuUpdateText(MENU_FPS);
 					break;
 
-				// case MENU_FULLSCREEN:
-				// 	if (keys & SAL_INPUT_RIGHT)
-				// 	{
-				// 		mMenuOptions->fullScreen = (mMenuOptions->fullScreen + 1) % 4;
-				// 	}
-				// 	else
-				// 	{
-				// 		if (mMenuOptions->fullScreen == 0)
-				// 			mMenuOptions->fullScreen = 3;
-				// 		else
-				// 			mMenuOptions->fullScreen--;
-				// 	}
-				// 	MainMenuUpdateText(MENU_FULLSCREEN);
-				// 	break;
+				case MENU_FULLSCREEN:
+					if (keys & SAL_INPUT_RIGHT)
+					{
+						mMenuOptions->fullScreen = (mMenuOptions->fullScreen + 1) % 3;
+					}
+					else
+					{
+						if (mMenuOptions->fullScreen == 0)
+							mMenuOptions->fullScreen = 2;
+						else
+							mMenuOptions->fullScreen--;
+					}
+					MainMenuUpdateText(MENU_FULLSCREEN);
+					break;
 			}
 		}
 
