@@ -255,8 +255,7 @@ uint32 S9xReadJoypad (int which1)
 
 	u32 joy = sal_InputPoll();
 	
-	if (((joy & SAL_INPUT_SELECT) && (joy & SAL_INPUT_START))
-	 || (joy & SAL_INPUT_MENU))
+	if (joy & SAL_INPUT_MENU)
 	{
 		mEnterMenu = 1;		
 		return val;
