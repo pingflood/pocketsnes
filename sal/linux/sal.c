@@ -56,7 +56,7 @@ static u32 sal_Input(int held)
 		CASE(DOWN, DOWN);
 		CASE(LEFT, LEFT);
 		CASE(RIGHT, RIGHT);
-		CASE(3, MENU);
+		CASE(END, MENU);
 		default: break;
 	}
 
