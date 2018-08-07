@@ -36,6 +36,7 @@ static s8 mSystemDir[SAL_MAX_PATH];
 static struct MENU_OPTIONS *mMenuOptions=NULL;
 static u16 mTempFb[SNES_WIDTH*SNES_HEIGHT_EXTENDED*2];
 
+extern "C" void S9xSaveSRAM(int showWarning);
 									
 void DefaultMenuOptions(void)
 {
@@ -954,7 +955,7 @@ s32 SaveStateMenu(void)
 	strcpy(mMenuText[SAVESTATE_MENU_LOAD],"Load state");
 	strcpy(mMenuText[SAVESTATE_MENU_SAVE],"Save state");
 	strcpy(mMenuText[SAVESTATE_MENU_DELETE],"Delete state");
-	strcpy(mMenuText[SAVESTATE_MENU_RETURN],"Back");
+	strcpy(mMenuText[SAVESTATE_MENU_SAVE_SRAM],"Save SRAM");
 	sal_InputIgnore();
 
 	while (!menuExit)
@@ -1008,8 +1009,13 @@ s32 SaveStateMenu(void)
 				case SAVESTATE_MENU_DELETE:
 					SaveStateSelect(SAVESTATE_MODE_DELETE);
 					break;
-				case SAVESTATE_MENU_RETURN:
-					menuExit=1;
+				case SAVESTATE_MENU_SAVE_SRAM:
+					if(mRomName[0]!=0)
+					{
+						MenuMessageBox("","","Saving SRAM...",MENU_MESSAGE_BOX_MODE_MSG);
+						S9xSaveSRAM(1);
+						usleep(2e6);
+					}
 					break;
 			}
 		}
@@ -1041,16 +1047,19 @@ s32 SaveStateMenu(void)
 
 void ShowCredits()
 {
-	s32 menuExit=0,menuCount=7,menufocus=0,menuSmooth=0;
+	s32 menuExit=0,menuCount=0,menufocus=0,menuSmooth=0;
 	u32 keys=0;
 
-	strcpy(mMenuText[0],"PocketSNES - built " __DATE__);
-	strcpy(mMenuText[1],"-------------------------------------");
-	strcpy(mMenuText[2],"Based on Snes9x version " VERSION /* snes9x.h */);
-	strcpy(mMenuText[3],"PocketSNES created by Scott Ramsby");
-	strcpy(mMenuText[4],"Initial port to the Dingoo by Reesy");
-	strcpy(mMenuText[5],"Ported to OpenDingux by pcercuei");
-	strcpy(mMenuText[6],"Optimisations and fixes by Nebuleon");
+	strcpy(mMenuText[menuCount++],"PocketSNES - built " __DATE__);
+	strcpy(mMenuText[menuCount++],"-------------------------------------");
+	strcpy(mMenuText[menuCount++],"Based on Snes9x version " VERSION /* snes9x.h */);
+	strcpy(mMenuText[menuCount++],"PocketSNES created by Scott Ramsby");
+	strcpy(mMenuText[menuCount++],"Initial port to the Dingoo by Reesy");
+	strcpy(mMenuText[menuCount++],"Ported to OpenDingux by pcercuei");
+	strcpy(mMenuText[menuCount++],"Optimisations and fixes by Nebuleon");
+	strcpy(mMenuText[menuCount++],"Initial port to RS97 by Steward-Fu");
+	strcpy(mMenuText[menuCount++],"RS97 optimizations by Gameblabla");
+	strcpy(mMenuText[menuCount++],"and pingflood");
 
 	sal_InputIgnore();
 	while (!menuExit)
@@ -1104,122 +1113,8 @@ void MainMenuUpdateText(s32 menu_index)
 			strcpy(mMenuText[MENU_CREDITS],"Credits");
 			break;
 
-		case MENU_RETURN:
-			strcpy(mMenuText[MENU_RETURN],"Return to game");
-			break;
-
-		case MENU_AUTO_SAVE_SRAM:
-			sprintf(mMenuText[MENU_AUTO_SAVE_SRAM],
-						"Save SRAM when changed:    %s",
-						mMenuOptions->autoSaveSram ? " ON" : "OFF");
-			break;
-
-		case MENU_SOUND_SYNC:
-			switch (mMenuOptions->soundSync)
-			{
-				case 0:
-					strcpy(mMenuText[MENU_SOUND_SYNC], "Prefer fluid...          Video");
-					break;
-				case 1:
-					strcpy(mMenuText[MENU_SOUND_SYNC], "Prefer fluid...      Vid & aud");
-					break;
-				default:
-					strcpy(mMenuText[MENU_SOUND_SYNC], "Prefer fluid...          Audio");
-					break;
-			}
-
-		case MENU_SOUND_ON:
-			sprintf(mMenuText[MENU_SOUND_ON],
-						"Sound:                     %s",
-						mMenuOptions->soundEnabled ? " ON" : "OFF");
-			break;
-		
-		case MENU_SOUND_RATE:		
-			sprintf(mMenuText[MENU_SOUND_RATE],"Sound rate:              %5d",mMenuOptions->soundRate);
-			break;
-
-		case MENU_SOUND_STEREO:
-			sprintf(mMenuText[MENU_SOUND_STEREO],
-						"Stereo:                    %s",
-						mMenuOptions->stereo ? " ON" : "OFF");
-			break;
-
-#if 0
-		case MENU_CPU_SPEED:		
-			sprintf(mMenuText[MENU_CPU_SPEED],"Cpu Speed:                  %d",mMenuOptions->cpuSpeed);
-			break;
-		
-		case MENU_SOUND_VOL:
-			sprintf(mMenuText[MENU_SOUND_VOL],"Volume:                     %d",mMenuOptions->volume);
-			break;
-#endif
-		
-		case MENU_FRAMESKIP: 
-			switch(mMenuOptions->frameSkip)
-			{
-				case 0:
-					strcpy(mMenuText[MENU_FRAMESKIP],
-						"Frameskip:                AUTO");
-					break;
-				default:
-					sprintf(mMenuText[MENU_FRAMESKIP],
-						"Frameskip:                   %1d",mMenuOptions->frameSkip-1);
-					break;
-			}
-			break;
-
-		case MENU_FPS:
-			switch(mMenuOptions->showFps)
-			{
-				case 0:
-					strcpy(mMenuText[MENU_FPS],"Show FPS:                  OFF");
-					break;
-				case 1:
-					strcpy(mMenuText[MENU_FPS],"Show FPS:                   ON");
-					break;  
-			}
-			break;
-
-		case MENU_FULLSCREEN:
-			switch(mMenuOptions->fullScreen)
-			{
-				case 0:
-					strcpy(mMenuText[MENU_FULLSCREEN],"Full screen:               OFF");
-					break;
-				case 1:
-					strcpy(mMenuText[MENU_FULLSCREEN],"Full screen:              FAST");
-					break;  
-				case 2:
-					strcpy(mMenuText[MENU_FULLSCREEN],"Full screen:            SMOOTH");
-					break;  
-				// case 3:
-				// 	strcpy(mMenuText[MENU_FULLSCREEN],"Full screen:          HARDWARE");
-				// 	break;
-			}
-			break;
-			
-		case MENU_LOAD_GLOBAL_SETTINGS:
-			strcpy(mMenuText[MENU_LOAD_GLOBAL_SETTINGS],"Load global settings");
-			break;
-			
-		case MENU_SAVE_GLOBAL_SETTINGS:
-			strcpy(mMenuText[MENU_SAVE_GLOBAL_SETTINGS],"Save global settings");
-			break;
-			
-		case MENU_LOAD_CURRENT_SETTINGS:
-			strcpy(mMenuText[MENU_LOAD_CURRENT_SETTINGS],"Load per-game settings");
-			break;
-		
-		case MENU_SAVE_CURRENT_SETTINGS:
-			strcpy(mMenuText[MENU_SAVE_CURRENT_SETTINGS],"Save per-game settings");
-			break;
-
-		case MENU_DELETE_CURRENT_SETTINGS:
-			strcpy(mMenuText[MENU_DELETE_CURRENT_SETTINGS],"Delete per-game settings");
-			break;
-
-		case MENU_SAVE_SRAM:
-			strcpy(mMenuText[MENU_SAVE_SRAM],"Save SRAM");
+		case MENU_SETTINGS:
+			strcpy(mMenuText[MENU_SETTINGS],"Settings");
 			break;
 
 #ifndef NO_ROM_BROWSER
@@ -1230,34 +1125,154 @@ void MainMenuUpdateText(s32 menu_index)
 	}
 }
 
+static 
+void SettingsMenuUpdateText(s32 menu_index)
+{
+	switch(menu_index)
+	{
+		case SETTINGS_MENU_AUTO_SAVE_SRAM:
+			sprintf(mMenuText[SETTINGS_MENU_AUTO_SAVE_SRAM],
+						"Save SRAM when changed:    %s",
+						mMenuOptions->autoSaveSram ? " ON" : "OFF");
+			break;
+
+		case SETTINGS_MENU_SOUND_SYNC:
+			switch (mMenuOptions->soundSync)
+			{
+				case 0:
+					strcpy(mMenuText[SETTINGS_MENU_SOUND_SYNC], "Prefer fluid...          Video");
+					break;
+				case 1:
+					strcpy(mMenuText[SETTINGS_MENU_SOUND_SYNC], "Prefer fluid...      Vid & aud");
+					break;
+				default:
+					strcpy(mMenuText[SETTINGS_MENU_SOUND_SYNC], "Prefer fluid...          Audio");
+					break;
+			}
+
+		case SETTINGS_MENU_SOUND_ON:
+			sprintf(mMenuText[SETTINGS_MENU_SOUND_ON],
+						"Sound:                     %s",
+						mMenuOptions->soundEnabled ? " ON" : "OFF");
+			break;
+		
+		case SETTINGS_MENU_SOUND_RATE:		
+			sprintf(mMenuText[SETTINGS_MENU_SOUND_RATE],"Sound rate:              %5d",mMenuOptions->soundRate);
+			break;
+
+		case SETTINGS_MENU_SOUND_STEREO:
+			sprintf(mMenuText[SETTINGS_MENU_SOUND_STEREO],
+						"Stereo:                    %s",
+						mMenuOptions->stereo ? " ON" : "OFF");
+			break;
+
+#if 0
+		case SETTINGS_MENU_CPU_SPEED:		
+			sprintf(mMenuText[SETTINGS_MENU_CPU_SPEED],"Cpu Speed:                  %d",mMenuOptions->cpuSpeed);
+			break;
+		
+		case SETTINGS_MENU_SOUND_VOL:
+			sprintf(mMenuText[SETTINGS_MENU_SOUND_VOL],"Volume:                     %d",mMenuOptions->volume);
+			break;
+#endif
+		
+		case SETTINGS_MENU_FRAMESKIP: 
+			switch(mMenuOptions->frameSkip)
+			{
+				case 0:
+					strcpy(mMenuText[SETTINGS_MENU_FRAMESKIP],
+						"Frameskip:                AUTO");
+					break;
+				default:
+					sprintf(mMenuText[SETTINGS_MENU_FRAMESKIP],
+						"Frameskip:                   %1d",mMenuOptions->frameSkip-1);
+					break;
+			}
+			break;
+
+		case SETTINGS_MENU_FPS:
+			switch(mMenuOptions->showFps)
+			{
+				case 0:
+					strcpy(mMenuText[SETTINGS_MENU_FPS],"Show FPS:                  OFF");
+					break;
+				case 1:
+					strcpy(mMenuText[SETTINGS_MENU_FPS],"Show FPS:                   ON");
+					break;  
+			}
+			break;
+
+		case SETTINGS_MENU_FULLSCREEN:
+			switch(mMenuOptions->fullScreen)
+			{
+				case 0:
+					strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Full screen:               OFF");
+					break;
+				case 1:
+					strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Full screen:              FAST");
+					break;  
+				case 2:
+					strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Full screen:            SMOOTH");
+					break;  
+				// case 3:
+				// 	strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Full screen:          HARDWARE");
+				// 	break;
+			}
+			break;
+			
+		case SETTINGS_MENU_LOAD_GLOBAL_SETTINGS:
+			strcpy(mMenuText[SETTINGS_MENU_LOAD_GLOBAL_SETTINGS],"Load global settings");
+			break;
+			
+		case SETTINGS_MENU_SAVE_GLOBAL_SETTINGS:
+			strcpy(mMenuText[SETTINGS_MENU_SAVE_GLOBAL_SETTINGS],"Save global settings");
+			break;
+			
+		case SETTINGS_MENU_LOAD_CURRENT_SETTINGS:
+			strcpy(mMenuText[SETTINGS_MENU_LOAD_CURRENT_SETTINGS],"Load per-game settings");
+			break;
+		
+		case SETTINGS_MENU_SAVE_CURRENT_SETTINGS:
+			strcpy(mMenuText[SETTINGS_MENU_SAVE_CURRENT_SETTINGS],"Save per-game settings");
+			break;
+
+		case SETTINGS_MENU_DELETE_CURRENT_SETTINGS:
+			strcpy(mMenuText[SETTINGS_MENU_DELETE_CURRENT_SETTINGS],"Delete per-game settings");
+			break;
+	}
+}
+
+static
+void SettingsMenuUpdateTextAll(void)
+{
+//	SettingsMenuUpdateText(SETTINGS_MENU_CPU_SPEED);
+	SettingsMenuUpdateText(SETTINGS_MENU_SOUND_ON);
+	SettingsMenuUpdateText(SETTINGS_MENU_SOUND_STEREO);
+	SettingsMenuUpdateText(SETTINGS_MENU_SOUND_RATE);
+//	SettingsMenuUpdateText(SETTINGS_MENU_SOUND_VOL);
+	SettingsMenuUpdateText(SETTINGS_MENU_FRAMESKIP);
+	SettingsMenuUpdateText(SETTINGS_MENU_FPS);
+	SettingsMenuUpdateText(SETTINGS_MENU_SOUND_SYNC);
+	SettingsMenuUpdateText(SETTINGS_MENU_FULLSCREEN);
+	SettingsMenuUpdateText(SETTINGS_MENU_LOAD_GLOBAL_SETTINGS);
+	SettingsMenuUpdateText(SETTINGS_MENU_SAVE_GLOBAL_SETTINGS);
+	SettingsMenuUpdateText(SETTINGS_MENU_LOAD_CURRENT_SETTINGS);
+	SettingsMenuUpdateText(SETTINGS_MENU_SAVE_CURRENT_SETTINGS);
+	SettingsMenuUpdateText(SETTINGS_MENU_DELETE_CURRENT_SETTINGS);
+	SettingsMenuUpdateText(SETTINGS_MENU_AUTO_SAVE_SRAM);
+}
+
 static
 void MainMenuUpdateTextAll(void)
 {
 	MainMenuUpdateText(MENU_STATE);
 	MainMenuUpdateText(MENU_RESET_GAME);
-	MainMenuUpdateText(MENU_EXIT_APP);
-	MainMenuUpdateText(MENU_RETURN);
-//	MainMenuUpdateText(MENU_CPU_SPEED);
-	MainMenuUpdateText(MENU_SOUND_ON);
-	MainMenuUpdateText(MENU_SOUND_STEREO);
-	MainMenuUpdateText(MENU_SOUND_RATE);
-//	MainMenuUpdateText(MENU_SOUND_VOL);
-	MainMenuUpdateText(MENU_FRAMESKIP);
-	MainMenuUpdateText(MENU_FPS);
-	MainMenuUpdateText(MENU_SOUND_SYNC);
-	MainMenuUpdateText(MENU_FULLSCREEN);
-	MainMenuUpdateText(MENU_LOAD_GLOBAL_SETTINGS);
-	MainMenuUpdateText(MENU_SAVE_GLOBAL_SETTINGS);
-	MainMenuUpdateText(MENU_LOAD_CURRENT_SETTINGS);
-	MainMenuUpdateText(MENU_SAVE_CURRENT_SETTINGS);
-	MainMenuUpdateText(MENU_DELETE_CURRENT_SETTINGS);
-	MainMenuUpdateText(MENU_RETURN);
-	MainMenuUpdateText(MENU_CREDITS);
-	MainMenuUpdateText(MENU_AUTO_SAVE_SRAM);
-	MainMenuUpdateText(MENU_SAVE_SRAM);
 #ifndef NO_ROM_BROWSER
 	MainMenuUpdateText(MENU_ROM_SELECT);
 #endif
+	MainMenuUpdateText(MENU_SETTINGS);
+	MainMenuUpdateText(MENU_CREDITS);
+	MainMenuUpdateText(MENU_EXIT_APP);
 }
 
 void MenuReloadOptions()
@@ -1303,8 +1318,239 @@ void MenuInit(const char *systemDir, struct MENU_OPTIONS *menuOptions)
 }
 
 
+static
+s32 SettingsMenu(void)
+{
+	s32 menuExit=0,menuCount=SETTINGS_MENU_COUNT,menufocus=0,menuSmooth=0;
+	s32 action=0;
+	s32 subaction=0;
+	u32 keys=0;
 
-extern "C" void S9xSaveSRAM(int showWarning);
+	SettingsMenuUpdateTextAll();
+
+	sal_InputIgnore();
+
+	while (!menuExit)
+	{
+		// Draw screen:
+		menuSmooth=menuSmooth*7+(menufocus<<8); menuSmooth>>=3;
+		RenderMenu("Settings", menuCount,menuSmooth,menufocus);
+		sal_VideoFlip(1);
+
+		keys=sal_InputPollRepeat();
+
+		if (keys & INP_BUTTON_MENU_CANCEL)
+		{
+			while (keys)
+			{
+				// Draw screen:
+				menuSmooth=menuSmooth*7+(menufocus<<8); menuSmooth>>=3;
+				RenderMenu("Settings", menuCount,menuSmooth,menufocus);
+				sal_VideoFlip(1);
+
+				keys=sal_InputPoll();
+			}
+		
+			menuExit=1;
+		}
+		else if (keys & INP_BUTTON_MENU_SELECT)
+		{
+			while (keys)
+			{
+				// Draw screen:
+				menuSmooth=menuSmooth*7+(menufocus<<8); menuSmooth>>=3;
+				RenderMenu("Settings", menuCount,menuSmooth,menufocus);
+				sal_VideoFlip(1);
+
+				keys=sal_InputPoll();
+			}
+
+			switch(menufocus)
+			{
+				case SETTINGS_MENU_LOAD_GLOBAL_SETTINGS:
+					LoadMenuOptions(mSystemDir, MENU_OPTIONS_FILENAME, MENU_OPTIONS_EXT, (char*)mMenuOptions, sizeof(struct MENU_OPTIONS), 1);
+					SettingsMenuUpdateTextAll();
+					break;
+				case SETTINGS_MENU_SAVE_GLOBAL_SETTINGS:
+					SaveMenuOptions(mSystemDir, MENU_OPTIONS_FILENAME, MENU_OPTIONS_EXT, (char*)mMenuOptions, sizeof(struct MENU_OPTIONS), 1);
+					break;
+
+				case SETTINGS_MENU_LOAD_CURRENT_SETTINGS:
+					if(mRomName[0]!=0)
+					{
+						LoadMenuOptions(mSystemDir, mRomName, MENU_OPTIONS_EXT, (char*)mMenuOptions, sizeof(struct MENU_OPTIONS), 1);
+						SettingsMenuUpdateTextAll();
+					}
+					break;
+				case SETTINGS_MENU_SAVE_CURRENT_SETTINGS:
+					if(mRomName[0]!=0)
+					{
+						SaveMenuOptions(mSystemDir, mRomName, MENU_OPTIONS_EXT, (char*)mMenuOptions, sizeof(struct MENU_OPTIONS), 1);
+					}
+					break;
+
+				case SETTINGS_MENU_DELETE_CURRENT_SETTINGS:
+					if(mRomName[0]!=0)
+					{
+						DeleteMenuOptions(mSystemDir, mRomName, MENU_OPTIONS_EXT, 1);
+					}
+					break;
+			
+			}
+		}
+		else if ((keys & (SAL_INPUT_LEFT | SAL_INPUT_RIGHT))
+		      && (keys & (SAL_INPUT_LEFT | SAL_INPUT_RIGHT)) != (SAL_INPUT_LEFT | SAL_INPUT_RIGHT))
+		{
+			switch(menufocus)
+			{
+				case SETTINGS_MENU_SOUND_ON:
+					mMenuOptions->soundEnabled^=1;
+					SettingsMenuUpdateText(SETTINGS_MENU_SOUND_ON);
+					break;
+
+				case SETTINGS_MENU_SOUND_STEREO:
+					mMenuOptions->stereo^=1;
+					SettingsMenuUpdateText(SETTINGS_MENU_SOUND_STEREO);
+					break;
+
+				case SETTINGS_MENU_AUTO_SAVE_SRAM:
+					mMenuOptions->autoSaveSram^=1;
+					SettingsMenuUpdateText(SETTINGS_MENU_AUTO_SAVE_SRAM);
+					break;
+
+				case SETTINGS_MENU_SOUND_SYNC:
+					if (keys & SAL_INPUT_RIGHT)
+					{
+						mMenuOptions->soundSync = (mMenuOptions->soundSync + 1) % 3;
+					}
+					else
+					{
+						if (mMenuOptions->soundSync == 0)
+							mMenuOptions->soundSync = 2;
+						else
+							mMenuOptions->soundSync--;
+					}
+					SettingsMenuUpdateText(SETTINGS_MENU_SOUND_SYNC);
+					break;
+
+#if 0
+				case SETTINGS_MENU_CPU_SPEED:
+					
+					if (keys & SAL_INPUT_RIGHT)
+					{
+						if(keys&INP_BUTTON_MENU_SELECT)
+						{
+							mMenuOptions->cpuSpeed=sal_CpuSpeedNextFast(mMenuOptions->cpuSpeed);
+						}
+						else
+						{
+							mMenuOptions->cpuSpeed=sal_CpuSpeedNext(mMenuOptions->cpuSpeed);
+						}	
+					}
+					else
+					{
+						if(keys&INP_BUTTON_MENU_SELECT)
+						{
+							mMenuOptions->cpuSpeed=sal_CpuSpeedPreviousFast(mMenuOptions->cpuSpeed);
+						}
+						else
+						{
+							mMenuOptions->cpuSpeed=sal_CpuSpeedPrevious(mMenuOptions->cpuSpeed);
+						}
+					}
+					SettingsMenuUpdateText(SETTINGS_MENU_CPU_SPEED);
+					break;
+#endif
+
+				case SETTINGS_MENU_SOUND_RATE:
+					if (keys & SAL_INPUT_RIGHT)
+					{
+						mMenuOptions->soundRate=sal_AudioRateNext(mMenuOptions->soundRate);	
+					}
+					else
+					{
+						mMenuOptions->soundRate=sal_AudioRatePrevious(mMenuOptions->soundRate);
+					}
+					SettingsMenuUpdateText(SETTINGS_MENU_SOUND_RATE);
+					break;
+
+#if 0
+				case SETTINGS_MENU_SOUND_VOL:
+					if (keys & SAL_INPUT_RIGHT)
+					{
+						mMenuOptions->volume+=1;
+						if(mMenuOptions->volume>31) mMenuOptions->volume=0;
+					}
+					else
+					{
+						mMenuOptions->volume-=1;
+						if(mMenuOptions->volume>31) mMenuOptions->volume=31;
+
+					}
+					SettingsMenuUpdateText(SETTINGS_MENU_SOUND_VOL);
+					break;
+#endif
+
+				case SETTINGS_MENU_FRAMESKIP:
+					if (keys & SAL_INPUT_RIGHT)
+					{
+						mMenuOptions->frameSkip++;
+						if(mMenuOptions->frameSkip>6) mMenuOptions->frameSkip=0;
+					}
+					else
+					{
+						mMenuOptions->frameSkip--;
+						if(mMenuOptions->frameSkip>6) mMenuOptions->frameSkip=6;
+					}
+					SettingsMenuUpdateText(SETTINGS_MENU_FRAMESKIP);
+					break;
+
+				case SETTINGS_MENU_FPS:
+					mMenuOptions->showFps^=1;
+					SettingsMenuUpdateText(SETTINGS_MENU_FPS);
+					break;
+
+				case SETTINGS_MENU_FULLSCREEN:
+					if (keys & SAL_INPUT_RIGHT)
+					{
+						mMenuOptions->fullScreen = (mMenuOptions->fullScreen + 1) % 3;
+					}
+					else
+					{
+						if (mMenuOptions->fullScreen == 0)
+							mMenuOptions->fullScreen = 2;
+						else
+							mMenuOptions->fullScreen--;
+					}
+					SettingsMenuUpdateText(SETTINGS_MENU_FULLSCREEN);
+					break;
+			}
+		}
+		else if ((keys & (SAL_INPUT_UP | SAL_INPUT_DOWN))
+		      && (keys & (SAL_INPUT_UP | SAL_INPUT_DOWN)) != (SAL_INPUT_UP | SAL_INPUT_DOWN))
+		{
+			if (keys & SAL_INPUT_UP)
+				menufocus--; // Up
+			else if (keys & SAL_INPUT_DOWN)
+				menufocus++; // Down
+
+			if (menufocus>menuCount-1)
+			{
+				menufocus=0;
+				menuSmooth=(menufocus<<8)-1;
+			}
+			else if (menufocus<0)
+			{
+				menufocus=menuCount-1;
+				menuSmooth=(menufocus<<8)-1;
+			}
+		}
+
+		usleep(10000);
+	}
+  sal_InputIgnore();
+  return action;
+}
 
 s32 MenuRun(s8 *romName)
 {
@@ -1370,35 +1616,6 @@ s32 MenuRun(s8 *romName)
 					}
 					break;
 #endif
-				case MENU_LOAD_GLOBAL_SETTINGS:
-					LoadMenuOptions(mSystemDir, MENU_OPTIONS_FILENAME, MENU_OPTIONS_EXT, (char*)mMenuOptions, sizeof(struct MENU_OPTIONS), 1);
-					MainMenuUpdateTextAll();
-					break;
-				case MENU_SAVE_GLOBAL_SETTINGS:
-					SaveMenuOptions(mSystemDir, MENU_OPTIONS_FILENAME, MENU_OPTIONS_EXT, (char*)mMenuOptions, sizeof(struct MENU_OPTIONS), 1);
-					break;
-
-				case MENU_LOAD_CURRENT_SETTINGS:
-					if(mRomName[0]!=0)
-					{
-						LoadMenuOptions(mSystemDir, mRomName, MENU_OPTIONS_EXT, (char*)mMenuOptions, sizeof(struct MENU_OPTIONS), 1);
-
-						MainMenuUpdateTextAll();
-					}
-					break;
-				case MENU_SAVE_CURRENT_SETTINGS:
-					if(mRomName[0]!=0)
-					{
-						SaveMenuOptions(mSystemDir, mRomName, MENU_OPTIONS_EXT, (char*)mMenuOptions, sizeof(struct MENU_OPTIONS), 1);
-					}
-					break;
-
-				case MENU_DELETE_CURRENT_SETTINGS:
-					if(mRomName[0]!=0)
-					{
-						DeleteMenuOptions(mSystemDir, mRomName, MENU_OPTIONS_EXT, 1);
-					}
-					break;
 
 				case MENU_STATE:
 					if(mRomName[0]!=0)
@@ -1413,16 +1630,13 @@ s32 MenuRun(s8 *romName)
 					MainMenuUpdateTextAll();
 					break;
 
-				case MENU_SAVE_SRAM:
-					if(mRomName[0]!=0)
-					{
-						MenuMessageBox("","","Saving SRAM...",MENU_MESSAGE_BOX_MODE_MSG);
-						S9xSaveSRAM(1);
-					}
-					break;
-
 				case MENU_CREDITS:
 					ShowCredits();
+					MainMenuUpdateTextAll();
+					break;
+
+				case MENU_SETTINGS:
+					SettingsMenu();
 					MainMenuUpdateTextAll();
 					break;
 
@@ -1433,13 +1647,7 @@ s32 MenuRun(s8 *romName)
 						menuExit=1;
 					}
 					break;
-				case MENU_RETURN:
-					if(mRomName[0]!=0)
-					{
-						action=EVENT_RUN_ROM;
-						menuExit=1;
-					}
-					break;
+				
 				case MENU_EXIT_APP:
 					action=EVENT_EXIT_APP;
 					menuExit=1;
@@ -1474,134 +1682,6 @@ s32 MenuRun(s8 *romName)
 				menuSmooth=(menufocus<<8)-1;
 			}
 		}
-		else if ((keys & (SAL_INPUT_LEFT | SAL_INPUT_RIGHT))
-		      && (keys & (SAL_INPUT_LEFT | SAL_INPUT_RIGHT)) != (SAL_INPUT_LEFT | SAL_INPUT_RIGHT))
-		{
-			switch(menufocus)
-			{
-				case MENU_SOUND_ON:
-					mMenuOptions->soundEnabled^=1;
-					MainMenuUpdateText(MENU_SOUND_ON);
-					break;
-
-				case MENU_SOUND_STEREO:
-					mMenuOptions->stereo^=1;
-					MainMenuUpdateText(MENU_SOUND_STEREO);
-					break;
-
-				case MENU_AUTO_SAVE_SRAM:
-					mMenuOptions->autoSaveSram^=1;
-					MainMenuUpdateText(MENU_AUTO_SAVE_SRAM);
-					break;
-
-				case MENU_SOUND_SYNC:
-					if (keys & SAL_INPUT_RIGHT)
-					{
-						mMenuOptions->soundSync = (mMenuOptions->soundSync + 1) % 3;
-					}
-					else
-					{
-						if (mMenuOptions->soundSync == 0)
-							mMenuOptions->soundSync = 2;
-						else
-							mMenuOptions->soundSync--;
-					}
-					MainMenuUpdateText(MENU_SOUND_SYNC);
-					break;
-
-#if 0
-				case MENU_CPU_SPEED:
-					
-					if (keys & SAL_INPUT_RIGHT)
-					{
-						if(keys&INP_BUTTON_MENU_SELECT)
-						{
-							mMenuOptions->cpuSpeed=sal_CpuSpeedNextFast(mMenuOptions->cpuSpeed);
-						}
-						else
-						{
-							mMenuOptions->cpuSpeed=sal_CpuSpeedNext(mMenuOptions->cpuSpeed);
-						}	
-					}
-					else
-					{
-						if(keys&INP_BUTTON_MENU_SELECT)
-						{
-							mMenuOptions->cpuSpeed=sal_CpuSpeedPreviousFast(mMenuOptions->cpuSpeed);
-						}
-						else
-						{
-							mMenuOptions->cpuSpeed=sal_CpuSpeedPrevious(mMenuOptions->cpuSpeed);
-						}
-					}
-					MainMenuUpdateText(MENU_CPU_SPEED);
-					break;
-#endif
-
-				case MENU_SOUND_RATE:
-					if (keys & SAL_INPUT_RIGHT)
-					{
-						mMenuOptions->soundRate=sal_AudioRateNext(mMenuOptions->soundRate);	
-					}
-					else
-					{
-						mMenuOptions->soundRate=sal_AudioRatePrevious(mMenuOptions->soundRate);
-					}
-					MainMenuUpdateText(MENU_SOUND_RATE);
-					break;
-
-#if 0
-				case MENU_SOUND_VOL:
-					if (keys & SAL_INPUT_RIGHT)
-					{
-						mMenuOptions->volume+=1;
-						if(mMenuOptions->volume>31) mMenuOptions->volume=0;
-					}
-					else
-					{
-						mMenuOptions->volume-=1;
-						if(mMenuOptions->volume>31) mMenuOptions->volume=31;
-
-					}
-					MainMenuUpdateText(MENU_SOUND_VOL);
-					break;
-#endif
-
-				case MENU_FRAMESKIP:
-					if (keys & SAL_INPUT_RIGHT)
-					{
-						mMenuOptions->frameSkip++;
-						if(mMenuOptions->frameSkip>6) mMenuOptions->frameSkip=0;
-					}
-					else
-					{
-						mMenuOptions->frameSkip--;
-						if(mMenuOptions->frameSkip>6) mMenuOptions->frameSkip=6;
-					}
-					MainMenuUpdateText(MENU_FRAMESKIP);
-					break;
-
-				case MENU_FPS:
-					mMenuOptions->showFps^=1;
-					MainMenuUpdateText(MENU_FPS);
-					break;
-
-				case MENU_FULLSCREEN:
-					if (keys & SAL_INPUT_RIGHT)
-					{
-						mMenuOptions->fullScreen = (mMenuOptions->fullScreen + 1) % 3;
-					}
-					else
-					{
-						if (mMenuOptions->fullScreen == 0)
-							mMenuOptions->fullScreen = 2;
-						else
-							mMenuOptions->fullScreen--;
-					}
-					MainMenuUpdateText(MENU_FULLSCREEN);
-					break;
-			}
-		}
 
 		usleep(10000);
 	}
@@ -1610,6 +1690,3 @@ s32 MenuRun(s8 *romName)
 
   return action;
 }
-
-
-
