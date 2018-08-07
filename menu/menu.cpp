@@ -1206,13 +1206,16 @@ void SettingsMenuUpdateText(s32 menu_index)
 			switch(mMenuOptions->fullScreen)
 			{
 				case 0:
-					strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Full screen:               OFF");
+					strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Video scaling:        ORIGINAL");
 					break;
 				case 1:
-					strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Full screen:              FAST");
+					strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Video scaling:       SCANLINES");
 					break;  
 				case 2:
-					strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Full screen:            SMOOTH");
+					strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Video scaling:         FS FAST");
+					break;  
+				case 3:
+					strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Video scaling:       FS SMOOTH");
 					break;  
 				// case 3:
 				// 	strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Full screen:          HARDWARE");
@@ -1513,12 +1516,12 @@ s32 SettingsMenu(void)
 				case SETTINGS_MENU_FULLSCREEN:
 					if (keys & SAL_INPUT_RIGHT)
 					{
-						mMenuOptions->fullScreen = (mMenuOptions->fullScreen + 1) % 3;
+						mMenuOptions->fullScreen = (mMenuOptions->fullScreen + 1) % 4;
 					}
 					else
 					{
 						if (mMenuOptions->fullScreen == 0)
-							mMenuOptions->fullScreen = 2;
+							mMenuOptions->fullScreen = 3;
 						else
 							mMenuOptions->fullScreen--;
 					}
