@@ -1014,7 +1014,7 @@ s32 SaveStateMenu(void)
 					{
 						MenuMessageBox("","","Saving SRAM...",MENU_MESSAGE_BOX_MODE_MSG);
 						S9xSaveSRAM(1);
-						usleep(2e6);
+						usleep(1e6);
 					}
 					break;
 			}
@@ -1376,6 +1376,7 @@ s32 SettingsMenu(void)
 					break;
 				case SETTINGS_MENU_SAVE_GLOBAL_SETTINGS:
 					SaveMenuOptions(mSystemDir, MENU_OPTIONS_FILENAME, MENU_OPTIONS_EXT, (char*)mMenuOptions, sizeof(struct MENU_OPTIONS), 1);
+					usleep(5e5);
 					break;
 
 				case SETTINGS_MENU_LOAD_CURRENT_SETTINGS:
@@ -1389,6 +1390,7 @@ s32 SettingsMenu(void)
 					if(mRomName[0]!=0)
 					{
 						SaveMenuOptions(mSystemDir, mRomName, MENU_OPTIONS_EXT, (char*)mMenuOptions, sizeof(struct MENU_OPTIONS), 1);
+						usleep(5e5);
 					}
 					break;
 
@@ -1396,6 +1398,7 @@ s32 SettingsMenu(void)
 					if(mRomName[0]!=0)
 					{
 						DeleteMenuOptions(mSystemDir, mRomName, MENU_OPTIONS_EXT, 1);
+						usleep(5e5);
 					}
 					break;
 			
