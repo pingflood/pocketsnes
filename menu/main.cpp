@@ -176,8 +176,18 @@ bool8_32 S9xDeinitUpdate (int Width, int Height, bool8_32)
 	u32 h = PAL ? SNES_HEIGHT_EXTENDED : SNES_HEIGHT;
 	switch (mMenuOptions.fullScreen)
 	{
-		case 0: /* No scaling */
-		case 3: /* Hardware scaling */
+		case 0: /* No scaling / Hardware scaling */
+		{
+			uint32_t *s = (uint32_t*) IntermediateScreen;
+			uint32_t *d = (uint32_t*) sal_RS97VideoGetBuffer() + (SAL_SCREEN_WIDTH - SNES_WIDTH)/4 + (SAL_SCREEN_HEIGHT - h) * 160;
+			for(uint8_t y = 0; y < h; y++, s += SNES_WIDTH/2, d += 160) {
+				memmove(d, s, SNES_WIDTH * 2);
+				d += 160;
+				memmove(d, s, SNES_WIDTH * 2);
+			}
+			break;
+		}
+		case 1: /* Hardware with (scanlines mode) */
 		{
 			uint32_t *s = (uint32_t*) IntermediateScreen;
 			uint32_t *d = (uint32_t*) sal_RS97VideoGetBuffer() + (SAL_SCREEN_WIDTH - SNES_WIDTH)/4 + (SAL_SCREEN_HEIGHT - h) * 160;
@@ -185,7 +195,7 @@ bool8_32 S9xDeinitUpdate (int Width, int Height, bool8_32)
 			break;
 		}
 
-		case 1: /* Fast software scaling */
+		case 2: /* Fast software scaling */
 			if (PAL) {
 				upscale_256x240_to_320x240((uint32_t*) sal_RS97VideoGetBuffer(), (uint32_t*) IntermediateScreen, SNES_WIDTH);
 			} else {
@@ -193,7 +203,7 @@ bool8_32 S9xDeinitUpdate (int Width, int Height, bool8_32)
 			}
 			break;
 
-		case 2: /* Smooth software scaling */
+		case 3: /* Smooth software scaling */
 			// if (PAL) {
 				upscale_256x240_to_320x240_bilinearish((uint32_t*) sal_RS97VideoGetBuffer() + (SAL_SCREEN_HEIGHT - h) * 160, (uint32_t*) IntermediateScreen, SNES_WIDTH);
 			// } else {
