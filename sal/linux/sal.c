@@ -204,7 +204,7 @@ void sal_VideoFlip(s32 vsync)
 {
 	uint32_t *s = (uint32_t*)mScreen->pixels;
 	uint32_t *d = (uint32_t*)rs97Screen->pixels;// + (SAL_SCREEN_WIDTH - SNES_WIDTH) / 4;
-	for(uint8_t y = 0; y < 240; y++, s += SAL_SCREEN_WIDTH/2, d += 320) memmove(d, s, SAL_SCREEN_WIDTH*2);
+	for(uint8_t y = 0; y < 240; y++, s += SAL_SCREEN_WIDTH/2, d += 320) memmove(d, s, SAL_SCREEN_WIDTH * 4);
 	// SDL_Flip(mScreen);
 }
 
