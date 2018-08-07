@@ -194,11 +194,11 @@ bool8_32 S9xDeinitUpdate (int Width, int Height, bool8_32)
 			break;
 
 		case 2: /* Smooth software scaling */
-			if (PAL) {
+			// if (PAL) {
 				upscale_256x240_to_320x240_bilinearish((uint32_t*) sal_RS97VideoGetBuffer() + (SAL_SCREEN_HEIGHT - h) * 160, (uint32_t*) IntermediateScreen, SNES_WIDTH);
-			} else {
-				upscale_256x240_to_320x240_bilinearish((uint32_t*) sal_RS97VideoGetBuffer() + (SAL_SCREEN_HEIGHT - h) * 160, (uint32_t*) IntermediateScreen, SNES_WIDTH);
-			}
+			// } else {
+				// upscale_256x240_to_320x240_bilinearish((uint32_t*) sal_RS97VideoGetBuffer() + (SAL_SCREEN_HEIGHT - h) * 160, (uint32_t*) IntermediateScreen, SNES_WIDTH);
+			// }
 			break;
 	}
 
