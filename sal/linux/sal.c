@@ -22,39 +22,32 @@ s32 mCpuSpeedLookup[1]={0};
 
 #include <sal_common.h>
 
-// #define CASE(sym, key) \
-//   case SDLK_##sym: \
-// 	inputHeld &= ~(SAL_INPUT_##key); \
-// 	inputHeld |= type << SAL_INPUT_INDEX_##key; \
-// 	break
-
 static u32 inputHeld = 0;
 
 static u32 sal_Input(int held)
 {
 	SDL_Event event;
 	if (!SDL_PollEvent(&event)) {
-		if (held)
-			return inputHeld;
+		if (held) return inputHeld;
 		return 0;
 	}
+
 	inputHeld = 0;
-	if (event.key.type == SDL_KEYDOWN) {
-		u8 *keystate = SDL_GetKeyState(NULL);
-		if ( keystate[SDLK_LCTRL] )		inputHeld |= SAL_INPUT_A;
-		if ( keystate[SDLK_LALT] )		inputHeld |= SAL_INPUT_B;
-		if ( keystate[SDLK_SPACE] )		inputHeld |= SAL_INPUT_X;
-		if ( keystate[SDLK_LSHIFT] )	inputHeld |= SAL_INPUT_Y;
-		if ( keystate[SDLK_TAB] )		inputHeld |= SAL_INPUT_L;
-		if ( keystate[SDLK_BACKSPACE] )	inputHeld |= SAL_INPUT_R;
-		if ( keystate[SDLK_RETURN] )	inputHeld |= SAL_INPUT_START;
-		if ( keystate[SDLK_ESCAPE] )	inputHeld |= SAL_INPUT_SELECT;
-		if ( keystate[SDLK_UP] )		inputHeld |= SAL_INPUT_UP;
-		if ( keystate[SDLK_DOWN] )		inputHeld |= SAL_INPUT_DOWN;
-		if ( keystate[SDLK_LEFT] )		inputHeld |= SAL_INPUT_LEFT;
-		if ( keystate[SDLK_RIGHT] )		inputHeld |= SAL_INPUT_RIGHT;
-		if ( keystate[SDLK_END] )		inputHeld |= SAL_INPUT_MENU;
-	}
+
+	u8 *keystate = SDL_GetKeyState(NULL);
+	if ( keystate[SDLK_LCTRL] )		inputHeld |= SAL_INPUT_A;
+	if ( keystate[SDLK_LALT] )		inputHeld |= SAL_INPUT_B;
+	if ( keystate[SDLK_SPACE] )		inputHeld |= SAL_INPUT_X;
+	if ( keystate[SDLK_LSHIFT] )	inputHeld |= SAL_INPUT_Y;
+	if ( keystate[SDLK_TAB] )		inputHeld |= SAL_INPUT_L;
+	if ( keystate[SDLK_BACKSPACE] )	inputHeld |= SAL_INPUT_R;
+	if ( keystate[SDLK_RETURN] )	inputHeld |= SAL_INPUT_START;
+	if ( keystate[SDLK_ESCAPE] )	inputHeld |= SAL_INPUT_SELECT;
+	if ( keystate[SDLK_UP] )		inputHeld |= SAL_INPUT_UP;
+	if ( keystate[SDLK_DOWN] )		inputHeld |= SAL_INPUT_DOWN;
+	if ( keystate[SDLK_LEFT] )		inputHeld |= SAL_INPUT_LEFT;
+	if ( keystate[SDLK_RIGHT] )		inputHeld |= SAL_INPUT_RIGHT;
+	if ( keystate[SDLK_END] )		inputHeld |= SAL_INPUT_MENU;
 
 	mInputRepeat = inputHeld;
 	return inputHeld;
