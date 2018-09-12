@@ -1,4 +1,5 @@
 *.o
+*.gcda
 dist/PocketSNES.dge
 PocketSNES.opk
 .opk_data
