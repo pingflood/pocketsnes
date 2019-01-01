@@ -1,8 +1,8 @@
 # Define the applications properties here:
 
-TARGET = ./dist/PocketSNES
+TARGET = ./dist/PocketSNES.dge
 
-CHAINPREFIX := /opt/rs97-toolchain
+CHAINPREFIX := /opt/mipsel-linux-uclibc
 CROSS_COMPILE := $(CHAINPREFIX)/usr/bin/mipsel-linux-
 
 CC  := $(CROSS_COMPILE)gcc
@@ -44,6 +44,16 @@ all : $(TARGET)
 
 $(TARGET) : $(OBJS)
 	$(CMD)$(CXX) $(CXXFLAGS) $^ $(LDFLAGS) -o $@
+
+ipk: $(TARGET)
+	@rm -rf /tmp/.pocketsnes-ipk/ && mkdir -p /tmp/.pocketsnes-ipk/root/home/retrofw/emus/pocketsnes /tmp/.pocketsnes-ipk/root/home/retrofw/apps/gmenu2x/sections/emulators
+	@cp dist/PocketSNES.dge dist/PocketSNES.man.txt dist/PocketSNES.png dist/pocketsnes_bg.png /tmp/.pocketsnes-ipk/root/home/retrofw/emus/pocketsnes
+	@cp dist/pocketsnes.lnk /tmp/.pocketsnes-ipk/root/home/retrofw/apps/gmenu2x/sections/emulators
+	@sed "s/^Version:.*/Version: $$(date +%Y%m%d)/" dist/control > /tmp/.pocketsnes-ipk/control
+	@tar --owner=0 --group=0 -czvf /tmp/.pocketsnes-ipk/control.tar.gz -C /tmp/.pocketsnes-ipk/ control
+	@tar --owner=0 --group=0 -czvf /tmp/.pocketsnes-ipk/data.tar.gz -C /tmp/.pocketsnes-ipk/root/ .
+	@echo 2.0 > /tmp/.pocketsnes-ipk/debian-binary
+	@ar r dist/pocketsnes.ipk /tmp/.pocketsnes-ipk/control.tar.gz /tmp/.pocketsnes-ipk/data.tar.gz /tmp/.pocketsnes-ipk/debian-binary
 
 %.o: %.c
 	$(CMD)$(CC) $(CFLAGS) -c $< -o $@
