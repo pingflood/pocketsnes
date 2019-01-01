@@ -1,0 +1,10 @@
+Package: pocketsnes
+Version: 
+Description: RS97 port of PocketSNES
+Section: emus
+Priority: optional
+Maintainer: pingflood
+Architecture: mipsel
+Homepage: https://github.com/pingflood/PocketSNES
+Depends:
+Source: https://github.com/pingflood/PocketSNES

@@ -1,8 +1,8 @@
 # Define the applications properties here:
 
-TARGET = ./dist/PocketSNES.dge
+TARGET = ./dist/PocketSNES
 
-CHAINPREFIX := /opt/rs97-toolchain-musl
+CHAINPREFIX := /opt/rs97-toolchain
 CROSS_COMPILE := $(CHAINPREFIX)/usr/bin/mipsel-linux-
 
 CC  := $(CROSS_COMPILE)gcc
@@ -25,7 +25,7 @@ CFLAGS += -fno-common -Wno-write-strings -Wno-sign-compare -ffast-math -ftree-ve
 CFLAGS += -funswitch-loops -fno-strict-aliasing
 CFLAGS += -DMIPS_XBURST -DFAST_LSB_WORD_ACCESS -DNO_ROM_BROWSER
 # CFLAGS += -fprofile-generate -fprofile-dir=/mnt/int_sd/profile
-CFLAGS += -fprofile-use
+# CFLAGS += -fprofile-use
 
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti -fno-math-errno -fno-threadsafe-statics
 

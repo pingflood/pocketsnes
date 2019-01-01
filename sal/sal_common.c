@@ -106,11 +106,11 @@ static void sal_VideoDrawRect16(s32 x, s32 y, s32 width, s32 height, u16 color, 
 	}
 }
 
-void sal_RS97VideoDrawRect(s32 x, s32 y, s32 width, s32 height, u32 color)
-{
-	if (mBpp==8) sal_VideoDrawRect8(x,y,width,height,(u8)color, (uint32_t *)sal_RS97VideoGetBuffer());
-	else sal_VideoDrawRect16(x,y,width,height,(u16)color, (uint32_t *)sal_RS97VideoGetBuffer());
-}
+// void sal_RS97VideoDrawRect(s32 x, s32 y, s32 width, s32 height, u32 color)
+// {
+// 	if (mBpp==8) sal_VideoDrawRect8(x,y,width,height,(u8)color, (uint32_t *)sal_RS97VideoGetBuffer());
+// 	else sal_VideoDrawRect16(x,y,width,height,(u16)color, (uint32_t *)sal_RS97VideoGetBuffer());
+// }
 
 void sal_VideoDrawRect(s32 x, s32 y, s32 width, s32 height, u32 color)
 {
@@ -219,11 +219,11 @@ void sal_VideoPrint(s32 x, s32 y, const char *buffer, u32 color)
 	else sal_VideoPrint16(x,y,buffer,(u16)color, (uint32_t *)sal_VideoGetBuffer());
 }
 
-void sal_RS97VideoPrint(s32 x, s32 y, const char *buffer, u32 color)
-{
-	if (mBpp==8) sal_VideoPrint8(x,y,buffer,(u8)color, (uint32_t *)sal_RS97VideoGetBuffer());
-	else sal_VideoPrint16(x,y,buffer,(u16)color, (uint32_t *)sal_RS97VideoGetBuffer());
-}
+// void sal_RS97VideoPrint(s32 x, s32 y, const char *buffer, u32 color)
+// {
+// 	if (mBpp==8) sal_VideoPrint8(x,y,buffer,(u8)color, (uint32_t *)sal_RS97VideoGetBuffer());
+// 	else sal_VideoPrint16(x,y,buffer,(u16)color, (uint32_t *)sal_RS97VideoGetBuffer());
+// }
 
 static 
 void sal_VideoClear16(u16 color)
