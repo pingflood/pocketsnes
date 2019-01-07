@@ -1,6 +1,6 @@
 Package: pocketsnes
 Version: 
-Description: RS97 port of PocketSNES
+Description: RetroGame port of PocketSNES
 Section: emus
 Priority: optional
 Maintainer: pingflood

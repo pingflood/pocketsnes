@@ -1,5 +1,5 @@
-title=PocketSNES
-description=SNES/SFC Emulator
+title=SNES
+description=PocketSNES Emulator
 exec=/home/retrofw/emus/pocketsnes/PocketSNES.dge
 ipu_mode=1
 selectorbrowser=true
