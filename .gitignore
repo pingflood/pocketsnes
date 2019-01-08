@@ -1,6 +1,7 @@
 *.o
 *.gcda
-dist/PocketSNES.dge
-PocketSNES.opk
+*.dge
+*.opk
 .opk_data
 *.ipk
+*.elf

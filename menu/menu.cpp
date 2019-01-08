@@ -744,16 +744,19 @@ static s32 SaveStateSelect(s32 mode)
 	{
 		keys=sal_InputPollRepeat();
 
-		if(keys&SAL_INPUT_UP) {saveno--; action=1;}
-		if(keys&SAL_INPUT_DOWN) {saveno++; action=1;}
-		if(saveno<-1) saveno=9;
-		if(saveno>9) saveno=-1;
+		if(keys&SAL_INPUT_UP || keys&SAL_INPUT_LEFT) {saveno--; action=1;}
+		if(keys&SAL_INPUT_DOWN || keys&SAL_INPUT_RIGHT) {saveno++; action=1;}
+		// if(saveno<-1) saveno=9;
+		// if(saveno>9) saveno=-1;
+		if(saveno<0) saveno=9;
+		if(saveno>9) saveno=0;
 	      
 		if(keys&INP_BUTTON_MENU_CANCEL) action=0; // exit
 		else if((keys&INP_BUTTON_MENU_SELECT)&&(saveno==-1)) action=0; // exit
 		else if((keys&INP_BUTTON_MENU_SELECT)&&(mode==0)&&((action==2)||(action==5))) action=6;  // pre-save mode
 		else if((keys&INP_BUTTON_MENU_SELECT)&&(mode==1)&&(action==5)) action=8;  // pre-load mode
-		else if((keys&INP_BUTTON_MENU_SELECT)&&(mode==2)&&(action==5))
+		else if((keys&INP_BUTTON_MENU_SELECT)&&(mode==2)&&(action==5)
+		|| (keys&SAL_INPUT_X)&&(action==5))
 		{
 			if(MenuMessageBox("Are you sure you want to delete","this save?","",MENU_MESSAGE_BOX_MODE_YESNO)==SAL_OK) action=13;  //delete slot with no preview
 		}
@@ -766,7 +769,7 @@ static s32 SaveStateSelect(s32 mode)
 		}
 
 		PrintTitle("Save States");
-		sal_VideoPrint(36,4,"UP/DOWN to choose a slot",SAL_RGB(31,8,8));
+		sal_VideoPrint(8,4,"Choose a slot",SAL_RGB(31,8,8));
       
 		if(saveno==-1) 
 		{
@@ -818,10 +821,10 @@ static s32 SaveStateSelect(s32 mode)
 			case 9:
 				sal_VideoPrint(87,145-36,"Loading failed",SAL_RGB(31,8,8));
 				break;
-			case 10:	
-				PrintBar(145-36-4);
-				sal_VideoPrint(75,145-36,"Return to menu",SAL_RGB(31,31,31));
-				break;
+			// case 10:	
+			// 	PrintBar(145-36-4);
+			// 	sal_VideoPrint(75,145-36,"Return to menu",SAL_RGB(31,31,31));
+			// 	break;
 			case 12:
 				sal_VideoPrint(95,145-36,"Slot used",SAL_RGB(31,31,31));
 				sal_VideoPrint((262-(strlen(MENU_TEXT_PREVIEW_SAVESTATE)<<3))>>1,165,MENU_TEXT_PREVIEW_SAVESTATE,SAL_RGB(31,31,31));
@@ -1151,7 +1154,7 @@ void SettingsMenuUpdateText(s32 menu_index)
 					strcpy(mMenuText[SETTINGS_MENU_SOUND_SYNC], "Prefer fluid              Video");
 					break;
 				case 1:
-					strcpy(mMenuText[SETTINGS_MENU_SOUND_SYNC], "Prefer fluid          Vid & aud");
+					strcpy(mMenuText[SETTINGS_MENU_SOUND_SYNC], "Prefer fluid               Both");
 					break;
 				default:
 					strcpy(mMenuText[SETTINGS_MENU_SOUND_SYNC], "Prefer fluid              Audio");
@@ -1671,7 +1674,7 @@ s32 MenuRun(s8 *romName)
 					if(subaction==100)
 					{
 						menuExit=1;
-						action=100;
+						action=EVENT_RUN_ROM;
 					}
 					break;
 				case SAVESTATE_MENU_SAVE:
