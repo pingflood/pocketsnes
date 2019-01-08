@@ -111,7 +111,7 @@ enum MENU_MESSAGE_BOX_MODE
 #define INP_BUTTON_MENU_QUICKLOAD1		SAL_INPUT_L
 #define INP_BUTTON_MENU_QUICKLOAD2		SAL_INPUT_SELECT
 #define MENU_TEXT_LOAD_SAVESTATE 		"Press A to load"
-#define MENU_TEXT_OVERWRITE_SAVESTATE	"Press A to overwrite"
+#define MENU_TEXT_OVERWRITE_SAVESTATE	"A to overwrite | X to delete"
 #define MENU_TEXT_DELETE_SAVESTATE 		"Press A to delete"
 #define MENU_TEXT_PREVIEW_SAVESTATE 	"Press Y to preview"
 

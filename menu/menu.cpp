@@ -756,7 +756,7 @@ static s32 SaveStateSelect(s32 mode)
 		else if((keys&INP_BUTTON_MENU_SELECT)&&(mode==0)&&((action==2)||(action==5))) action=6;  // pre-save mode
 		else if((keys&INP_BUTTON_MENU_SELECT)&&(mode==1)&&(action==5)) action=8;  // pre-load mode
 		else if((keys&INP_BUTTON_MENU_SELECT)&&(mode==2)&&(action==5)
-		|| (keys&SAL_INPUT_X)&&(action==5))
+		|| (keys&SAL_INPUT_X)&&(mode==0))
 		{
 			if(MenuMessageBox("Are you sure you want to delete","this save?","",MENU_MESSAGE_BOX_MODE_YESNO)==SAL_OK) action=13;  //delete slot with no preview
 		}
