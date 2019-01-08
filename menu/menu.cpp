@@ -1332,7 +1332,7 @@ void MenuInit(const char *systemDir, struct MENU_OPTIONS *menuOptions)
 	pix=&mMenuBackground[0];
 	for(x=0;x<SAL_SCREEN_WIDTH * SAL_SCREEN_HEIGHT;x++) *pix++=SAL_RGB(0,0,0);
 
-	sal_ImageLoad("pocketsnes_bg.png", &mMenuBackground, SAL_SCREEN_WIDTH, SAL_SCREEN_HEIGHT);
+	sal_ImageLoad("backdrop.png", &mMenuBackground, SAL_SCREEN_WIDTH, SAL_SCREEN_HEIGHT);
 
 	MenuReloadOptions();
 }
