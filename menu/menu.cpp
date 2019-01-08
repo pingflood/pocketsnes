@@ -944,107 +944,107 @@ void RenderMenu(const char *menuName, s32 menuCount, s32 menuSmooth, s32 menufoc
     	}
 }
 
-static
-s32 SaveStateMenu(void)
-{
-	s32 menuExit=0,menuCount=SAVESTATE_MENU_COUNT,menufocus=0,menuSmooth=0;
-	s32 action=0;
-	s32 subaction=0;
-	u32 keys=0;
+// static
+// s32 SaveStateMenu(void)
+// {
+// 	s32 menuExit=0,menuCount=SAVESTATE_MENU_COUNT,menufocus=0,menuSmooth=0;
+// 	s32 action=0;
+// 	s32 subaction=0;
+// 	u32 keys=0;
 
-	//Update
-	strcpy(mMenuText[SAVESTATE_MENU_LOAD],"Load state");
-	strcpy(mMenuText[SAVESTATE_MENU_SAVE],"Save state");
-	strcpy(mMenuText[SAVESTATE_MENU_DELETE],"Delete state");
-	strcpy(mMenuText[SAVESTATE_MENU_SAVE_SRAM],"Save SRAM");
-	sal_InputIgnore();
+// 	//Update
+// 	strcpy(mMenuText[SAVESTATE_MENU_LOAD],"Load state");
+// 	strcpy(mMenuText[SAVESTATE_MENU_SAVE],"Save state");
+// 	// strcpy(mMenuText[SAVESTATE_MENU_DELETE],"Delete state");
+// 	strcpy(mMenuText[SAVESTATE_MENU_SAVE_SRAM],"Save SRAM");
+// 	sal_InputIgnore();
 
-	while (!menuExit)
-	{
-		// Draw screen:
-		menuSmooth=menuSmooth*7+(menufocus<<8); menuSmooth>>=3;
-		RenderMenu("Save States", menuCount,menuSmooth,menufocus);
-		sal_VideoFlip(1);
+// 	while (!menuExit)
+// 	{
+// 		// Draw screen:
+// 		menuSmooth=menuSmooth*7+(menufocus<<8); menuSmooth>>=3;
+// 		RenderMenu("Save States", menuCount,menuSmooth,menufocus);
+// 		sal_VideoFlip(1);
 
-		keys=sal_InputPollRepeat();
+// 		keys=sal_InputPollRepeat();
 
-		if (keys & INP_BUTTON_MENU_CANCEL)
-		{
-			while (keys)
-			{
-				// Draw screen:
-				menuSmooth=menuSmooth*7+(menufocus<<8); menuSmooth>>=3;
-				RenderMenu("Save States", menuCount,menuSmooth,menufocus);
-				sal_VideoFlip(1);
+// 		if (keys & INP_BUTTON_MENU_CANCEL)
+// 		{
+// 			while (keys)
+// 			{
+// 				// Draw screen:
+// 				menuSmooth=menuSmooth*7+(menufocus<<8); menuSmooth>>=3;
+// 				RenderMenu("Save States", menuCount,menuSmooth,menufocus);
+// 				sal_VideoFlip(1);
 
-				keys=sal_InputPoll();
-			}
+// 				keys=sal_InputPoll();
+// 			}
 		
-			menuExit=1;
-		}
-		else if (keys & INP_BUTTON_MENU_SELECT)
-		{
-			while (keys)
-			{
-				// Draw screen:
-				menuSmooth=menuSmooth*7+(menufocus<<8); menuSmooth>>=3;
-				RenderMenu("Save States", menuCount,menuSmooth,menufocus);
-				sal_VideoFlip(1);
+// 			menuExit=1;
+// 		}
+// 		else if (keys & INP_BUTTON_MENU_SELECT)
+// 		{
+// 			while (keys)
+// 			{
+// 				// Draw screen:
+// 				menuSmooth=menuSmooth*7+(menufocus<<8); menuSmooth>>=3;
+// 				RenderMenu("Save States", menuCount,menuSmooth,menufocus);
+// 				sal_VideoFlip(1);
 
-				keys=sal_InputPoll();
-			}
+// 				keys=sal_InputPoll();
+// 			}
 
-			switch(menufocus)
-			{
-				case SAVESTATE_MENU_LOAD:
-					subaction=SaveStateSelect(SAVESTATE_MODE_LOAD);
-					if(subaction==100)
-					{
-						menuExit=1;
-						action=100;
-					}
-					break;
-				case SAVESTATE_MENU_SAVE:
-					SaveStateSelect(SAVESTATE_MODE_SAVE);
-					break;
-				case SAVESTATE_MENU_DELETE:
-					SaveStateSelect(SAVESTATE_MODE_DELETE);
-					break;
-				case SAVESTATE_MENU_SAVE_SRAM:
-					if(mRomName[0]!=0)
-					{
-						MenuMessageBox("","","Saving SRAM...",MENU_MESSAGE_BOX_MODE_MSG);
-						S9xSaveSRAM(1);
-						usleep(1e6);
-					}
-					break;
-			}
-		}
-		else if ((keys & (SAL_INPUT_UP | SAL_INPUT_DOWN))
-		      && (keys & (SAL_INPUT_UP | SAL_INPUT_DOWN)) != (SAL_INPUT_UP | SAL_INPUT_DOWN))
-		{
-			if (keys & SAL_INPUT_UP)
-				menufocus--; // Up
-			else if (keys & SAL_INPUT_DOWN)
-				menufocus++; // Down
+// 			switch(menufocus)
+// 			{
+// 				// case SAVESTATE_MENU_LOAD:
+// 				// 	subaction=SaveStateSelect(SAVESTATE_MODE_LOAD);
+// 				// 	if(subaction==100)
+// 				// 	{
+// 				// 		menuExit=1;
+// 				// 		action=100;
+// 				// 	}
+// 				// 	break;
+// 				// case SAVESTATE_MENU_SAVE:
+// 				// 	SaveStateSelect(SAVESTATE_MODE_SAVE);
+// 				// 	break;
+// 				// case SAVESTATE_MENU_DELETE:
+// 				// 	SaveStateSelect(SAVESTATE_MODE_DELETE);
+// 				// 	break;
+// 				case SAVESTATE_MENU_SAVE_SRAM:
+// 					if(mRomName[0]!=0)
+// 					{
+// 						MenuMessageBox("","","Saving SRAM...",MENU_MESSAGE_BOX_MODE_MSG);
+// 						S9xSaveSRAM(1);
+// 						usleep(1e6);
+// 					}
+// 					break;
+// 			}
+// 		}
+// 		else if ((keys & (SAL_INPUT_UP | SAL_INPUT_DOWN))
+// 		      && (keys & (SAL_INPUT_UP | SAL_INPUT_DOWN)) != (SAL_INPUT_UP | SAL_INPUT_DOWN))
+// 		{
+// 			if (keys & SAL_INPUT_UP)
+// 				menufocus--; // Up
+// 			else if (keys & SAL_INPUT_DOWN)
+// 				menufocus++; // Down
 
-			if (menufocus>menuCount-1)
-			{
-				menufocus=0;
-				menuSmooth=(menufocus<<8)-1;
-			}
-			else if (menufocus<0)
-			{
-				menufocus=menuCount-1;
-				menuSmooth=(menufocus<<8)-1;
-			}
-		}
+// 			if (menufocus>menuCount-1)
+// 			{
+// 				menufocus=0;
+// 				menuSmooth=(menufocus<<8)-1;
+// 			}
+// 			else if (menufocus<0)
+// 			{
+// 				menufocus=menuCount-1;
+// 				menuSmooth=(menufocus<<8)-1;
+// 			}
+// 		}
 
-		usleep(10000);
-	}
-  sal_InputIgnore();
-  return action;
-}
+// 		usleep(10000);
+// 	}
+//   sal_InputIgnore();
+//   return action;
+// }
 
 void ShowCredits()
 {
@@ -1057,9 +1057,9 @@ void ShowCredits()
 	strcpy(mMenuText[menuCount++],"PocketSNES created by Scott Ramsby");
 	strcpy(mMenuText[menuCount++],"Initial port to the Dingoo by Reesy");
 	strcpy(mMenuText[menuCount++],"Ported to OpenDingux by pcercuei");
-	strcpy(mMenuText[menuCount++],"Optimisations and fixes by Nebuleon");
-	strcpy(mMenuText[menuCount++],"Initial port to RetroGame by Steward-Fu");
-	strcpy(mMenuText[menuCount++],"RetroGame optimizations by Gameblabla");
+	strcpy(mMenuText[menuCount++],"Optimizations and fixes by Nebuleon");
+	strcpy(mMenuText[menuCount++],"Port to RetroGame by Steward-Fu");
+	strcpy(mMenuText[menuCount++],"RetroGame optimizations by Sauce");
 	strcpy(mMenuText[menuCount++],"and pingflood");
 
 	sal_InputIgnore();
@@ -1098,20 +1098,24 @@ void MainMenuUpdateText(s32 menu_index)
 {
 	switch(menu_index)
 	{
-		case MENU_STATE:
-			strcpy(mMenuText[MENU_STATE],"Save states");
+		// case MENU_STATE:
+		// 	strcpy(mMenuText[MENU_STATE],"Save states");
+		// 	break;
+		case SAVESTATE_MENU_LOAD:
+			strcpy(mMenuText[SAVESTATE_MENU_LOAD],"Load state");
 			break;
-
+		case SAVESTATE_MENU_SAVE:
+			strcpy(mMenuText[SAVESTATE_MENU_SAVE],"Save state");
+			break;
+		// case SAVESTATE_MENU_DELETE:
+		// 	strcpy(mMenuText[SAVESTATE_MENU_DELETE],"Delete state");
+		// 	break;
 		case MENU_RESET_GAME:
-			strcpy(mMenuText[MENU_RESET_GAME],"Reset game");
+			strcpy(mMenuText[MENU_RESET_GAME],"Reset");
 			break;
 
 		case MENU_EXIT_APP:
-			strcpy(mMenuText[MENU_EXIT_APP],"Exit PocketSNES");
-			break;
-
-		case MENU_CREDITS:
-			strcpy(mMenuText[MENU_CREDITS],"Credits");
+			strcpy(mMenuText[MENU_EXIT_APP],"Exit");
 			break;
 
 		case MENU_SETTINGS:
@@ -1131,6 +1135,9 @@ void SettingsMenuUpdateText(s32 menu_index)
 {
 	switch(menu_index)
 	{
+		case SAVESTATE_MENU_SAVE_SRAM:
+			strcpy(mMenuText[SAVESTATE_MENU_SAVE_SRAM],"Save SRAM now");
+
 		case SETTINGS_MENU_AUTO_SAVE_SRAM:
 			sprintf(mMenuText[SETTINGS_MENU_AUTO_SAVE_SRAM],
 						"Save SRAM on change         %s",
@@ -1243,6 +1250,10 @@ void SettingsMenuUpdateText(s32 menu_index)
 		case SETTINGS_MENU_DELETE_CURRENT_SETTINGS:
 			strcpy(mMenuText[SETTINGS_MENU_DELETE_CURRENT_SETTINGS],"Delete game settings");
 			break;
+
+		case MENU_CREDITS:
+			strcpy(mMenuText[MENU_CREDITS],"Credits");
+			break;
 	}
 }
 
@@ -1264,18 +1275,23 @@ void SettingsMenuUpdateTextAll(void)
 	SettingsMenuUpdateText(SETTINGS_MENU_SAVE_CURRENT_SETTINGS);
 	SettingsMenuUpdateText(SETTINGS_MENU_DELETE_CURRENT_SETTINGS);
 	SettingsMenuUpdateText(SETTINGS_MENU_AUTO_SAVE_SRAM);
+	SettingsMenuUpdateText(SAVESTATE_MENU_SAVE_SRAM);
+	SettingsMenuUpdateText(MENU_CREDITS);
 }
 
 static
 void MainMenuUpdateTextAll(void)
 {
-	MainMenuUpdateText(MENU_STATE);
+	MainMenuUpdateText(SAVESTATE_MENU_LOAD);
+	MainMenuUpdateText(SAVESTATE_MENU_SAVE);
+	// MainMenuUpdateText(SAVESTATE_MENU_DELETE);
+
 	MainMenuUpdateText(MENU_RESET_GAME);
 #ifndef NO_ROM_BROWSER
 	MainMenuUpdateText(MENU_ROM_SELECT);
 #endif
 	MainMenuUpdateText(MENU_SETTINGS);
-	MainMenuUpdateText(MENU_CREDITS);
+	// MainMenuUpdateText(MENU_CREDITS);
 	MainMenuUpdateText(MENU_EXIT_APP);
 }
 
@@ -1402,7 +1418,11 @@ s32 SettingsMenu(void)
 						usleep(5e5);
 					}
 					break;
-			
+
+				case MENU_CREDITS:
+					ShowCredits();
+					MainMenuUpdateTextAll();
+					break;
 			}
 		}
 		else if ((keys & (SAL_INPUT_LEFT | SAL_INPUT_RIGHT))
@@ -1423,6 +1443,15 @@ s32 SettingsMenu(void)
 				case SETTINGS_MENU_AUTO_SAVE_SRAM:
 					mMenuOptions->autoSaveSram^=1;
 					SettingsMenuUpdateText(SETTINGS_MENU_AUTO_SAVE_SRAM);
+					break;
+
+				case SAVESTATE_MENU_SAVE_SRAM:
+					if(mRomName[0]!=0)
+					{
+						MenuMessageBox("","","Saving SRAM...",MENU_MESSAGE_BOX_MODE_MSG);
+						S9xSaveSRAM(1);
+						usleep(1e6);
+					}
 					break;
 
 				case SETTINGS_MENU_SOUND_SYNC:
@@ -1624,23 +1653,38 @@ s32 MenuRun(s8 *romName)
 					break;
 #endif
 
-				case MENU_STATE:
-					if(mRomName[0]!=0)
-					{
-						subaction=SaveStateMenu();
-						if (subaction==100)
-						{
-							action=EVENT_RUN_ROM;
-							menuExit=1;
-						}
-					}
-					MainMenuUpdateTextAll();
-					break;
+				// case MENU_STATE:
+				// 	if(mRomName[0]!=0)
+				// 	{
+				// 		subaction=SaveStateMenu();
+				// 		if (subaction==100)
+				// 		{
+				// 			action=EVENT_RUN_ROM;
+				// 			menuExit=1;
+				// 		}
+				// 	}
+				// 	MainMenuUpdateTextAll();
+				// 	break;
 
-				case MENU_CREDITS:
-					ShowCredits();
-					MainMenuUpdateTextAll();
+				case SAVESTATE_MENU_LOAD:
+					subaction=SaveStateSelect(SAVESTATE_MODE_LOAD);
+					if(subaction==100)
+					{
+						menuExit=1;
+						action=100;
+					}
 					break;
+				case SAVESTATE_MENU_SAVE:
+					SaveStateSelect(SAVESTATE_MODE_SAVE);
+					break;
+				// case SAVESTATE_MENU_DELETE:
+				// 	SaveStateSelect(SAVESTATE_MODE_DELETE);
+				// 	break;
+
+				// case MENU_CREDITS:
+				// 	ShowCredits();
+				// 	MainMenuUpdateTextAll();
+				// 	break;
 
 				case MENU_SETTINGS:
 					SettingsMenu();
