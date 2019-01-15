@@ -65,4 +65,4 @@ ipk: $(TARGET)
 .PHONY : clean
 clean :
 	$(CMD)rm -f $(OBJS) $(TARGET)
-	$(CMD)rm -rf .opk_data $(TARGET).opk
+	$(CMD)rm -rf .opk_data $(TARGET).opk dist/pocketsnes.ipk
