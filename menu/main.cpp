@@ -142,6 +142,8 @@ void S9xLoadSDD1Data (void)
 }
 
 u16 IntermediateScreen[SNES_WIDTH * SNES_HEIGHT_EXTENDED];
+SDL_Surface *image;
+
 bool LastPAL; /* Whether the last frame's height was 239 (true) or 224. */
 
 bool8_32 S9xInitUpdate ()
@@ -209,7 +211,7 @@ bool8_32 S9xDeinitUpdate (int Width, int Height, bool8_32)
 		case 3: /* Hardware scaling */
 		{
 			u32 h = PAL ? SNES_HEIGHT_EXTENDED : SNES_HEIGHT;
-			SDL_Surface *image = SDL_CreateRGBSurfaceFrom((uint16_t*)IntermediateScreen,SNES_WIDTH,h,16,SNES_WIDTH * sizeof(u16),0,0,0,0);
+			image = SDL_CreateRGBSurfaceFrom((uint16_t*)IntermediateScreen,SNES_WIDTH,h,16,SNES_WIDTH * sizeof(u16),0,0,0,0);
 			sal_VideoBlit(image);
 			break;
 		}
