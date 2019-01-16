@@ -8,7 +8,7 @@
 #define AVERAGEHI(AB) ((((AB) & 0xF7DE0000) >> 1) + (((AB) & 0xF7DE) << 15))
 #define AVERAGELO(CD) ((((CD) & 0xF7DE) >> 1) + (((CD) & 0xF7DE0000) >> 17))
 
-// void (*upscale_p)(uint32_t *dst, uint32_t *src, int width) = upscale_256x224_to_320x240;
+void (*upscale_p)(uint32_t *dst, uint32_t *src, int width) = upscale_256x224_to_320x240;
 
 /*
  * Approximately bilinear scaler, 256x224 to 320x240
@@ -305,7 +305,7 @@ void upscale_256x240_to_320x240_bilinearish(uint32_t* dst, uint32_t* src, int wi
 	for (BlockY = 0; BlockY < 239; BlockY++)
 	{
 		BlockSrc = Src16 + BlockY * 256 * 1;
-		BlockDst = Dst16 + BlockY * 320 * 2;
+		BlockDst = Dst16 + BlockY * 320 * 1;
 		for (BlockX = 0; BlockX < 64; BlockX++)
 		{
 			/* Horizontally:
@@ -362,7 +362,7 @@ void upscale_256x224_to_320x240(uint32_t *dst, uint32_t *src, int width)
     int dh = 0;
     int y, x;
 
-    for (y = 0; y < 240; y++, dst += 160)
+    for (y = 0; y < 240; y++)
     {
         source = dh * width / 2;
 
@@ -406,7 +406,7 @@ void upscale_256x240_to_320x240(uint32_t *dst, uint32_t *src, int width)
     int dh = 0;
     int y, x;
 
-    for (y = 0; y < 239; y++, dst += 160)
+    for (y = 0; y < 239; y++)
     {
         source = dh * width / 2;
 
@@ -430,16 +430,15 @@ void upscale_256x240_to_320x240(uint32_t *dst, uint32_t *src, int width)
             }
 
             *dst++ = ab;
-            *dst++ = ((ab >> 17) + ((cd & 0xFFFF) >> 1)) + (cd << 16);
-            *dst++ = (cd >> 16) + (ef << 16);
-            *dst++ = (ef >> 16) + (((ef & 0xFFFF0000) >> 1) + ((gh & 0xFFFF) << 15));
-            *dst++ = gh;
+            *dst++  = ((ab >> 17) + ((cd & 0xFFFF) >> 1)) + (cd << 16);
+            *dst++  = (cd >> 16) + (ef << 16);
+            *dst++  = (ef >> 16) + (((ef & 0xFFFF0000) >> 1) + ((gh & 0xFFFF) << 15));
+            *dst++  = gh;
 
             source += 4;
 
         }
         Eh += 239; if(Eh >= 239) { Eh -= 239; dh++; }
-        
     }
 }
 
@@ -499,7 +498,7 @@ void upscale_256x224_to_384x240_for_400x240(uint32_t *dst, uint32_t *src, int wi
             source += 2;
 
         }
-        *dst += 320 + (400 - 384) / 2; 
+        dst += (400 - 384) / 2; 
         Eh += 224; if(Eh >= 240) { Eh -= 240; dh++; }
     }
 }
@@ -560,7 +559,7 @@ void upscale_256x224_to_384x272_for_480x272(uint32_t *dst, uint32_t *src, int wi
             source += 2;
 
         }
-        *dst += 320 + (480 - 384) / 2; 
+        dst += (480 - 384) / 2; 
         Eh += 224; if(Eh >= 272) { Eh -= 272; dh++; }
     }
 }
