@@ -151,8 +151,12 @@ bool8_32 S9xInitUpdate ()
 {
 	if (mInMenu) return TRUE;
 
+#ifdef GCW_ZERO
 	if (mMenuOptions.fullScreen == 3) GFX.Screen = (uint8*) mScreen->pixels;
-	else GFX.Screen = (u8*) IntermediateScreen; /* replacement needed after loading the saved states menu */
+	else 
+#endif
+	GFX.Screen = (u8*) IntermediateScreen; /* replacement needed after loading the saved states menu */
+	
 	return TRUE;
 }
 
@@ -589,8 +593,11 @@ int SnesInit()
 	Settings.C4 = TRUE;
 	Settings.SDD1 = TRUE;
 
+#ifdef GCW_ZERO
 	if (mMenuOptions.fullScreen == 3) GFX.Screen = (uint8*) mScreen->pixels;
-	else GFX.Screen = (u8*) IntermediateScreen; /* replacement needed after loading the saved states menu */
+	else 
+#endif
+	GFX.Screen = (u8*) IntermediateScreen; /* replacement needed after loading the saved states menu */
 
 	GFX.RealPitch = GFX.Pitch = 256 * sizeof(u16);
 	
