@@ -799,19 +799,18 @@ static s32 SaveStateSelect(s32 mode)
 					sal_AudioSetMuted(1);
 					GFX.Screen = (uint8 *) &mTempFb[0];
 					// GFX.Screen = (uint8 *) sal_VideoGetBuffer();
-					IPPU.RenderThisFrame=TRUE;
+					IPPU.RenderThisFrame = TRUE;
 					unsigned int fullScreenSave = mMenuOptions->fullScreen;
 					mMenuOptions->fullScreen = 0;
-					S9xMainLoop ();
-					// mMenuOptions->fullScreen = fullScreenSave;
+					S9xMainLoop();
+					mMenuOptions->fullScreen = fullScreenSave;
 					sal_AudioSetMuted(0);
 					mPreviewingState = 0;
-					action=5;
+					action = 5;
+				} else {
+					action = 4; // did not load correctly; report an error
 				}
-				else
-					action=4; // did not load correctly; report an error
 				break;
-			}
 			case 6:
 				//Reload state in case user has been previewing
 				LoadStateTemp();
