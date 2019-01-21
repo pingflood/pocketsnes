@@ -1,8 +1,6 @@
 title=PocketSNES
 description=SNES/SFC Emulator
 exec=/home/retrofw/emus/pocketsnes/PocketSNES.dge
-selectorbrowser=true
 selectordir=/home/retrofw/roms/snes
 selectorfilter=.zip,.sfc,.smc,.swc
 clock=600
-vsync=false
