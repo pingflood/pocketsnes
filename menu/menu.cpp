@@ -9,8 +9,7 @@
 #include "soundux.h"
 
 #define MAX_DISPLAY_CHARS			40
-
-#define ROM_SELECTOR_SAVE_DEFAULT_DIR		0
+#define ROM_SELECTOR_SAVE_DEFAULT_DIR	0
 #define ROM_SELECTOR_MAIN_MENU			1
 #define ROM_SELECTOR_DEFAULT_FOCUS		2
 #define ROM_SELECTOR_ROM_START			3
@@ -746,8 +745,6 @@ static s32 SaveStateSelect(s32 mode)
 
 		if(keys&SAL_INPUT_UP || keys&SAL_INPUT_LEFT) {saveno--; action=1;}
 		if(keys&SAL_INPUT_DOWN || keys&SAL_INPUT_RIGHT) {saveno++; action=1;}
-		// if(saveno<-1) saveno=9;
-		// if(saveno>9) saveno=-1;
 		if(saveno<0) saveno=9;
 		if(saveno>9) saveno=0;
 	      
@@ -821,10 +818,6 @@ static s32 SaveStateSelect(s32 mode)
 			case 9:
 				sal_VideoPrint(87,145-36,"Loading failed",SAL_RGB(31,8,8));
 				break;
-			// case 10:	
-			// 	PrintBar(145-36-4);
-			// 	sal_VideoPrint(75,145-36,"Return to menu",SAL_RGB(31,31,31));
-			// 	break;
 			case 12:
 				sal_VideoPrint(95,145-36,"Slot used",SAL_RGB(31,31,31));
 				sal_VideoPrint((262-(strlen(MENU_TEXT_PREVIEW_SAVESTATE)<<3))>>1,165,MENU_TEXT_PREVIEW_SAVESTATE,SAL_RGB(31,31,31));
@@ -908,7 +901,6 @@ static s32 SaveStateSelect(s32 mode)
 	{
 		LoadStateTemp();
 	}
-	// GFX.Screen = (uint8 *) sal_RS97VideoGetBuffer();
 	GFX.Screen = (uint8 *) sal_VideoGetBuffer();
 	DeleteStateTemp();
 	sal_InputIgnore();
@@ -947,107 +939,6 @@ void RenderMenu(const char *menuName, s32 menuCount, s32 menuSmooth, s32 menufoc
     	}
 }
 
-// static
-// s32 SaveStateMenu(void)
-// {
-// 	s32 menuExit=0,menuCount=SAVESTATE_MENU_COUNT,menufocus=0,menuSmooth=0;
-// 	s32 action=0;
-// 	s32 subaction=0;
-// 	u32 keys=0;
-
-// 	//Update
-// 	strcpy(mMenuText[SAVESTATE_MENU_LOAD],"Load state");
-// 	strcpy(mMenuText[SAVESTATE_MENU_SAVE],"Save state");
-// 	// strcpy(mMenuText[SAVESTATE_MENU_DELETE],"Delete state");
-// 	strcpy(mMenuText[SAVESTATE_MENU_SAVE_SRAM],"Save SRAM");
-// 	sal_InputIgnore();
-
-// 	while (!menuExit)
-// 	{
-// 		// Draw screen:
-// 		menuSmooth=menuSmooth*7+(menufocus<<8); menuSmooth>>=3;
-// 		RenderMenu("Save States", menuCount,menuSmooth,menufocus);
-// 		sal_VideoFlip(1);
-
-// 		keys=sal_InputPollRepeat();
-
-// 		if (keys & INP_BUTTON_MENU_CANCEL)
-// 		{
-// 			while (keys)
-// 			{
-// 				// Draw screen:
-// 				menuSmooth=menuSmooth*7+(menufocus<<8); menuSmooth>>=3;
-// 				RenderMenu("Save States", menuCount,menuSmooth,menufocus);
-// 				sal_VideoFlip(1);
-
-// 				keys=sal_InputPoll();
-// 			}
-		
-// 			menuExit=1;
-// 		}
-// 		else if (keys & INP_BUTTON_MENU_SELECT)
-// 		{
-// 			while (keys)
-// 			{
-// 				// Draw screen:
-// 				menuSmooth=menuSmooth*7+(menufocus<<8); menuSmooth>>=3;
-// 				RenderMenu("Save States", menuCount,menuSmooth,menufocus);
-// 				sal_VideoFlip(1);
-
-// 				keys=sal_InputPoll();
-// 			}
-
-// 			switch(menufocus)
-// 			{
-// 				// case SAVESTATE_MENU_LOAD:
-// 				// 	subaction=SaveStateSelect(SAVESTATE_MODE_LOAD);
-// 				// 	if(subaction==100)
-// 				// 	{
-// 				// 		menuExit=1;
-// 				// 		action=100;
-// 				// 	}
-// 				// 	break;
-// 				// case SAVESTATE_MENU_SAVE:
-// 				// 	SaveStateSelect(SAVESTATE_MODE_SAVE);
-// 				// 	break;
-// 				// case SAVESTATE_MENU_DELETE:
-// 				// 	SaveStateSelect(SAVESTATE_MODE_DELETE);
-// 				// 	break;
-// 				case SAVESTATE_MENU_SAVE_SRAM:
-// 					if(mRomName[0]!=0)
-// 					{
-// 						MenuMessageBox("","","Saving SRAM...",MENU_MESSAGE_BOX_MODE_MSG);
-// 						S9xSaveSRAM(1);
-// 						usleep(1e6);
-// 					}
-// 					break;
-// 			}
-// 		}
-// 		else if ((keys & (SAL_INPUT_UP | SAL_INPUT_DOWN))
-// 		      && (keys & (SAL_INPUT_UP | SAL_INPUT_DOWN)) != (SAL_INPUT_UP | SAL_INPUT_DOWN))
-// 		{
-// 			if (keys & SAL_INPUT_UP)
-// 				menufocus--; // Up
-// 			else if (keys & SAL_INPUT_DOWN)
-// 				menufocus++; // Down
-
-// 			if (menufocus>menuCount-1)
-// 			{
-// 				menufocus=0;
-// 				menuSmooth=(menufocus<<8)-1;
-// 			}
-// 			else if (menufocus<0)
-// 			{
-// 				menufocus=menuCount-1;
-// 				menuSmooth=(menufocus<<8)-1;
-// 			}
-// 		}
-
-// 		usleep(10000);
-// 	}
-//   sal_InputIgnore();
-//   return action;
-// }
 
 void ShowCredits()
 {
@@ -1072,7 +963,6 @@ void ShowCredits()
 
 		if (keys & SAL_INPUT_UP) menufocus--; // Up
 		if (keys & SAL_INPUT_DOWN) menufocus++; // Down
-
     
 		if (keys&INP_BUTTON_MENU_CANCEL) menuExit=1;
     
@@ -1101,30 +991,21 @@ void MainMenuUpdateText(s32 menu_index)
 {
 	switch(menu_index)
 	{
-		// case MENU_STATE:
-		// 	strcpy(mMenuText[MENU_STATE],"Save states");
-		// 	break;
 		case SAVESTATE_MENU_LOAD:
 			strcpy(mMenuText[SAVESTATE_MENU_LOAD],"Load state");
 			break;
 		case SAVESTATE_MENU_SAVE:
 			strcpy(mMenuText[SAVESTATE_MENU_SAVE],"Save state");
 			break;
-		// case SAVESTATE_MENU_DELETE:
-		// 	strcpy(mMenuText[SAVESTATE_MENU_DELETE],"Delete state");
-		// 	break;
 		case MENU_RESET_GAME:
 			strcpy(mMenuText[MENU_RESET_GAME],"Reset");
 			break;
-
 		case MENU_EXIT_APP:
 			strcpy(mMenuText[MENU_EXIT_APP],"Exit");
 			break;
-
 		case MENU_SETTINGS:
 			strcpy(mMenuText[MENU_SETTINGS],"Settings");
 			break;
-
 #ifndef NO_ROM_BROWSER
 		case MENU_ROM_SELECT:
 			strcpy(mMenuText[MENU_ROM_SELECT],"Select ROM");
@@ -1162,9 +1043,7 @@ void SettingsMenuUpdateText(s32 menu_index)
 			}
 
 		case SETTINGS_MENU_SOUND_ON:
-			sprintf(mMenuText[SETTINGS_MENU_SOUND_ON],
-						"Sound                       %s",
-						mMenuOptions->soundEnabled ? " ON" : "OFF");
+			sprintf(mMenuText[SETTINGS_MENU_SOUND_ON], "Sound                       %s", mMenuOptions->soundEnabled ? " ON" : "OFF");
 			break;
 		
 		case SETTINGS_MENU_SOUND_RATE:		
@@ -1172,9 +1051,7 @@ void SettingsMenuUpdateText(s32 menu_index)
 			break;
 
 		case SETTINGS_MENU_SOUND_STEREO:
-			sprintf(mMenuText[SETTINGS_MENU_SOUND_STEREO],
-						"Stereo                      %s",
-						mMenuOptions->stereo ? " ON" : "OFF");
+			sprintf(mMenuText[SETTINGS_MENU_SOUND_STEREO], "Stereo                      %s", mMenuOptions->stereo ? " ON" : "OFF");
 			break;
 
 #if 0
@@ -1213,43 +1090,23 @@ void SettingsMenuUpdateText(s32 menu_index)
 			}
 			break;
 
-		// case SETTINGS_MENU_FULLSCREEN:
-		// 	switch(mMenuOptions->fullScreen)
-		// 	{
-		// 		case 0:
-		// 			strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Video scaling          ORIGINAL");
-		// 			break;
-		// 		// case 1:
-		// 		// 	strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Video scaling         SCANLINES");
-		// 		// 	break;  
-		// 		case 1:
-		// 			strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Video scaling           FS FAST");
-		// 			break;  
-		// 		case 2:
-		// 			strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Video scaling         FS SMOOTH");
-		// 			break;  
-		// 		// case 3:
-		// 		// 	strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Full screen:          HARDWARE");
-		// 		// 	break;
-		// 	}
-		// 	break;
-			case SETTINGS_MENU_FULLSCREEN:
-				switch(mMenuOptions->fullScreen)
-				{
-					case 0:
-						strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Video scaling          ORIGINAL");
-						break;
-					case 1:
-						strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Video scaling              FAST");
-						break;  
-					case 2:
-						strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Video scaling            SMOOTH");
-						break;  
-					case 3:
-						strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Video scaling          HARDWARE");
-						break;
-				}
-			
+		case SETTINGS_MENU_FULLSCREEN:
+			switch(mMenuOptions->fullScreen)
+			{
+				case 0:
+					strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Video scaling          ORIGINAL");
+					break;
+				case 1:
+					strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Video scaling              FAST");
+					break;  
+				case 2:
+					strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Video scaling            SMOOTH");
+					break;  
+				case 3:
+					strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Video scaling          HARDWARE");
+					break;
+			}
+		
 		case SETTINGS_MENU_LOAD_GLOBAL_SETTINGS:
 			strcpy(mMenuText[SETTINGS_MENU_LOAD_GLOBAL_SETTINGS],"Load global settings");
 			break;
@@ -1303,14 +1160,11 @@ void MainMenuUpdateTextAll(void)
 {
 	MainMenuUpdateText(SAVESTATE_MENU_LOAD);
 	MainMenuUpdateText(SAVESTATE_MENU_SAVE);
-	// MainMenuUpdateText(SAVESTATE_MENU_DELETE);
-
 	MainMenuUpdateText(MENU_RESET_GAME);
 #ifndef NO_ROM_BROWSER
 	MainMenuUpdateText(MENU_ROM_SELECT);
 #endif
 	MainMenuUpdateText(MENU_SETTINGS);
-	// MainMenuUpdateText(MENU_CREDITS);
 	MainMenuUpdateText(MENU_EXIT_APP);
 }
 
@@ -1414,7 +1268,6 @@ s32 SettingsMenu(void)
 					SaveMenuOptions(mSystemDir, MENU_OPTIONS_FILENAME, MENU_OPTIONS_EXT, (char*)mMenuOptions, sizeof(struct MENU_OPTIONS), 1);
 					usleep(5e5);
 					break;
-
 				case SETTINGS_MENU_LOAD_CURRENT_SETTINGS:
 					if(mRomName[0]!=0)
 					{
@@ -1429,7 +1282,6 @@ s32 SettingsMenu(void)
 						usleep(5e5);
 					}
 					break;
-
 				case SETTINGS_MENU_DELETE_CURRENT_SETTINGS:
 					if(mRomName[0]!=0)
 					{
@@ -1437,7 +1289,6 @@ s32 SettingsMenu(void)
 						usleep(5e5);
 					}
 					break;
-
 				case MENU_CREDITS:
 					ShowCredits();
 					MainMenuUpdateTextAll();
@@ -1515,21 +1366,6 @@ s32 SettingsMenu(void)
 					}
 					SettingsMenuUpdateText(SETTINGS_MENU_CPU_SPEED);
 					break;
-#endif
-
-				case SETTINGS_MENU_SOUND_RATE:
-					if (keys & SAL_INPUT_RIGHT)
-					{
-						mMenuOptions->soundRate=sal_AudioRateNext(mMenuOptions->soundRate);	
-					}
-					else
-					{
-						mMenuOptions->soundRate=sal_AudioRatePrevious(mMenuOptions->soundRate);
-					}
-					SettingsMenuUpdateText(SETTINGS_MENU_SOUND_RATE);
-					break;
-
-#if 0
 				case SETTINGS_MENU_SOUND_VOL:
 					if (keys & SAL_INPUT_RIGHT)
 					{
@@ -1545,6 +1381,17 @@ s32 SettingsMenu(void)
 					SettingsMenuUpdateText(SETTINGS_MENU_SOUND_VOL);
 					break;
 #endif
+				case SETTINGS_MENU_SOUND_RATE:
+					if (keys & SAL_INPUT_RIGHT)
+					{
+						mMenuOptions->soundRate=sal_AudioRateNext(mMenuOptions->soundRate);	
+					}
+					else
+					{
+						mMenuOptions->soundRate=sal_AudioRatePrevious(mMenuOptions->soundRate);
+					}
+					SettingsMenuUpdateText(SETTINGS_MENU_SOUND_RATE);
+					break;
 
 				case SETTINGS_MENU_FRAMESKIP:
 					if (keys & SAL_INPUT_RIGHT)
@@ -1570,16 +1417,11 @@ s32 SettingsMenu(void)
 					{
 						mMenuOptions->fullScreen++;
 						if(mMenuOptions->fullScreen > 3) mMenuOptions->fullScreen = 0;
-						// mMenuOptions->fullScreen = (mMenuOptions->fullScreen + 1) % 4;
 					}
 					else
 					{
 						mMenuOptions->fullScreen--;
 						if(mMenuOptions->fullScreen > 3) mMenuOptions->fullScreen = 3;
-						// if (mMenuOptions->fullScreen == 0)
-						// 	mMenuOptions->fullScreen = 2;
-						// else
-						// 	mMenuOptions->fullScreen--;
 					}
 					SettingsMenuUpdateText(SETTINGS_MENU_FULLSCREEN);
 					break;
@@ -1675,20 +1517,6 @@ s32 MenuRun(s8 *romName)
 					}
 					break;
 #endif
-
-				// case MENU_STATE:
-				// 	if(mRomName[0]!=0)
-				// 	{
-				// 		subaction=SaveStateMenu();
-				// 		if (subaction==100)
-				// 		{
-				// 			action=EVENT_RUN_ROM;
-				// 			menuExit=1;
-				// 		}
-				// 	}
-				// 	MainMenuUpdateTextAll();
-				// 	break;
-
 				case SAVESTATE_MENU_LOAD:
 					subaction=SaveStateSelect(SAVESTATE_MODE_LOAD);
 					if(subaction==100)
@@ -1700,20 +1528,10 @@ s32 MenuRun(s8 *romName)
 				case SAVESTATE_MENU_SAVE:
 					SaveStateSelect(SAVESTATE_MODE_SAVE);
 					break;
-				// case SAVESTATE_MENU_DELETE:
-				// 	SaveStateSelect(SAVESTATE_MODE_DELETE);
-				// 	break;
-
-				// case MENU_CREDITS:
-				// 	ShowCredits();
-				// 	MainMenuUpdateTextAll();
-				// 	break;
-
 				case MENU_SETTINGS:
 					SettingsMenu();
 					MainMenuUpdateTextAll();
 					break;
-
 				case MENU_RESET_GAME:
 					if(mRomName[0]!=0)
 					{
@@ -1721,7 +1539,6 @@ s32 MenuRun(s8 *romName)
 						menuExit=1;
 					}
 					break;
-				
 				case MENU_EXIT_APP:
 					action=EVENT_EXIT_APP;
 					menuExit=1;

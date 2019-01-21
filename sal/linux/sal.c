@@ -9,7 +9,6 @@
 #define SNES_HEIGHT 239
 
 SDL_Surface *mScreen = NULL;
-// static SDL_Surface *rs97Screen = NULL;
 static u32 mSoundThreadFlag=0;
 static u32 mSoundLastCpuSpeed=0;
 static u32 mPaletteBuffer[PALETTE_BUFFER_LENGTH];
@@ -140,10 +139,7 @@ u32 sal_VideoInit(u32 bpp)
     SDL_DOUBLEBUF
 #endif
 	);
-	// mScreen = SDL_SetVideoMode(SAL_SCREEN_WIDTH, SAL_SCREEN_HEIGHT, bpp, SDL_HWSURFACE);
-	// mScreen = SDL_SetVideoMode(320, 480, 16, SDL_HWSURFACE /* | SDL_DOUBLEBUF*/);
-	// rs97Screen = SDL_SetVideoMode(320, 480, 16, SDL_HWSURFACE /* | SDL_DOUBLEBUF*/);
-	// mScreen = SDL_CreateRGBSurface(SDL_SWSURFACE, SAL_SCREEN_WIDTH, SAL_SCREEN_HEIGHT, 16, 0, 0, 0, 0);
+
 	//If there was an error in setting up the screen
 	if( mScreen == NULL )
 	{
@@ -166,7 +162,6 @@ u32 sal_VideoGetHeight()
 
 u32 sal_VideoGetPitch()
 {
-	// return rs97Screen->pitch;
 	return mScreen->pitch;
 }
 
@@ -181,8 +176,7 @@ void sal_VideoEnterGame(u32 fullscreenOption, u32 pal, u32 refreshRate)
 		Width = SAL_SCREEN_WIDTH;
 		Height = SAL_SCREEN_HEIGHT;
 	}
-	if (SDL_MUSTLOCK(mScreen))
-		SDL_UnlockSurface(mScreen);
+	if (SDL_MUSTLOCK(mScreen)) SDL_UnlockSurface(mScreen);
 	mScreen = SDL_SetVideoMode(Width, Height, mBpp, SDL_HWSURFACE |
 #ifdef SDL_TRIPLEBUF
 		SDL_TRIPLEBUF
@@ -191,8 +185,7 @@ void sal_VideoEnterGame(u32 fullscreenOption, u32 pal, u32 refreshRate)
 #endif
 		);
 	mRefreshRate = refreshRate;
-	if (SDL_MUSTLOCK(mScreen))
-		SDL_LockSurface(mScreen);
+	if (SDL_MUSTLOCK(mScreen)) SDL_LockSurface(mScreen);
 #endif
 }
 
@@ -207,11 +200,9 @@ void sal_VideoSetPAL(u32 fullscreenOption, u32 pal)
 void sal_VideoExitGame()
 {
 #ifdef GCW_ZERO
-	if (SDL_MUSTLOCK(mScreen))
-		SDL_UnlockSurface(mScreen);
+	if (SDL_MUSTLOCK(mScreen)) SDL_UnlockSurface(mScreen);
 	mScreen = SDL_SetVideoMode(SAL_SCREEN_WIDTH, SAL_SCREEN_HEIGHT, mBpp, SDL_HWSURFACE | SDL_DOUBLEBUF);
-	if (SDL_MUSTLOCK(mScreen))
-		SDL_LockSurface(mScreen);
+	if (SDL_MUSTLOCK(mScreen)) SDL_LockSurface(mScreen);
 #endif
 }
 
@@ -226,24 +217,15 @@ void sal_VideoBitmapDim(u16* img, u32 pixelCount)
 
 void sal_VideoFlip(s32 vsync)
 {
-	if (SDL_MUSTLOCK(mScreen)) {
-		SDL_UnlockSurface(mScreen); 
-		SDL_Flip(mScreen);
-		SDL_LockSurface(mScreen);
-	} else
-		SDL_Flip(mScreen);
+	if (SDL_MUSTLOCK(mScreen)) SDL_UnlockSurface(mScreen);
+	SDL_Flip(mScreen);
+	if (SDL_MUSTLOCK(mScreen)) SDL_LockSurface(mScreen);
 }
-
 
 void *sal_VideoGetBuffer()
 {
 	return (void*)mScreen->pixels;
 }
-
-// void *sal_RS97VideoGetBuffer()
-// {
-// 	return (void*)rs97Screen->pixels;
-// }
 
 void sal_VideoPaletteSync() 
 { 	
