@@ -864,7 +864,7 @@ static s32 SaveStateSelect(s32 mode)
 					unsigned int fullScreenSave = mMenuOptions->fullScreen;
 					mMenuOptions->fullScreen = 0;
 					S9xMainLoop ();
-					// mMenuOptions->fullScreen = fullScreenSave;
+					mMenuOptions->fullScreen = fullScreenSave;
 					sal_AudioSetMuted(0);
 					mPreviewingState = 0;
 					action=5;
