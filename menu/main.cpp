@@ -178,6 +178,7 @@ bool8_32 S9xDeinitUpdate (int Width, int Height, bool8_32)
 	switch (mMenuOptions.fullScreen)
 	{
 		case 0: /* No scaling */
+		case 3: /* Hardware scaling */
 		{
 			u32 h = PAL ? SNES_HEIGHT_EXTENDED : SNES_HEIGHT;
 			u32 y, pitch = sal_VideoGetPitch();
@@ -192,7 +193,6 @@ bool8_32 S9xDeinitUpdate (int Width, int Height, bool8_32)
 			}
 			break;
 		}
-
 		case 1: /* Fast software scaling */
 			if (PAL) {
 				upscale_256x240_to_320x240((uint32_t*) sal_VideoGetBuffer(), (uint32_t*) IntermediateScreen, SNES_WIDTH);
@@ -208,13 +208,13 @@ bool8_32 S9xDeinitUpdate (int Width, int Height, bool8_32)
 				upscale_256x224_to_320x240_bilinearish((uint32_t*) sal_VideoGetBuffer() + 160, (uint32_t*) IntermediateScreen, SNES_WIDTH);
 			}
 			break;
-		case 3: /* Hardware scaling */
-		{
-			u32 h = PAL ? SNES_HEIGHT_EXTENDED : SNES_HEIGHT;
-			image = SDL_CreateRGBSurfaceFrom((uint16_t*)IntermediateScreen,SNES_WIDTH,h,16,SNES_WIDTH * sizeof(u16),0,0,0,0);
-			sal_VideoBlit(image);
-			break;
-		}
+		// case 3: /* Hardware scaling */
+		// {
+		// 	u32 h = PAL ? SNES_HEIGHT_EXTENDED : SNES_HEIGHT;
+		// 	image = SDL_CreateRGBSurfaceFrom((uint16_t*)IntermediateScreen,SNES_WIDTH,h,16,SNES_WIDTH * sizeof(u16),0,0,0,0);
+		// 	sal_VideoBlit(image);
+		// 	break;
+		// }
 	}
 
 	u32 newTimer;
