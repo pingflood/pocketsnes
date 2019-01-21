@@ -8,7 +8,7 @@
 #define SNES_WIDTH  256
 #define SNES_HEIGHT 239
 
-static SDL_Surface *mScreen = NULL;
+SDL_Surface *mScreen = NULL;
 // static SDL_Surface *rs97Screen = NULL;
 static u32 mSoundThreadFlag=0;
 static u32 mSoundLastCpuSpeed=0;
@@ -233,41 +233,6 @@ void sal_VideoFlip(s32 vsync)
 	} else
 		SDL_Flip(mScreen);
 }
-
-void sal_VideoBlit(SDL_Surface *src)
-{
-	// if (SDL_MUSTLOCK(mScreen)) {
-	// 	SDL_UnlockSurface(mScreen); 
-	// 	SDL_Flip(mScreen);
-	// 	SDL_LockSurface(mScreen);
-	// } else
-
-
-/* Blit the image to the center of the screen */
-		SDL_Rect dstrect;
-		dstrect.x = (mScreen->w - src->w) / 2;
-		dstrect.y = (mScreen->h - src->h) / 2;
-		dstrect.w = src->w;
-		dstrect.h = src->h;
-
-		SDL_BlitSurface(src, NULL, mScreen, &dstrect);
-
-// ScreenSurface
-		// SDL_Flip(mScreen);
-
-	// uint32_t *s = (uint32_t*)mScreen->pixels;
-	// uint32_t *d = (uint32_t*)rs97Screen->pixels;// + (SAL_SCREEN_WIDTH - SNES_WIDTH) / 4;
-	// for(uint8_t y = 0; y < 240; y++, s += SAL_SCREEN_WIDTH/2, d += 320) memmove(d, s, SAL_SCREEN_WIDTH * 4);
-	// SDL_Flip(mScreen);
-}
-
-
-
-
-
-
-
-
 
 
 void *sal_VideoGetBuffer()

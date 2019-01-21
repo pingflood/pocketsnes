@@ -67,7 +67,6 @@ void sal_VideoSetPAL(u32 fullscreenOption, u32 pal);
 void sal_VideoExitGame();
 u32 sal_VideoGetPitch();
 void sal_VideoFlip(s32 vsync);
-void sal_VideoBlit(SDL_Surface *src);
 void *sal_VideoGetBuffer();
 // void *sal_RS97VideoGetBuffer();
 void sal_VideoPaletteSet(u32 index, u32 color);
