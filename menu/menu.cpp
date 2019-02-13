@@ -795,6 +795,8 @@ static s32 SaveStateSelect(s32 mode)
 				break;
 			case 4:
 				sal_VideoPrint(59,145-36,"Previewing failed",SAL_RGB(31,8,8));
+				sal_VideoDrawRect(0, 186, 262, 16, SAL_RGB(22,0,0));
+				if(mode==0) sal_VideoPrint((262-(strlen(MENU_TEXT_DELETE_SAVESTATE)<<3))>>1,190,MENU_TEXT_DELETE_SAVESTATE,SAL_RGB(31,31,31));
 				break;
 			case 5: 
 			{
