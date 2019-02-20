@@ -35,6 +35,8 @@ static s8 mSystemDir[SAL_MAX_PATH];
 static struct MENU_OPTIONS *mMenuOptions=NULL;
 static u16 mTempFb[SNES_WIDTH*SNES_HEIGHT_EXTENDED*2];
 
+static char errormsg[MAX_DISPLAY_CHARS];
+
 extern "C" void S9xSaveSRAM(int showWarning);
 									
 void DefaultMenuOptions(void)
@@ -709,10 +711,12 @@ bool8 LoadStateFile(s8 *filename)
 }
 
 static 
-void SaveStateFile(s8 *filename)
+bool8 SaveStateFile(s8 *filename)
 {
-	if (!S9xFreezeGame(filename))
+	bool8 ret;
+	if (!(ret = S9xFreezeGame(filename)))
 		fprintf(stderr, "Failed to write saved state at %s: %s\n", filename, strerror(errno));
+	return ret;
 }
 
 u32 IsPreviewingState()
@@ -795,10 +799,12 @@ static s32 SaveStateSelect(s32 mode)
 				break;
 			case 4:
 				sal_VideoPrint(59,145-36,"Previewing failed",SAL_RGB(31,8,8));
+				snprintf(errormsg, sizeof(errormsg), "%s",strerror(errno));
+				sal_VideoPrint((320-strlen(errormsg)*8)/2,145-20,errormsg,SAL_RGB(31,8,8));
 				sal_VideoDrawRect(0, 186, 262, 16, SAL_RGB(22,0,0));
 				if(mode==0) sal_VideoPrint((262-(strlen(MENU_TEXT_DELETE_SAVESTATE)<<3))>>1,190,MENU_TEXT_DELETE_SAVESTATE,SAL_RGB(31,31,31));
 				break;
-			case 5: 
+			case 5:
 			{
 				u32 DestWidth = 205, DestHeight = 154;
 				sal_VideoBitmapScale(0, 0, SNES_WIDTH, SNES_HEIGHT, DestWidth, DestHeight, SAL_SCREEN_WIDTH - DestWidth, &mTempFb[0], (u16*)sal_VideoGetBuffer()+(SAL_SCREEN_WIDTH*(((202 + 16) - DestHeight)/2))+((262 - DestWidth)/2));
@@ -813,12 +819,16 @@ static s32 SaveStateSelect(s32 mode)
 				break;
 			case 7:
 				sal_VideoPrint(95,145-36,"Saving failed",SAL_RGB(31,8,8));
+				snprintf(errormsg, sizeof(errormsg), "%s",strerror(errno));
+				sal_VideoPrint((320-strlen(errormsg)*8)/2,145-20,errormsg,SAL_RGB(31,8,8));
 				break;
 			case 8:
 				sal_VideoPrint(87,145-36,"Loading...",SAL_RGB(31,31,31));
 				break;
 			case 9:
 				sal_VideoPrint(87,145-36,"Loading failed",SAL_RGB(31,8,8));
+				snprintf(errormsg, sizeof(errormsg), "%s",strerror(errno));
+				sal_VideoPrint((320-strlen(errormsg)*8)/2,145-20,errormsg,SAL_RGB(31,8,8));
 				break;
 			case 12:
 				sal_VideoPrint(95,145-36,"Slot used",SAL_RGB(31,31,31));
@@ -871,22 +881,25 @@ static s32 SaveStateSelect(s32 mode)
 			case 6:
 				//Reload state in case user has been previewing
 				LoadStateTemp();
-				SaveStateFile(mSaveState[saveno].fullFilename);
-				mSaveState[saveno].inUse=1;
-				action=1;
+				if (SaveStateFile(mSaveState[saveno].fullFilename)) {
+					mSaveState[saveno].inUse=1;
+					action=1;
+				} else {
+					action=7; // did not saved correctly; report an error
+				}
 				break;
-			case 7:
-				action=1;
-				break;
+			// case 7:
+				// action=1;
+				// break;
 			case 8:
 				if (LoadStateFile(mSaveState[saveno].fullFilename))
 					action=100;  // loaded ok so exit
 				else
 					action=9; // did not load correctly; report an error
 				break;
-			case 9:
-				action=1;
-				break;
+			// case 9:
+				// action=1;
+				// break;
 			case 11:
 				action=1;
 				break;
