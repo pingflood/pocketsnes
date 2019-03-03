@@ -24,12 +24,13 @@ CFLAGS += -O3 -fdata-sections -ffunction-sections -mips32 -march=mips32 -mno-mip
 CFLAGS += -fno-common -Wno-write-strings -Wno-sign-compare -ffast-math -ftree-vectorize
 CFLAGS += -funswitch-loops -fno-strict-aliasing
 CFLAGS += -DMIPS_XBURST -DFAST_LSB_WORD_ACCESS -DNO_ROM_BROWSER
+# CFLAGS += -flto
 # CFLAGS += -fprofile-generate -fprofile-dir=/mnt/int_sd/profile
 # CFLAGS += -fprofile-use
 
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti -fno-math-errno -fno-threadsafe-statics
 
-LDFLAGS = $(CXXFLAGS) -lpthread -lz -lpng  $(SDL_LIBS) -flto -Wl,--as-needed -Wl,--gc-sections -s
+LDFLAGS = $(CXXFLAGS) -lpthread -lz -lpng  $(SDL_LIBS) -Wl,--as-needed -Wl,--gc-sections -s
 
 # Find all source files
 SOURCE = pocketsnes/snes9x menu sal/linux sal

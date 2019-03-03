@@ -724,11 +724,11 @@ u32 IsPreviewingState()
 	return mPreviewingState;
 }
 
+s32 saveno=0; // save state number
 static s32 SaveStateSelect(s32 mode)
 {
 	s8 text[128];
 	s32 action=11;
-	s32 saveno=0;
 	u32 keys=0;
 	u16 *pixTo,*pixFrom;
 
