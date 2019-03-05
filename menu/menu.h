@@ -167,6 +167,7 @@ s32 LoadMenuOptions(const char *path, const char *filename, const char *ext,
 			const char *optionsmem, s32 maxSize, s32 showMessage);
 s32 DeleteMenuOptions(const char *path, const char *filename,
 			const char *ext, s32 showMessage);
+void LoadCurrentOptions(void);
 void DefaultMenuOptions(void);
 void MenuPause(void);
 void PrintTitle(const char *title);

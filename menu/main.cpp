@@ -525,14 +525,12 @@ int SnesRomLoad()
 	char text[256];
 	FILE *stream=NULL;
   
-    	MenuMessageBox("Loading ROM...",mRomName,"",MENU_MESSAGE_BOX_MODE_MSG);
-
+	MenuMessageBox("Loading ROM...",mRomName,"",MENU_MESSAGE_BOX_MODE_MSG);
 	if (!Memory.LoadROM (mRomName))
 	{
 		MenuMessageBox("Loading ROM",mRomName,"Failed!",MENU_MESSAGE_BOX_MODE_PAUSE);
 		return SAL_ERROR;
 	}
-	
 	MenuMessageBox("Done loading the ROM",mRomName,"",MENU_MESSAGE_BOX_MODE_MSG);
 
 	S9xReset();
@@ -716,7 +714,6 @@ int mainEntry(int argc, char* argv[])
 
 	MenuInit(sal_DirectoryGetHome(), &mMenuOptions);
 
-
 	if(SnesInit() == SAL_ERROR)
 	{
 		sal_Reset();
@@ -745,6 +742,9 @@ int mainEntry(int argc, char* argv[])
 			}
 			else
 			{
+				MenuMessageBox("Loading game settings...",mRomName,"",MENU_MESSAGE_BOX_MODE_MSG);
+				LoadCurrentOptions();
+
 				event=EVENT_RUN_ROM;
 		  	}
 		}
