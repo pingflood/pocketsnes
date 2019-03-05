@@ -1122,10 +1122,17 @@ void MainMenuUpdateTextAll(void)
 	MainMenuUpdateText(MENU_EXIT_APP);
 }
 
+void LoadCurrentOptions()
+{
+	if (mRomName[0] != 0) {
+		LoadMenuOptions(mSystemDir, mRomName, MENU_OPTIONS_EXT, (char*)mMenuOptions, sizeof(struct MENU_OPTIONS), 1);
+	}
+	return;
+}
+
 void MenuReloadOptions()
 {
-	if(mRomName[0]!=0)
-	{
+	if (mRomName[0] != 0) {
 		//Load settings for game
 		if (LoadMenuOptions(mSystemDir, mRomName, MENU_OPTIONS_EXT, (s8*)mMenuOptions, sizeof(struct MENU_OPTIONS), 0) == SAL_OK) {
 			return;
