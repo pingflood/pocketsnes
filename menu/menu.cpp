@@ -41,13 +41,15 @@ extern "C" void S9xSaveSRAM(int showWarning);
 									
 void DefaultMenuOptions(void)
 {
-	mMenuOptions->frameSkip=0;   //auto
+	// mMenuOptions->frameSkip=0;   //auto
+	mMenuOptions->frameSkip=1;   //0
 	mMenuOptions->soundEnabled = 1; 
 	mMenuOptions->volume=25; 
 	mMenuOptions->cpuSpeed=336; 
 	mMenuOptions->country=0;
 	mMenuOptions->showFps=0;
-	mMenuOptions->soundRate=22050; //44100;
+	// mMenuOptions->soundRate=22050; //44100;
+	mMenuOptions->soundRate=44100;
 	mMenuOptions->stereo=0;
 	mMenuOptions->fullScreen=3;
 	mMenuOptions->autoSaveSram=1;

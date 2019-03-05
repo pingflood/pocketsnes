@@ -23,10 +23,10 @@ CFLAGS =  -std=gnu++03 $(INCLUDE) -DRC_OPTIMIZED -DGCW_ZERO -D__LINUX__ -D__DING
 CFLAGS += -O3 -fdata-sections -ffunction-sections -mips32 -march=mips32 -mno-mips16 -fomit-frame-pointer -fno-builtin
 CFLAGS += -fno-common -Wno-write-strings -Wno-sign-compare -ffast-math -ftree-vectorize
 CFLAGS += -funswitch-loops -fno-strict-aliasing
-CFLAGS += -DMIPS_XBURST -DFAST_LSB_WORD_ACCESS -DNO_ROM_BROWSER
+CFLAGS += -DMIPS_XBURST -DFAST_LSB_WORD_ACCESS
 # CFLAGS += -flto
-# CFLAGS += -fprofile-generate -fprofile-dir=/mnt/int_sd/profile
-# CFLAGS += -fprofile-use
+# CFLAGS += -fprofile-generate -fprofile-dir=/home/retrofw/profile/pocketsnes
+# CFLAGS += -fprofile-use -fprofile-dir=./profile -DNO_ROM_BROWSER
 
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti -fno-math-errno -fno-threadsafe-statics
 
@@ -51,9 +51,12 @@ ipk: $(TARGET)
 	@cp dist/PocketSNES.dge dist/PocketSNES.man.txt dist/PocketSNES.png dist/backdrop.png /tmp/.pocketsnes-ipk/root/home/retrofw/emus/pocketsnes
 	@cp dist/pocketsnes.lnk /tmp/.pocketsnes-ipk/root/home/retrofw/apps/gmenu2x/sections/emulators
 	@cp dist/snes.pocketsnes.lnk /tmp/.pocketsnes-ipk/root/home/retrofw/apps/gmenu2x/sections/emulators.systems
-	@sed "s/^Version:.*/Version: $$(date +%Y%m%d)/" dist/control > /tmp/.pocketsnes-ipk/control
+	# @sed "s/^Version:.*/Version: $$(date +%Y%m%d)/" dist/control > /tmp/.pocketsnes-ipk/control
+	@sed "s/^Version:.*/Version: 20190304/" dist/control > /tmp/.pocketsnes-ipk/control
 	@cp dist/conffiles /tmp/.pocketsnes-ipk/
-	@tar --owner=0 --group=0 -czvf /tmp/.pocketsnes-ipk/control.tar.gz -C /tmp/.pocketsnes-ipk/ control conffiles
+	# echo -e "#!/bin/sh\nmkdir -p /home/retrofw/profile/pocketsnes; exit 0" > /tmp/.pocketsnes-ipk/preinst
+	# chmod +x /tmp/.gmenu-ipk/postinst /tmp/.pocketsnes-ipk/preinst
+	@tar --owner=0 --group=0 -czvf /tmp/.pocketsnes-ipk/control.tar.gz -C /tmp/.pocketsnes-ipk/ control conffiles #preinst
 	@tar --owner=0 --group=0 -czvf /tmp/.pocketsnes-ipk/data.tar.gz -C /tmp/.pocketsnes-ipk/root/ .
 	@echo 2.0 > /tmp/.pocketsnes-ipk/debian-binary
 	@ar r dist/pocketsnes.ipk /tmp/.pocketsnes-ipk/control.tar.gz /tmp/.pocketsnes-ipk/data.tar.gz /tmp/.pocketsnes-ipk/debian-binary
