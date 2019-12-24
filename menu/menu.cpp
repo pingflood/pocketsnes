@@ -38,15 +38,13 @@ static u16 mTempFb[SNES_WIDTH*SNES_HEIGHT_EXTENDED*2];
 static char errormsg[MAX_DISPLAY_CHARS];
 
 extern "C" void S9xSaveSRAM(int showWarning);
-									
+
 void DefaultMenuOptions(void)
 {
-	// mMenuOptions->frameSkip=0;   //auto
-	mMenuOptions->frameSkip=1;   //0
-	mMenuOptions->soundEnabled = 1; 
-	mMenuOptions->volume=25; 
-	mMenuOptions->cpuSpeed=336; 
 	mMenuOptions->frameSkip=0;   //auto
+	mMenuOptions->soundEnabled = 1;
+	mMenuOptions->volume=25;
+	mMenuOptions->cpuSpeed=336;
 	mMenuOptions->country=0;
 	mMenuOptions->showFps=0;
 	mMenuOptions->soundRate=48000;
@@ -77,7 +75,7 @@ s32 SaveMenuOptions(const char *path, const char *filename, const char *ext,
 	s8 _filename[SAL_MAX_PATH];
 	s8 _ext[SAL_MAX_PATH];
 	s8 _path[SAL_MAX_PATH];
-	
+
 	if (showMessage)
 	{
 		PrintTitle("");
@@ -97,7 +95,7 @@ s32 DeleteMenuOptions(const char *path, const char *filename,
 	s8 _filename[SAL_MAX_PATH];
 	s8 _ext[SAL_MAX_PATH];
 	s8 _path[SAL_MAX_PATH];
-	
+
 	if (showMessage)
 	{
 		PrintTitle("");
@@ -157,16 +155,16 @@ s32 MenuMessageBox(const char *message1, const char *message2,
   s32 select=0;
   s32 subaction=-1;
   u32 keys=0;
-  
+
   sal_InputIgnore();
   while(subaction==-1)
   {
      keys=sal_InputPollRepeat();
-     if (keys & SAL_INPUT_UP) 
+     if (keys & SAL_INPUT_UP)
      {
        select=SAL_OK; // Up
      }
-     if (keys & SAL_INPUT_DOWN) 
+     if (keys & SAL_INPUT_DOWN)
      {
        select=SAL_ERROR; // Down
      }
@@ -194,7 +192,7 @@ s32 MenuMessageBox(const char *message1, const char *message2,
 	          sal_VideoPrint(8,140,"NO",SAL_RGB(31,31,31));
 	       }
 	       break;
-	case MENU_MESSAGE_BOX_MODE_PAUSE: 
+	case MENU_MESSAGE_BOX_MODE_PAUSE:
 			PrintBar(120-4);
 			sal_VideoPrint(8,120,"Press button to continue",SAL_RGB(31,31,31));
 			break;
@@ -209,8 +207,8 @@ s32 MenuMessageBox(const char *message1, const char *message2,
 }
 
 void PrintTitle(const char *title)
-{	
-	sal_ImageDraw(mMenuBackground,SAL_SCREEN_WIDTH, SAL_SCREEN_HEIGHT,0,0);	
+{
+	sal_ImageDraw(mMenuBackground,SAL_SCREEN_WIDTH, SAL_SCREEN_HEIGHT,0,0);
 }
 
 void PrintBar(u32 givenY)
@@ -254,7 +252,7 @@ void SwapDirectoryEntry(struct SAL_DIRECTORY_ENTRY *salFrom, struct SAL_DIRECTOR
 	strcpy(salTo->displayName, temp.displayName);
 	strcpy(salTo->filename, temp.filename);
 	salTo->type=temp.type;
-		
+
 }
 
 int FileScan()
@@ -311,14 +309,14 @@ int FileScan()
 			while(sal_DirectoryRead(&d, &mRomList[x+startIndex])==SAL_OK)
 			{
 				//Dir entry read
-#if 0	
+#if 0
 				PrintTitle("File Scan");
 				sprintf(text,"Fetched item %d of %d",x, itemCount-1);
 				sal_VideoPrint(8,120,text,SAL_RGB(31,31,31));
 				PrintBar(228-4);
 				sal_VideoPrint(0,228,mRomDir,SAL_RGB(0,0,0));
 				sal_VideoFlip(1);
-#endif	
+#endif
 				if (mRomList[x+startIndex].type == SAL_FILE_TYPE_FILE)
 				{
 					sal_DirectorySplitFilename(mRomList[x+startIndex].filename,path,filename,ext);
@@ -338,7 +336,7 @@ int FileScan()
 					dirCount++;
 					x++;
 				}
-				
+
 			}
 			mRomCount=ROM_SELECTOR_ROM_START+dirCount+fileCount;
 			sal_DirectoryClose(&d);
@@ -373,7 +371,7 @@ int FileScan()
 		//Now sort directory entries
 		for(a=startIndex;a<startIndex+dirCount;a++)
 		{
-			lowIndex=a;		
+			lowIndex=a;
 			for(b=a+1;b<startIndex+dirCount;b++)
 			{
 				if (sal_StringCompare(mRomList[b].displayName, mRomList[lowIndex].displayName) < 0)
@@ -389,7 +387,7 @@ int FileScan()
 		//Now sort file entries
 		for(a=startIndex+dirCount;a<mRomCount;a++)
 		{
-			lowIndex=a;		
+			lowIndex=a;
 			for(b=a+1;b<mRomCount;b++)
 			{
 				if (sal_StringCompare(mRomList[b].displayName, mRomList[lowIndex].displayName) < 0)
@@ -437,9 +435,9 @@ s32 FileSelect()
 	s32 scanstart=0,scanend=0;
 	u32 keys=0;
 	s32 size=0, check=SAL_OK;
-	
+
 	previousRom[0] = '\0';
-	
+
 	if (FileScan() != SAL_OK)
 	{
 		strcpy(mRomDir, sal_DirectoryGetUser());
@@ -451,7 +449,7 @@ s32 FileSelect()
 			return 0;
 		}
 	}
-	
+
 	focus = LoadLastSelectedRomPos(); //try to load a saved position in the romlist
 
 	smooth=focus<<8;
@@ -459,7 +457,7 @@ s32 FileSelect()
 	while (menuExit==0)
 	{
 		keys=sal_InputPollRepeat();
-		
+
 		if (keys & INP_BUTTON_MENU_SELECT)
 		{
 			switch(focus)
@@ -473,10 +471,10 @@ s32 FileSelect()
 					action=0;
 					menuExit=1;
 					break;
-				
+
 				case ROM_SELECTOR_DEFAULT_FOCUS: //blank space - do nothing
 					break;
-					
+
 				default:
 					// normal file or dir selected
 					if (mRomList[focus].type == SAL_FILE_TYPE_DIRECTORY)
@@ -496,7 +494,7 @@ s32 FileSelect()
 							sal_DirectoryGetParent(mRomDir);
 							FileScan();
 							focus=ROM_SELECTOR_DEFAULT_FOCUS; // default menu to non menu item
-														// just to stop directory scan being started 
+														// just to stop directory scan being started
 							smooth=focus<<8;
 							sal_InputIgnore();
 							break;
@@ -507,7 +505,7 @@ s32 FileSelect()
 							sal_DirectoryCombine(mRomDir,mRomList[focus].filename);
 							FileScan();
 							focus=ROM_SELECTOR_DEFAULT_FOCUS; // default menu to non menu item
-														// just to stop directory scan being started 
+														// just to stop directory scan being started
 							smooth=focus<<8;
 						}
 					}
@@ -546,7 +544,7 @@ s32 FileSelect()
 				focus-=12;
 			else if (keys & SAL_INPUT_RIGHT)
 				focus+=12;
-			
+
 			if (focus>mRomCount-1)
 				focus=mRomCount-1;
 			else if (focus<0)
@@ -590,16 +588,16 @@ s32 FileSelect()
 		if (scanstart<0) scanstart=0;
 		scanend = focus+15;
 		if (scanend>mRomCount) scanend=mRomCount;
-		
+
 		for (i=scanstart;i<scanend;i++)
 		{
 			s32 x=0,y=0;
-      
+
 			y=(i<<4)-(smooth>>4);
 			x=0;
 			y+=112 - 28;
 			if (y<=48 - 28 || y>=232 - 36) continue;
-           
+
 			if (i==focus)
 			{
 				color=SAL_RGB(31,31,31);
@@ -610,7 +608,7 @@ s32 FileSelect()
 				color=SAL_RGB(31,31,31);
 			}
 
-			 
+
 			// Draw Directory icon if current entry is a directory
 			if(mRomList[i].type == SAL_FILE_TYPE_DIRECTORY)
 			{
@@ -622,7 +620,7 @@ s32 FileSelect()
 				sal_VideoPrint(x,y,mRomList[i].displayName,color);
 			}
 
-			
+
 		}
 
 		sal_VideoPrint(0,4,mRomDir,SAL_RGB(31,8,8));
@@ -646,11 +644,11 @@ static void ScanSaveStates(s8 *romname)
 	s8 path[SAL_MAX_PATH];
 
 	if(!strcmp(romname,mSaveStateName)) return; // is current save state rom so exit
-	
+
 	sal_DirectorySplitFilename(romname,path,filename,ext);
 
 	sprintf(savename,"%s.%s",filename,SAVESTATE_EXT);
-  
+
 	for(i=0;i<10;i++)
 	{
 		/*
@@ -686,7 +684,7 @@ bool8 LoadStateTemp()
 	return ret;
 }
 
-static 
+static
 void SaveStateTemp()
 {
 	char name[SAL_MAX_PATH];
@@ -712,7 +710,7 @@ bool8 LoadStateFile(s8 *filename)
 	return ret;
 }
 
-static 
+static
 bool8 SaveStateFile(s8 *filename)
 {
 	bool8 ret;
@@ -753,7 +751,7 @@ static s32 SaveStateSelect(s32 mode)
 		if(keys&SAL_INPUT_DOWN || keys&SAL_INPUT_RIGHT) {saveno++; action=1;}
 		if(saveno<0) saveno=9;
 		if(saveno>9) saveno=0;
-	      
+
 		if(keys&INP_BUTTON_MENU_CANCEL) action=0; // exit
 		else if((keys&INP_BUTTON_MENU_SELECT)&&(saveno==-1)) action=0; // exit
 		else if((keys&INP_BUTTON_MENU_SELECT)&&(mode==0)&&((action==2)||(action==5))) action=6;  // pre-save mode
@@ -773,10 +771,10 @@ static s32 SaveStateSelect(s32 mode)
 
 		PrintTitle("Save States");
 		sal_VideoPrint(8,4,"Choose a slot",SAL_RGB(31,8,8));
-      
-		if(saveno==-1) 
+
+		if(saveno==-1)
 		{
-			if(action!=10&&action!=0) 
+			if(action!=10&&action!=0)
 			{
 				action=10;
 			}
@@ -787,7 +785,7 @@ static s32 SaveStateSelect(s32 mode)
 			sprintf(text,"SLOT %d",saveno);
 			sal_VideoPrint(107,20,text,SAL_RGB(31,31,31));
 		}
-      
+
 		switch(action)
 		{
 			case 1:
@@ -843,17 +841,17 @@ static s32 SaveStateSelect(s32 mode)
 				sal_VideoPrint(87,145-36,"Deleting...",SAL_RGB(31,31,31));
 				break;
 		}
-      
+
 		sal_VideoFlip(1);
-      
+
 		switch(action)
 		{
 			case 1:
-				if(mSaveState[saveno].inUse) 
+				if(mSaveState[saveno].inUse)
 				{
 					action=3;
 				}
-				else 
+				else
 				{
 					action=2;
 				}
@@ -927,7 +925,7 @@ static s32 SaveStateSelect(s32 mode)
 static
 void RenderMenu(const char *menuName, s32 menuCount, s32 menuSmooth, s32 menufocus)
 {
-	
+
 	s32 i=0;
 	u16 color=0;
 	PrintTitle(menuName);
@@ -941,7 +939,7 @@ void RenderMenu(const char *menuName, s32 menuCount, s32 menuSmooth, s32 menufoc
       		y+=112 - 28;
 
       		if (y<=48 - 28 || y>=232 - 36) continue;
-      
+
       		if (i==menufocus)
       		{
         		color=SAL_RGB(31,31,31);
@@ -980,15 +978,15 @@ void ShowCredits()
 
 		if (keys & SAL_INPUT_UP) menufocus--; // Up
 		if (keys & SAL_INPUT_DOWN) menufocus++; // Down
-    
+
 		if (keys&INP_BUTTON_MENU_CANCEL) menuExit=1;
-    
+
 		if (menufocus>menuCount-1)
 		{
 			menufocus=0;
 			menuSmooth=(menufocus<<8)-1;
-		}   
-		else if (menufocus<0) 
+		}
+		else if (menufocus<0)
 		{
 			menufocus=menuCount-1;
 			menuSmooth=(menufocus<<8)-1;
@@ -1003,7 +1001,7 @@ void ShowCredits()
   	sal_InputIgnore();
 }
 
-static 
+static
 void MainMenuUpdateText(s32 menu_index)
 {
 	switch(menu_index)
@@ -1031,7 +1029,7 @@ void MainMenuUpdateText(s32 menu_index)
 	}
 }
 
-static 
+static
 void SettingsMenuUpdateText(s32 menu_index)
 {
 	switch(menu_index)
@@ -1062,8 +1060,8 @@ void SettingsMenuUpdateText(s32 menu_index)
 		case SETTINGS_MENU_SOUND_ON:
 			sprintf(mMenuText[SETTINGS_MENU_SOUND_ON], "Sound                       %s", mMenuOptions->soundEnabled ? " ON" : "OFF");
 			break;
-		
-		case SETTINGS_MENU_SOUND_RATE:		
+
+		case SETTINGS_MENU_SOUND_RATE:
 			sprintf(mMenuText[SETTINGS_MENU_SOUND_RATE],"Sound rate                %5d",mMenuOptions->soundRate);
 			break;
 
@@ -1072,16 +1070,16 @@ void SettingsMenuUpdateText(s32 menu_index)
 			break;
 
 #if 0
-		case SETTINGS_MENU_CPU_SPEED:		
+		case SETTINGS_MENU_CPU_SPEED:
 			sprintf(mMenuText[SETTINGS_MENU_CPU_SPEED],"Cpu Speed:                  %d",mMenuOptions->cpuSpeed);
 			break;
-		
+
 		case SETTINGS_MENU_SOUND_VOL:
 			sprintf(mMenuText[SETTINGS_MENU_SOUND_VOL],"Volume:                     %d",mMenuOptions->volume);
 			break;
 #endif
-		
-		case SETTINGS_MENU_FRAMESKIP: 
+
+		case SETTINGS_MENU_FRAMESKIP:
 			switch(mMenuOptions->frameSkip)
 			{
 				case 0:
@@ -1103,7 +1101,7 @@ void SettingsMenuUpdateText(s32 menu_index)
 					break;
 				case 1:
 					strcpy(mMenuText[SETTINGS_MENU_FPS],"Show FPS                     ON");
-					break;  
+					break;
 			}
 			break;
 
@@ -1115,27 +1113,27 @@ void SettingsMenuUpdateText(s32 menu_index)
 					break;
 				case 1:
 					strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Video scaling              FAST");
-					break;  
+					break;
 				case 2:
 					strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Video scaling            SMOOTH");
-					break;  
+					break;
 				case 3:
 					strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Video scaling          HARDWARE");
 					break;
 			}
-		
+
 		case SETTINGS_MENU_LOAD_GLOBAL_SETTINGS:
 			strcpy(mMenuText[SETTINGS_MENU_LOAD_GLOBAL_SETTINGS],"Load global settings");
 			break;
-			
+
 		case SETTINGS_MENU_SAVE_GLOBAL_SETTINGS:
 			strcpy(mMenuText[SETTINGS_MENU_SAVE_GLOBAL_SETTINGS],"Save global settings");
 			break;
-			
+
 		case SETTINGS_MENU_LOAD_CURRENT_SETTINGS:
 			strcpy(mMenuText[SETTINGS_MENU_LOAD_CURRENT_SETTINGS],"Load game settings");
 			break;
-		
+
 		case SETTINGS_MENU_SAVE_CURRENT_SETTINGS:
 			strcpy(mMenuText[SETTINGS_MENU_SAVE_CURRENT_SETTINGS],"Save game settings");
 			break;
@@ -1219,7 +1217,7 @@ void MenuInit(const char *systemDir, struct MENU_OPTIONS *menuOptions)
 	s8 filename[SAL_MAX_PATH];
 	u16 *pix;
 	s32 x;
-	
+
 	strcpy(mSystemDir,systemDir);
 	mMenuOptions=menuOptions;
 
@@ -1269,7 +1267,7 @@ s32 SettingsMenu(void)
 
 				keys=sal_InputPoll();
 			}
-		
+
 			menuExit=1;
 		}
 		else if (keys & INP_BUTTON_MENU_SELECT)
@@ -1367,7 +1365,7 @@ s32 SettingsMenu(void)
 
 #if 0
 				case SETTINGS_MENU_CPU_SPEED:
-					
+
 					if (keys & SAL_INPUT_RIGHT)
 					{
 						if(keys&INP_BUTTON_MENU_SELECT)
@@ -1377,7 +1375,7 @@ s32 SettingsMenu(void)
 						else
 						{
 							mMenuOptions->cpuSpeed=sal_CpuSpeedNext(mMenuOptions->cpuSpeed);
-						}	
+						}
 					}
 					else
 					{
@@ -1410,7 +1408,7 @@ s32 SettingsMenu(void)
 				case SETTINGS_MENU_SOUND_RATE:
 					if (keys & SAL_INPUT_RIGHT)
 					{
-						mMenuOptions->soundRate=sal_AudioRateNext(mMenuOptions->soundRate);	
+						mMenuOptions->soundRate=sal_AudioRateNext(mMenuOptions->soundRate);
 					}
 					else
 					{
@@ -1569,7 +1567,7 @@ s32 MenuRun(s8 *romName)
 					action=EVENT_EXIT_APP;
 					menuExit=1;
 					break;
-				
+
 			}
 		}
 		else if (keys & INP_BUTTON_MENU_CANCEL)
@@ -1602,7 +1600,7 @@ s32 MenuRun(s8 *romName)
 
 		usleep(10000);
 	}
-	
+
   sal_InputWaitForRelease();
 
   return action;
