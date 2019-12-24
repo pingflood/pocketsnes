@@ -1,8 +1,14 @@
+#
+# PocketSNES for the RetroFW
+#
+# by pingflood; 2019
+#
+
 # Define the applications properties here:
 
-TARGET = ./dist/PocketSNES.dge
+TARGET = pocketsnes/pocketsnes.dge
 
-CHAINPREFIX := /opt/mipsel-linux-uclibc
+CHAINPREFIX   := /opt/mipsel-RetroFW-linux-uclibc
 CROSS_COMPILE := $(CHAINPREFIX)/usr/bin/mipsel-linux-
 
 CC  := $(CROSS_COMPILE)gcc
@@ -13,27 +19,28 @@ SYSROOT := $(shell $(CC) --print-sysroot)
 SDL_CFLAGS := $(shell $(SYSROOT)/usr/bin/sdl-config --cflags)
 SDL_LIBS := $(shell $(SYSROOT)/usr/bin/sdl-config --libs)
 
-INCLUDE = -I pocketsnes \
+INCLUDE = -I src \
 		-I sal/linux/include -I sal/include \
-		-I pocketsnes/include \
-		-I menu -I pocketsnes/linux -I pocketsnes/snes9x
+		-I src/include \
+		-I menu -I src/linux -I src/snes9x
 
-CFLAGS =  -std=gnu++03 $(INCLUDE) -DRC_OPTIMIZED -DGCW_ZERO -D__LINUX__ -D__DINGUX__ -DFOREVER_16_BIT  $(SDL_CFLAGS)
-# CFLAGS =  -std=gnu++03 $(INCLUDE) -DRC_OPTIMIZED -D__LINUX__ -D__DINGUX__ $(SDL_CFLAGS)
-CFLAGS += -O3 -fdata-sections -ffunction-sections -mips32 -march=mips32 -mno-mips16 -fomit-frame-pointer -fno-builtin
+CFLAGS =  -std=gnu++11 $(INCLUDE) -DRC_OPTIMIZED -DGCW_ZERO -D__LINUX__ -D__DINGUX__ -DFOREVER_16_BIT $(SDL_CFLAGS)
+CFLAGS += -O3 -fdata-sections -ffunction-sections -fomit-frame-pointer -fno-builtin -fpermissive
+CFLAGS += -mips32 -march=mips32 -mno-mips16 -DMIPS_XBURST 
 CFLAGS += -fno-common -Wno-write-strings -Wno-sign-compare -ffast-math -ftree-vectorize
 CFLAGS += -funswitch-loops -fno-strict-aliasing
-CFLAGS += -DMIPS_XBURST -DFAST_LSB_WORD_ACCESS
-# CFLAGS += -flto
+CFLAGS += -DFAST_LSB_WORD_ACCESS
+CFLAGS += -flto=4 -fwhole-program -fuse-linker-plugin -fmerge-all-constants
+CFLAGS += -fdata-sections -ffunction-sections -fpermissive
 # CFLAGS += -fprofile-generate -fprofile-dir=/home/retrofw/profile/pocketsnes
 CFLAGS += -fprofile-use -fprofile-dir=./profile -DNO_ROM_BROWSER
 
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti -fno-math-errno -fno-threadsafe-statics
 
-LDFLAGS = $(CXXFLAGS) -lpthread -lz -lpng  $(SDL_LIBS) -Wl,--as-needed -Wl,--gc-sections -s
+LDFLAGS = $(CXXFLAGS) -lpthread -lz -lpng $(SDL_LIBS) -lSDL_image -Wl,--as-needed -Wl,--gc-sections -s
 
 # Find all source files
-SOURCE = pocketsnes/snes9x menu sal/linux sal
+SOURCE = src/snes9x menu sal/linux sal
 SRC_CPP = $(foreach dir, $(SOURCE), $(wildcard $(dir)/*.cpp))
 SRC_C   = $(foreach dir, $(SOURCE), $(wildcard $(dir)/*.c))
 OBJ_CPP = $(patsubst %.cpp, %.o, $(SRC_CPP))
@@ -44,9 +51,10 @@ OBJS    = $(OBJ_CPP) $(OBJ_C)
 all : $(TARGET)
 
 $(TARGET) : $(OBJS)
-	$(CMD)$(CXX) $(CXXFLAGS) $^ $(LDFLAGS) -o $@
+	$(CXX) $(CXXFLAGS) $^ $(LDFLAGS) -o $@
+	$(STRIP) $(TARGET)
 
-ipk: $(TARGET)
+ipk: all
 	@rm -rf /tmp/.pocketsnes-ipk/ && mkdir -p /tmp/.pocketsnes-ipk/root/home/retrofw/emus/pocketsnes /tmp/.pocketsnes-ipk/root/home/retrofw/apps/gmenu2x/sections/emulators /tmp/.pocketsnes-ipk/root/home/retrofw/apps/gmenu2x/sections/emulators.systems
 	@cp dist/PocketSNES.dge dist/PocketSNES.man.txt dist/PocketSNES.png dist/backdrop.png /tmp/.pocketsnes-ipk/root/home/retrofw/emus/pocketsnes
 	@cp dist/pocketsnes.lnk /tmp/.pocketsnes-ipk/root/home/retrofw/apps/gmenu2x/sections/emulators
@@ -62,12 +70,23 @@ ipk: $(TARGET)
 	@ar r dist/pocketsnes.ipk /tmp/.pocketsnes-ipk/control.tar.gz /tmp/.pocketsnes-ipk/data.tar.gz /tmp/.pocketsnes-ipk/debian-binary
 
 %.o: %.c
-	$(CMD)$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 %.o: %.cpp
-	$(CMD)$(CXX) $(CFLAGS) -c $< -o $@
+	$(CXX) $(CFLAGS) -c $< -o $@
 
 .PHONY : clean
+
+opk: all
+	@mksquashfs \
+	pocketsnes/default.retrofw.desktop \
+	pocketsnes/snes.retrofw.desktop \
+	pocketsnes/pocketsnes.dge \
+	pocketsnes/pocketsnes.man.txt \
+	pocketsnes/pocketsnes.png \
+	pocketsnes/backdrop.png \
+	pocketsnes/pocketsnes.opk \
+	-all-root -noappend -no-exports -no-xattrs
+
 clean :
-	$(CMD)rm -f $(OBJS) $(TARGET)
-	$(CMD)rm -rf .opk_data $(TARGET).opk dist/pocketsnes.ipk
+	rm -f $(OBJS) pocketsnes/pocketsnes.ipk
