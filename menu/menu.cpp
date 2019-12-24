@@ -46,6 +46,7 @@ void DefaultMenuOptions(void)
 	mMenuOptions->soundEnabled = 1; 
 	mMenuOptions->volume=25; 
 	mMenuOptions->cpuSpeed=336; 
+	mMenuOptions->frameSkip=0;   //auto
 	mMenuOptions->country=0;
 	mMenuOptions->showFps=0;
 	// mMenuOptions->soundRate=22050; //44100;
