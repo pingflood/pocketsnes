@@ -32,7 +32,7 @@ CFLAGS += -funswitch-loops -fno-strict-aliasing
 CFLAGS += -DMIPS_XBURST -DFAST_LSB_WORD_ACCESS
 # CFLAGS += -flto
 # CFLAGS += -fprofile-generate -fprofile-dir=/home/retrofw/profile/pocketsnes
-CFLAGS += -fprofile-use -fprofile-dir=./profile -DNO_ROM_BROWSER
+CFLAGS += -fprofile-use -fprofile-dir=./profile
 
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti -fno-math-errno -fno-threadsafe-statics
 
