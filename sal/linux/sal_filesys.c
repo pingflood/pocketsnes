@@ -1,4 +1,3 @@
-
 #include <string.h>
 //#include <error.h>
 #include <sys/stat.h>
@@ -109,57 +108,6 @@ s32 sal_DirectoryRead(struct SAL_DIR *d, struct SAL_DIRECTORY_ENTRY *dir, s8 *ba
 		return SAL_ERROR;
 	}
 }
-
-s32 sal_DirectoryGet(const char *path, struct SAL_DIRECTORY_ENTRY *dir,
-			s32 startIndex, s32 count)
-{
-	s32 fileCount=0;
-	DIR *d;
-	struct dirent *de;
-	uint32_t entriesRead=0;
-	
-	char fullFilename[256];
-	s32 endIndex=startIndex+count;
-	long loc;
-
-	d = opendir(path);
-
-	if (d)
-	{
-		loc=telldir(d);
-		seekdir(d,loc+startIndex);
-		while ((de = readdir(d)))
-		{
-			if(startIndex >= endIndex)
-			{
-				//exit loop
-				break;
-			}
-
-			//Is entry a file or directory
-			if (de->d_type == 4) // Directory
-			{
-				strcpy(dir[fileCount].filename,de->d_name);
-				strcpy(dir[fileCount].displayName,de->d_name);
-				dir[fileCount].type=SAL_FILE_TYPE_DIRECTORY;
-			}
-			else
-			{
-				//File
-				strcpy(dir[fileCount].filename,de->d_name);
-				strcpy(dir[fileCount].displayName,de->d_name);
-				dir[fileCount].type=SAL_FILE_TYPE_FILE;
-			}
-			fileCount++;
-			startIndex++;
-		}
-		closedir(d);
-	}
-	return SAL_ERROR;
-//	return SAL_OK;
-}
-
-
 
 void sal_DirectoryGetParent(s8 *path)
 {
