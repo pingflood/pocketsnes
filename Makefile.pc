@@ -1,9 +1,8 @@
 
 # Define the applications properties here:
 
-TARGET = dist/pocketsnes.elf
+TARGET = pocketsnes/pocketsnes.elf
 
-CHAINPREFIX=/opt/rs97-toolchain
 CROSS_COMPILE=
 CC = $(CROSS_COMPILE)gcc
 CXX = $(CROSS_COMPILE)g++
@@ -12,22 +11,23 @@ SYSROOT     :=
 SDL_CFLAGS  := $(shell $(SYSROOT)/usr/bin/sdl-config --cflags)
 SDL_LIBS    := $(shell $(SYSROOT)/usr/bin/sdl-config --libs)
 
-INCLUDE = -I pocketsnes \
+INCLUDE = -I src \
 		-I sal/linux/include -I sal/include \
-		-I pocketsnes/include \
-		-I menu -I pocketsnes/linux -I pocketsnes/snes9x
+		-I src/include \
+		-I menu -I src/linux -I src/snes9x
 
 CFLAGS =  -std=gnu++03 $(INCLUDE) -DRC_OPTIMIZED -D__LINUX__ -D__DINGUX__ -DFOREVER_16_BIT  $(SDL_CFLAGS)
 
-CFLAGS +=  -O0 -g -m32
+CFLAGS +=  -O0 -g #-m32
  
-CFLAGS += -DGCW_ZERO -DMIPS_XBURST -DFAST_LSB_WORD_ACCESS -DNO_ROM_BROWSER
+CFLAGS += -DGCW_ZERO #-DFAST_LSB_WORD_ACCESS -DNO_ROM_BROWSER
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti -fno-math-errno -fno-threadsafe-statics
 
-LDFLAGS = $(CXXFLAGS) -lpthread -lz -lpng  $(SDL_LIBS) -flto -Wl,--as-needed -Wl,--gc-sections -s
+# LDFLAGS = $(CXXFLAGS) -lpthread -lz -lpng  $(SDL_LIBS) -flto -Wl,--as-needed -Wl,--gc-sections -s
+LDFLAGS = $(CXXFLAGS) -lpthread -lz -lpng  $(SDL_LIBS) -Wl,--as-needed -Wl,--gc-sections -s
 
 # Find all source files
-SOURCE = pocketsnes/snes9x menu sal/linux sal
+SOURCE = src/snes9x menu sal/linux sal
 SRC_CPP = $(foreach dir, $(SOURCE), $(wildcard $(dir)/*.cpp))
 SRC_C   = $(foreach dir, $(SOURCE), $(wildcard $(dir)/*.c))
 OBJ_CPP = $(patsubst %.cpp, %.o, $(SRC_CPP))
