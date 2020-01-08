@@ -41,6 +41,8 @@ static u32 mVolumeDisplayTimer=0;
 static u32 mFramesCleared=0;
 static u32 mInMenu=0;
 
+volatile bool argv_rom_loaded = false;
+
 static int S9xCompareSDD1IndexEntries (const void *p1, const void *p2)
 {
     return (*(uint32 *) p1 - *(uint32 *) p2);
@@ -706,8 +708,10 @@ int mainEntry(int argc, char* argv[])
 	sal_VideoInit(16);
 
 	mRomName[0]=0;
-	if (argc >= 2)
+	if (argc >= 2) {
  		strcpy(mRomName, argv[1]); // Record ROM name
+		argv_rom_loaded = true;
+	}
 
 	MenuInit(sal_DirectoryGetHome(), &mMenuOptions);
 

@@ -33,7 +33,7 @@ CFLAGS += -DFAST_LSB_WORD_ACCESS
 CFLAGS += -flto=4 -fwhole-program -fuse-linker-plugin -fmerge-all-constants
 CFLAGS += -fdata-sections -ffunction-sections -fpermissive
 # CFLAGS += -fprofile-generate -fprofile-dir=/home/retrofw/profile/pocketsnes
-CFLAGS += -fprofile-use -fprofile-dir=./profile -DNO_ROM_BROWSER
+CFLAGS += -fprofile-use -fprofile-dir=./profile
 
 CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti -fno-math-errno -fno-threadsafe-statics
 
