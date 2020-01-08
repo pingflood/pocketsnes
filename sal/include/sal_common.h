@@ -132,8 +132,7 @@ void sal_DirectoryGetParent(s8 *path);
 s32 sal_DirectoryGetCurrent(s8 *path, u32 size);
 void sal_DirectoryCombine(s8 *path, const char *name);
 s32 sal_DirectoryGetItemCount(const char *path, s32 *returnItemCount);
-s32 sal_DirectoryGet(const char *path, struct SAL_DIRECTORY_ENTRY *dir,
-			s32 startIndex, s32 count);
+// s32 sal_DirectoryGet(const char *path, struct SAL_DIRECTORY_ENTRY *dir, s32 startIndex, s32 count);
 s32 sal_DirectoryCreate(const char *path);
 s32 sal_DirectoryOpen(const char *path, struct SAL_DIR *d);
 s32 sal_DirectoryClose(struct SAL_DIR *d);
