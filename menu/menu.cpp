@@ -1220,6 +1220,7 @@ s32 SettingsMenu(void)
 				case SETTINGS_MENU_LOAD_GLOBAL_SETTINGS:
 					LoadMenuOptions(mSystemDir, MENU_OPTIONS_FILENAME, MENU_OPTIONS_EXT, (char*)mMenuOptions, sizeof(struct MENU_OPTIONS), 1);
 					SettingsMenuUpdateTextAll();
+					usleep(5e5);
 					break;
 				case SETTINGS_MENU_SAVE_GLOBAL_SETTINGS:
 					SaveMenuOptions(mSystemDir, MENU_OPTIONS_FILENAME, MENU_OPTIONS_EXT, (char*)mMenuOptions, sizeof(struct MENU_OPTIONS), 1);
@@ -1230,6 +1231,7 @@ s32 SettingsMenu(void)
 					{
 						LoadMenuOptions(mSystemDir, mRomName, MENU_OPTIONS_EXT, (char*)mMenuOptions, sizeof(struct MENU_OPTIONS), 1);
 						SettingsMenuUpdateTextAll();
+						usleep(5e5);
 					}
 					break;
 				case SETTINGS_MENU_SAVE_CURRENT_SETTINGS:
