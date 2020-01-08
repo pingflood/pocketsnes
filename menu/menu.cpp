@@ -231,7 +231,10 @@ void DefaultRomListItems()
 
 	strcpy(mRomList[ROM_SELECTOR_SAVE_DEFAULT_DIR].displayName,"Save default directory");
 	strcpy(mRomList[ROM_SELECTOR_MAIN_MENU].displayName,"Main menu");
-	mRomList[ROM_SELECTOR_DEFAULT_FOCUS].displayName[0]=0;
+	strcpy(mRomList[ROM_SELECTOR_DEFAULT_FOCUS].displayName,"/");
+	strcpy(mRomList[ROM_SELECTOR_DEFAULT_FOCUS].filename,"/");
+	mRomList[ROM_SELECTOR_DEFAULT_FOCUS].type = SAL_FILE_TYPE_DIRECTORY;
+	// mRomList[ROM_SELECTOR_DEFAULT_FOCUS].displayName[0]=0;
 }
 
 static
@@ -307,7 +310,7 @@ int FileScan()
 		{
 			//Dir opened, now stream out details
 			x=0;
-			while(sal_DirectoryRead(&d, &mRomList[x+startIndex])==SAL_OK)
+			while(sal_DirectoryRead(&d, &mRomList[x+startIndex], mRomDir)==SAL_OK)
 			{
 				//Dir entry read
 #if 0
@@ -473,8 +476,8 @@ s32 FileSelect()
 					menuExit=1;
 					break;
 
-				case ROM_SELECTOR_DEFAULT_FOCUS: //blank space - do nothing
-					break;
+				// case ROM_SELECTOR_DEFAULT_FOCUS: //blank space - do nothing
+					// break;
 
 				default:
 					// normal file or dir selected
@@ -502,8 +505,11 @@ s32 FileSelect()
 						}
 						else
 						{
-							//go to sub directory
-							sal_DirectoryCombine(mRomDir,mRomList[focus].filename);
+							if (sal_StringCompare(mRomList[focus].filename,"/") == 0)
+								strcpy(mRomDir, "/");
+							else
+								sal_DirectoryCombine(mRomDir,mRomList[focus].filename); //go to sub directory
+
 							FileScan();
 							focus=ROM_SELECTOR_DEFAULT_FOCUS; // default menu to non menu item
 														// just to stop directory scan being started
@@ -934,9 +940,8 @@ void RenderMenu(const char *menuName, s32 menuCount, s32 menuSmooth, s32 menufoc
     	for (i=0;i<menuCount;i++)
     	{
       		int x=0,y=0;
-
+			x=8;
       		y=(i<<4)-(menuSmooth>>4);
-		x=8;
       		y+=112 - 28;
 
       		if (y<=48 - 28 || y>=232 - 36) continue;
@@ -944,7 +949,7 @@ void RenderMenu(const char *menuName, s32 menuCount, s32 menuSmooth, s32 menufoc
       		if (i==menufocus)
       		{
         		color=SAL_RGB(31,31,31);
-			PrintBar(y-4);
+				PrintBar(y-4);
       		}
       		else
       		{
