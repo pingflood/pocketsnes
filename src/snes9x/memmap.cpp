@@ -596,8 +596,7 @@ bool8 CMemory::LoadROM (const char *filename)
 	ExtendedFormat=NOPE;
 
 
- 	if(CleanUp7110!=NULL)
-		(*CleanUp7110)();
+    Del7110Gfx();
 	
     memset (&SNESGameFixes, 0, sizeof(SNESGameFixes));
     SNESGameFixes.SRAMInitialValue = 0x60;

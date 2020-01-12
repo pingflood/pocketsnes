@@ -400,14 +400,7 @@ static void S9xSetByte (uint8 Byte, uint32 Address)
     case CMemory::MAP_C4:
 		S9xSetC4 (Byte, Address & 0xffff);
 		return;
-	
-	case CMemory::MAP_SPC7110_DRAM:
-#ifdef SPC7110_DEBUG
-		printf("Writing Byte at %06X\n", Address);
-#endif
-		s7r.bank50[(Address & 0xffff)]= (uint8) Byte;
-		break;
-	
+
 	case CMemory::MAP_OBC_RAM:
 		SetOBC1(Byte, Address &0xFFFF);
 		return;
@@ -543,14 +536,8 @@ static void S9xSetWord (uint16 Word, uint32 Address)
 #ifdef DEBUGGER
 		printf ("W(W) %06x\n", Address);
 #endif
-	
-	case CMemory::MAP_SPC7110_DRAM:
-#ifdef SPC7110_DEBUG
-		printf("Writing Word at %06X\n", Address);
-#endif
-		s7r.bank50[(Address & 0xffff)]= (uint8) Word;
-		s7r.bank50[((Address + 1) & 0xffff)]= (uint8) Word;
-		break;
+        return;
+
     case CMemory::MAP_SA1RAM:
 		*(Memory.SRAM + (Address & 0xffff)) = (uint8) Word;
 		*(Memory.SRAM + ((Address + 1) & 0xffff)) = (uint8) (Word >> 8);

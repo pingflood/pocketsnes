@@ -220,9 +220,9 @@ int	S9xSRTCDaysInMmonth( int month, int year )
 }
 
 
-#define DAYTICKS (60*60*24)
-#define HOURTICKS (60*60)
-#define MINUTETICKS 60
+#define MINUTETICKS  60
+#define HOURTICKS   (60 * MINUTETICKS)
+#define DAYTICKS    (24 * HOURTICKS)
 
 
 /**********************************************************************************************/

@@ -101,6 +101,7 @@
 #include "gfx.h"
 #include "sa1.h"
 #include "spc7110.h"
+#include "spc7110dec.h"
 
 #ifdef SDD1_DECOMP
 #include "sdd1emu.h"
@@ -196,34 +197,14 @@ void S9xDoDMA (uint8 Channel)
 
 	if(Settings.SPC7110&&(d->AAddress==0x4800||d->ABank==0x50))
 	{
-		uint32 i,j;
-		i=(s7r.reg4805|(s7r.reg4806<<8));
-#ifdef SPC7110_DEBUG
-		printf("DMA Transfer of %04X bytes from %02X%02X%02X:%02X, offset of %04X, internal bank of %04X, multiplier %02X\n",d->TransferBytes,s7r.reg4803,s7r.reg4802,s7r.reg4801, s7r.reg4804,i,  s7r.bank50Internal, s7r.AlignBy);
-#endif
-		i*=s7r.AlignBy;
-		i+=s7r.bank50Internal;
-		i%=DECOMP_BUFFER_SIZE;
-		j=0;
-		if((i+d->TransferBytes)<DECOMP_BUFFER_SIZE)
-		{
-			spc7110_dma=&s7r.bank50[i];
-		}
-		else
-		{
-			spc7110_dma=new uint8[d->TransferBytes];
-			j=DECOMP_BUFFER_SIZE-i;
-			memmove(spc7110_dma, &s7r.bank50[i], j);
-			memmove(&spc7110_dma[j],s7r.bank50,d->TransferBytes-j);
-			s7_wrap=true;
-		}
-		int icount=s7r.reg4809|(s7r.reg480A<<8);
-		icount-=d->TransferBytes;
+		int32_t c;
+		spc7110_dma = &s7r.bank50[0];
+		for(c = 0; c < count; c++)
+			s7r.bank50[c] = spc7110dec_read();
+		int32_t icount = (s7r.reg4809 | (s7r.reg480A << 8)) - count;
 		s7r.reg4809=0x00ff&icount;
 		s7r.reg480A=(0xff00&icount)>>8;
 
-		s7r.bank50Internal+=d->TransferBytes;
-		s7r.bank50Internal%=DECOMP_BUFFER_SIZE;
 		inc=1;
 		d->AAddress-=count;
 	}
@@ -767,10 +748,8 @@ void S9xDoDMA (uint8 Channel)
 		while (CPU.Cycles > CPU.NextEvent)
 			S9xDoHBlankProcessing_NoSFX ();
 
-	if(Settings.SPC7110&&spc7110_dma)
-	{
-		if(spc7110_dma&&s7_wrap)
-			delete [] spc7110_dma;
+	if(Settings.SPC7110&&spc7110_dma&&s7_wrap) {
+		delete [] spc7110_dma;
 	}
 
 update_address:
@@ -794,10 +773,7 @@ update_address:
 
 void S9xStartHDMA ()
 {
-    if (Settings.DisableHDMA)
-		IPPU.HDMA = 0;
-    else
-		missing.hdma_this_frame = IPPU.HDMA = Memory.FillRAM [0x420c];
+	missing.hdma_this_frame = IPPU.HDMA = Memory.FillRAM [0x420c];
 	
 	//per anomie timing post
 	if(IPPU.HDMA!=0)

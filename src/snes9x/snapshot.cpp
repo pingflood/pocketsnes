@@ -461,7 +461,7 @@ static FreezeData SnapSA1 [] = {
 };
 
 #undef OFFSET
-#define OFFSET(f) Offset(f,struct SPC7110EmuVars *)
+#define OFFSET(f) Offset(f, SPC7110Regs *)
 
 static FreezeData SnapSPC7110 [] = {
     {OFFSET (reg4800), 1, INT_V},
@@ -519,7 +519,7 @@ static FreezeData SnapSPC7110 [] = {
 };
 
 #undef OFFSET
-#define OFFSET(f) Offset(f,struct SPC7110RTC *)
+#define OFFSET(f) Offset(f, S7RTC *)
 
 static FreezeData SnapS7RTC [] = {
     {OFFSET (reg), 16, uint8_ARRAY_V},
