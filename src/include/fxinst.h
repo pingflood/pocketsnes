@@ -213,9 +213,6 @@
 /* Emulate proper R14 ROM access (slower, but safer) */
 /* #define FX_DO_ROMBUFFER */
 
-/* Address checking (definately slow) */
-/* #define FX_ADDRESS_CHECK */
-
 struct FxRegs_s
 {
     /* FxChip registers */
@@ -243,8 +240,6 @@ struct FxRegs_s
     
     /* Other emulator variables */
     
-    int32	vErrorCode;
-    uint32	vIllegalAddress;
     
     uint8 *	pvRegisters;	/* 768 bytes located in the memory at address 0x3000 */
     uint32	nRamBanks;	/* Number of 64kb-banks in FxRam (Don't confuse it with SNES-Ram!!!) */
@@ -261,7 +256,7 @@ struct FxRegs_s
     uint32	vScreenRealHeight;	/* 128, 160, 192 or 256 */
     uint32	vPrevScreenHeight;
     uint32	vScreenSize;
-    
+ 
     uint8 *	pvRamBank;		/* Pointer to current RAM-bank */
     uint8 *	pvRomBank;		/* Pointer to current ROM-bank */
     uint8 *	pvPrgBank;		/* Pointer to current program ROM-bank */
@@ -270,17 +265,16 @@ struct FxRegs_s
     uint8 *	apvRomBank[256];	/* Rom bank table */
 
     uint8	bCacheActive;
-    uint8 *	pvCache;		/* Pointer to the GSU cache */
-    uint8 	avCacheBackup[512];	/* Backup of ROM when the cache has replaced it */
+
     uint32	vSCBRDirty;		/* if SCBR is written, our cached screen pointers need updating */
 };
 
 #define  FxRegs_s_null { \
    {0},    0,   0,    0, 0,    0,    0,    0,      0,      0, \
   NULL, NULL,   0,    0, 0,    0,    0,    0,      0,      0, \
-     0, NULL,   0, NULL, 0, NULL,    0,    0,   NULL, {NULL}, \
+     0, NULL, 0, NULL,    0,    0,   NULL, {NULL}, \
    {0},    0,   0,    0, 0, NULL, NULL, NULL, {NULL}, {NULL}, \
-     0, NULL, {0},    0, \
+     0,    0, \
 }
 
 /* GSU registers */
@@ -333,7 +327,7 @@ struct FxRegs_s
 #define SF(a) (GSU.vStatusReg |= FLG_##a )
 
 /* Test and set flag if condition, clear if not */
-#define TS(a,b) GSU.vStatusReg = ( (GSU.vStatusReg & (~FLG_##a)) | ( (!!(##b)) * FLG_##a ) )
+#define TS(a, b) (GSU.vStatusReg = ((GSU.vStatusReg & (~FLG_##a)) | ((!!(##b)) * FLG_##a)))
 
 /* Testing ALT1 & ALT2 bits */
 #define ALT0 (!TF(ALT1)&&!TF(ALT2))
@@ -352,13 +346,17 @@ struct FxRegs_s
 #define SUSEX16(a) ((int32)((uint16)(a)))
 
 /* Set/Clr Sign and Zero flag */
-#define TSZ(num) TS(S, (num & 0x8000)); TS(Z, (!USEX16(num)) )
+#define TSZ(num) \
+    TS(S, (num & 0x8000)); \
+    TS(Z, (!USEX16(num)))
 
 /* Clear flags */
-#define CLRFLAGS GSU.vStatusReg &= ~(FLG_ALT1|FLG_ALT2|FLG_B); GSU.pvDreg = GSU.pvSreg = &R0;
+#define CLRFLAGS \
+    GSU.vStatusReg &= ~(FLG_ALT1|FLG_ALT2|FLG_B); \
+    GSU.pvDreg = GSU.pvSreg = &R0;
 
 /* Read current RAM-Bank */
-#define RAM(adr) GSU.pvRamBank[USEX16(adr)]
+#define RAM(adr) (GSU.pvRamBank[USEX16(adr)])
 
 /* Read current ROM-Bank */
 #define ROM(idx) (GSU.pvRomBank[USEX16(idx)])
@@ -370,11 +368,7 @@ struct FxRegs_s
 #define PRGBANK(idx) GSU.pvPrgBank[USEX16(idx)]
 
 /* Update pipe from ROM */
-#if 0
-#define FETCHPIPE { PIPE = PRGBANK(R15); GSU.vPipeAdr = (GSU.vPrgBankReg<<16) + R15; }
-#else
 #define FETCHPIPE { PIPE = PRGBANK(R15); }
-#endif
 
 /* ABS */
 #define ABS(x) ((x)<0?-(x):(x))

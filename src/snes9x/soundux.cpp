@@ -119,11 +119,10 @@
 (v) = 8388607
 
 #define CLIP8(v) \
-	if ((v) < -128) \
+if ((v) < -128) \
     (v) = -128; \
-	else \
-	if ((v) > 127) \
-(v) = 127
+else if ((v) > 127) \
+         (v) = 127
 
 #include "snes9x.h"
 #include "soundux.h"
