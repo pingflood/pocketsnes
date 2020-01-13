@@ -174,8 +174,9 @@ static void fx_readRegisterSpace()
     
     fx_apfOpcodeTable[0x24c] = fx_apfOpcodeTable[0x04c] = fx_apfPlotTable[GSU.vMode];
     fx_apfOpcodeTable[0x14c] = fx_apfOpcodeTable[0x34c] = fx_apfPlotTable[GSU.vMode + 5];
-
-    fx_computeScreenPointers ();
+    
+    if(GSU.vMode != GSU.vPrevMode || GSU.vPrevScreenHeight != GSU.vScreenHeight || GSU.vSCBRDirty)
+       fx_computeScreenPointers ();
 }
 
 void fx_dirtySCBR()
@@ -184,134 +185,48 @@ void fx_dirtySCBR()
 }
 
 void fx_computeScreenPointers ()
-{
-    if (GSU.vMode != GSU.vPrevMode || 
-	GSU.vPrevScreenHeight != GSU.vScreenHeight ||
-	GSU.vSCBRDirty)
     {
-	int i;
-
+	int i, j, condition, mask, result;
+	uint apvIncrement, vMode, xIncrement;
 	GSU.vSCBRDirty = FALSE;
 
-	/* Make a list of pointers to the start of each screen column */
-	switch (GSU.vScreenHeight)
-	{
-	    case 128:
-		switch (GSU.vMode)
-		{
-		    case 0:
-			for (i = 0; i < 32; i++)
-			{
-			    GSU.apvScreen[i] = GSU.pvScreenBase + (i << 4);
-			    GSU.x[i] = i << 8;
-			}
-			break;
-		    case 1:
-			for (i = 0; i < 32; i++)
-			{
-			    GSU.apvScreen[i] = GSU.pvScreenBase + (i << 5);
-			    GSU.x[i] = i << 9;
-			}
-			break;
-		    case 2:
-		    case 3:
-			for (i = 0; i < 32; i++)
-			{
-			    GSU.apvScreen[i] = GSU.pvScreenBase + (i << 6);
-			    GSU.x[i] = i << 10;
-			}
-			break;
-		}
-		break;
-	    case 160:
-		switch (GSU.vMode)
-		{
-		    case 0:
-			for (i = 0; i < 32; i++)
-			{
-			    GSU.apvScreen[i] = GSU.pvScreenBase + (i << 4);
-			    GSU.x[i] = (i << 8) + (i << 6);
-			}
-			break;
-		    case 1:
-			for (i = 0; i < 32; i++)
-			{
-			    GSU.apvScreen[i] = GSU.pvScreenBase + (i << 5);
-			    GSU.x[i] = (i << 9) + (i << 7);
-			}
-			break;
-		    case 2:
-		    case 3:
-			for (i = 0; i < 32; i++)
-			{
-			    GSU.apvScreen[i] = GSU.pvScreenBase + (i << 6);
-			    GSU.x[i] = (i << 10) + (i << 8);
-			}
-			break;
-		}
-		break;
-	    case 192:
-		switch (GSU.vMode)
-		{
-		    case 0:
-			for (i = 0; i < 32; i++)
-			{
-			    GSU.apvScreen[i] = GSU.pvScreenBase + (i << 4);
-			    GSU.x[i] = (i << 8) + (i << 7);
-			}
-			break;
-		    case 1:
-			for (i = 0; i < 32; i++)
-			{
-			    GSU.apvScreen[i] = GSU.pvScreenBase + (i << 5);
-			    GSU.x[i] = (i << 9) + (i << 8);
-			}
-			break;
-		    case 2:
-		    case 3:
-			for (i = 0; i < 32; i++)
-			{
-			    GSU.apvScreen[i] = GSU.pvScreenBase + (i << 6);
-			    GSU.x[i] = (i << 10) + (i << 9);
-			}
-			break;
-		}
-		break;
-	    case 256:
-		switch (GSU.vMode)
-		{
-		    case 0:
-			for (i = 0; i < 32; i++)
-			{
-			    GSU.apvScreen[i] = GSU.pvScreenBase + 
-				((i & 0x10) << 9) + ((i & 0xf) << 8);
-			    GSU.x[i] = ((i & 0x10) << 8) + ((i & 0xf) << 4);
-			}
-			break;
-		    case 1:
-			for (i = 0; i < 32; i++)
-			{
-			    GSU.apvScreen[i] = GSU.pvScreenBase + 
-				((i & 0x10) << 10) + ((i & 0xf) << 9);
-			    GSU.x[i] = ((i & 0x10) << 9) + ((i & 0xf) << 5);
-			}
-			break;
-		    case 2:
-		    case 3:
-			for (i = 0; i < 32; i++)
-			{
-			    GSU.apvScreen[i] = GSU.pvScreenBase + 
-				((i & 0x10) << 11) + ((i & 0xf) << 10);
-			    GSU.x[i] = ((i & 0x10) << 10) + ((i & 0xf) << 6);
-			}
-			break;
-		}
-		break;
+  /* Make a list of pointers to the start of each screen column*/
+   vMode = GSU.vMode;
+   condition = vMode - 2;
+   mask = (condition | -condition) >> 31;
+   result = (vMode & mask) | (3 & ~mask);
+   vMode = result + 1;
+   GSU.x[0] = 0;
+   GSU.apvScreen[0] = GSU.pvScreenBase;
+   apvIncrement = vMode << 4;
+
+   if(GSU.vScreenHeight == 256)
+   {
+      GSU.x[16] = vMode << 12;
+      GSU.apvScreen[16] = GSU.pvScreenBase + (vMode << 13);
+      apvIncrement <<= 4;
+      xIncrement = vMode << 4;
+
+      for(i = 1, j = 17 ; i < 16 ; i++, j++)
+      {
+         GSU.x[i] = GSU.x[i - 1] + xIncrement;
+         GSU.apvScreen[i] = GSU.apvScreen[i - 1] + apvIncrement;
+         GSU.x[j] = GSU.x[j - 1] + xIncrement;
+         GSU.apvScreen[j] = GSU.apvScreen[j - 1] + apvIncrement;
+      }
+   }
+   else
+   {
+      xIncrement = (vMode * GSU.vScreenHeight) << 1;
+      for(i = 1 ; i < 32 ; i++)
+      {
+         GSU.x[i] = GSU.x[i - 1] + xIncrement;
+         GSU.apvScreen[i] = GSU.apvScreen[i - 1] + apvIncrement;
+           }
 	}
 	GSU.vPrevMode = GSU.vMode;
 	GSU.vPrevScreenHeight = GSU.vScreenHeight;
     }
-}
 
 static void fx_writeRegisterSpace()
 {
