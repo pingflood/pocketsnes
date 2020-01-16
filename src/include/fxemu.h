@@ -138,10 +138,6 @@ extern void FxBreakPointClear();
 /* Step by step execution */
 extern int FxStepOver(uint32 nInstructions);
 
-/* Errors */
-extern int FxGetErrorCode();
-extern int FxGetIllegalAddress();
-
 /* Access to internal registers */
 extern uint32 FxGetColorRegister();
 extern uint32 FxGetPlotOptionRegister();

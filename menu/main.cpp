@@ -776,7 +776,9 @@ int mainEntry(int argc, char* argv[])
 
 	MenuMessageBox("Saving SRAM...","","",MENU_MESSAGE_BOX_MODE_MSG);
 	PSNESForceSaveSRAM();
-
+	
+	if (Settings.SPC7110)
+		Del7110Gfx();
 	S9xGraphicsDeinit();
 	S9xDeinitAPU();
 	Memory.Deinit();

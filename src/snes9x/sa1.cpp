@@ -403,10 +403,10 @@ uint8 S9xGetSA1 (uint32 address)
     switch (address)
     {
     case 0x2300:
-	return ((uint8) ((Memory.FillRAM [0x2209] & 0x5f) | 
-		 (CPU.IRQActive & (SA1_IRQ_SOURCE | SA1_DMA_IRQ_SOURCE))));
+	return (uint8) ((Memory.FillRAM [0x2209] & 0x5f) | 
+		(Memory.FillRAM [0x2300] & 0xa0));
     case 0x2301:
-	return ((Memory.FillRAM [0x2200] & 0xf) |
+	return (uint8) ((Memory.FillRAM [0x2200] & 0xf) |
 		(Memory.FillRAM [0x2301] & 0xf0));
     case 0x2306:
 	return ((uint8)  SA1.sum);
@@ -418,6 +418,8 @@ uint8 S9xGetSA1 (uint32 address)
 	return ((uint8) (SA1.sum >> 24));
     case 0x230a:
 	return ((uint8) (SA1.sum >> 32));
+    case 0x230b:
+    return SA1.overflow ? 0x80 : 0;
     case 0x230c:
 	return (Memory.FillRAM [0x230c]);
     case 0x230d:
@@ -430,6 +432,8 @@ uint8 S9xGetSA1 (uint32 address)
 	}
 	return (byte);
     }
+    case 0x230e: /* version code register */
+    return 0x01;
     default:	
 	printf ("R: %04x\n", address);
 	break;
@@ -446,7 +450,7 @@ void S9xSetSA1 (uint8 byte, uint32 address)
 	SA1.Waiting = (byte & 0x60) != 0;
 //	SA1.Executing = !SA1.Waiting && SA1.S9xOpcodes;
 
-	if (!(byte & 0x20) && (Memory.FillRAM [0x2200] & 0x20))
+	if (!(byte & 0x80) && (Memory.FillRAM [0x2200] & 0x20))
 	{
 	    S9xSA1Reset ();
 	}
@@ -455,6 +459,7 @@ void S9xSetSA1 (uint8 byte, uint32 address)
 	    Memory.FillRAM [0x2301] |= 0x80;
 	    if (Memory.FillRAM [0x220a] & 0x80)
 	    {
+        Memory.FillRAM[0x220b] &= ~0x80;
 		SA1.Flags |= IRQ_PENDING_FLAG;
 		SA1.IRQActive |= SNES_IRQ_SOURCE;
 		SA1.Executing = !SA1.Waiting && SA1.S9xOpcodes;
@@ -466,9 +471,8 @@ void S9xSetSA1 (uint8 byte, uint32 address)
 #ifdef DEBUGGER
 		printf ("###SA1 NMI\n");
 #endif
-	    if (Memory.FillRAM [0x220a] & 0x10)
-	    {
-	    }
+        if (Memory.FillRAM[0x220a] & 0x10)
+            Memory.FillRAM[0x220b] &= ~0x10;
 	}
 	break;
 
@@ -476,11 +480,13 @@ void S9xSetSA1 (uint8 byte, uint32 address)
 	if (((byte ^ Memory.FillRAM [0x2201]) & 0x80) &&
 	    (Memory.FillRAM [0x2300] & byte & 0x80))
 	{
+        Memory.FillRAM[0x2202] &= ~0x80;
 	    S9xSetIRQ (SA1_IRQ_SOURCE);
 	}
 	if (((byte ^ Memory.FillRAM [0x2201]) & 0x20) &&
 	    (Memory.FillRAM [0x2300] & byte & 0x20))
 	{
+        Memory.FillRAM[0x2202] &= ~0x20;
 	    S9xSetIRQ (SA1_DMA_IRQ_SOURCE);
 	}
 	break;
@@ -518,19 +524,22 @@ void S9xSetSA1 (uint8 byte, uint32 address)
 	break;
 
     case 0x2209:
-	Memory.FillRAM [0x2209] = byte;
 	if (byte & 0x80)
+    {
 	    Memory.FillRAM [0x2300] |= 0x80;
 
-	if (byte & Memory.FillRAM [0x2201] & 0x80)
-	{
-	    S9xSetIRQ (SA1_IRQ_SOURCE);
-	}
+    	if (Memory.FillRAM [0x2201] & 0x80)
+	    {
+            Memory.FillRAM[0x2202] &= ~0x80;
+	        S9xSetIRQ (SA1_IRQ_SOURCE);
+    	}
+    }
 	break;
     case 0x220a:
 	if (((byte ^ Memory.FillRAM [0x220a]) & 0x80) &&
 	    (Memory.FillRAM [0x2301] & byte & 0x80))
 	{
+        Memory.FillRAM[0x220b] &= ~0x80;
 	    SA1.Flags |= IRQ_PENDING_FLAG;
 	    SA1.IRQActive |= SNES_IRQ_SOURCE;
 //	    SA1.Executing = !SA1.Waiting;
@@ -538,6 +547,7 @@ void S9xSetSA1 (uint8 byte, uint32 address)
 	if (((byte ^ Memory.FillRAM [0x220a]) & 0x40) &&
 	    (Memory.FillRAM [0x2301] & byte & 0x40))
 	{
+        Memory.FillRAM[0x220b] &= ~0x40;
 	    SA1.Flags |= IRQ_PENDING_FLAG;
 	    SA1.IRQActive |= TIMER_IRQ_SOURCE;
 //	    SA1.Executing = !SA1.Waiting;
@@ -545,6 +555,7 @@ void S9xSetSA1 (uint8 byte, uint32 address)
 	if (((byte ^ Memory.FillRAM [0x220a]) & 0x20) &&
 	    (Memory.FillRAM [0x2301] & byte & 0x20))
 	{
+        Memory.FillRAM[0x220b] &= ~0x20;
 	    SA1.Flags |= IRQ_PENDING_FLAG;
 	    SA1.IRQActive |= DMA_IRQ_SOURCE;
 //	    SA1.Executing = !SA1.Waiting;
@@ -552,6 +563,7 @@ void S9xSetSA1 (uint8 byte, uint32 address)
 	if (((byte ^ Memory.FillRAM [0x220a]) & 0x10) &&
 	    (Memory.FillRAM [0x2301] & byte & 0x10))
 	{
+        Memory.FillRAM[0x220b] &= ~0x10;
 #ifdef DEBUGGER
 	    printf ("###SA1 NMI\n");
 #endif
@@ -692,8 +704,10 @@ void S9xSetSA1 (uint8 byte, uint32 address)
 	if ((Memory.FillRAM [0x2230] & 0xb0) == 0xb0)
 	{
 	    Memory.FillRAM [0x2300] |= 0x20;
-	    if (Memory.FillRAM [0x2201] & 0x20)
-		S9xSetIRQ (SA1_DMA_IRQ_SOURCE);
+	    if (Memory.FillRAM [0x2201] & 0x20) {
+            Memory.FillRAM[0x2202] &= ~0x20;
+    		S9xSetIRQ (SA1_DMA_IRQ_SOURCE);
+        }
 	    SA1.in_char_dma = TRUE;
 	}
 	break;
@@ -773,21 +787,26 @@ void S9xSetSA1 (uint8 byte, uint32 address)
 	{
         case 0:	// multiply
 	    SA1.sum = SA1.op1 * SA1.op2;
+        SA1.op2 = 0;
 	    break;
 	case 1: // divide
 	    if (SA1.op2 == 0)
-		SA1.sum = SA1.op1 << 16;
+		SA1.sum = 0;
 	    else
 	    {
-		SA1.sum = (SA1.op1 / (int) ((uint16) SA1.op2)) |
-			  ((SA1.op1 % (int) ((uint16) SA1.op2)) << 16);
+            int16 quotient  = (int16) SA1.op1 / (uint16) SA1.op2;
+            uint16 remainder = (int16) SA1.op1 % (uint16) SA1.op2;
+            SA1.sum = (remainder << 16) | quotient;
 	    }
+        SA1.op1 = 0;
+        SA1.op2 = 0;
 	    break;
 	case 2:
 	default: // cumulative sum
 	    SA1.sum += SA1.op1 * SA1.op2;
-	    if (SA1.sum & ((int64) 0xffffff << 32))
-		SA1.overflow = TRUE;
+        SA1.overflow = (SA1.sum >= (1ULL << 40));
+        SA1.sum &= (1ULL << 40) - 1;
+        SA1.op2 = 0;
 	    break;
 	}
 	break;

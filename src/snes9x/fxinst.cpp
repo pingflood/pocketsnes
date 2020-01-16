@@ -139,24 +139,7 @@ static void fx_cache()
     {
 	fx_flushCache();
 	GSU.vCacheBaseReg = c;
-	GSU.bCacheActive = TRUE;
-#if 0
-	if(c < (0x10000-512))
-	{
-	    uint8 const* t = &ROM(c);
-	    memmove(GSU.pvCache,t,512);
-	}
-	else
-	{
-	    uint8 const* t1;
-	    uint8 const* t2;
-	    uint32 i = 0x10000 - c;
-	    t1 = &ROM(c);
-	    t2 = &ROM(0);
-	    memmove(GSU.pvCache,t1,i);
-	    memmove(&GSU.pvCache[i],t2,512-i);
-	}
-#endif	
+	GSU.bCacheActive = TRUE;	
     }
     R15++;
     CLRFLAGS;
@@ -1624,11 +1607,6 @@ void fx_run(uint32 nInstructions)
 	if (vOpcode == 0 /* fx_stop opcode, all alternatives */)
 		return;
     }
- /*
-#ifndef FX_ADDRESS_CHECK
-    GSU.vPipeAdr = USEX16(R15-1) | (USEX8(GSU.vPrgBankReg)<<16);
-#endif
-*/
 }
 
 /*** Special table for the different plot configurations ***/

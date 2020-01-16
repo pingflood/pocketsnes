@@ -123,8 +123,6 @@ void S9xResetDSP1 ()
 
 uint8 S9xGetDSP (uint16 address)
 {
-    uint8 t;
-	
 #ifdef DEBUGGER
     if (Settings.TraceDSP)
     {
@@ -133,9 +131,7 @@ uint8 S9xGetDSP (uint16 address)
     }
 #endif
  
-	t=(*GetDSP)(address);
-		//DSP1GetByte(address);
-    return (t);
+	return (*GetDSP)(address);
 }
 
 void S9xSetDSP (uint8 byte, uint16 address)

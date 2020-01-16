@@ -95,46 +95,8 @@
 /* The FxChip Emulator's internal variables */
 struct FxRegs_s GSU = FxRegs_s_null;
 
-#if 0
-void fx_setCache()
-{
-    uint32 c;
-    GSU.bCacheActive = TRUE;
-    GSU.pvRegisters[0x3e] &= 0xf0;
-    c = (uint32)GSU.pvRegisters[0x3e];
-    c |= ((uint32)GSU.pvRegisters[0x3f])<<8;
-    if(c == GSU.vCacheBaseReg)
-	return;
-    GSU.vCacheBaseReg = c;
-    GSU.vCacheFlags = 0;
-    if(c < (0x10000-512))
-    {
-	uint8 const* t = &ROM(c);
-	memmove(GSU.pvCache,t,512);
-    }
-    else
-    {
-	uint8 const* t1;
-	uint8 const* t2;
-	uint32 i = 0x10000 - c;
-	t1 = &ROM(c);
-	t2 = &ROM(0);
-	memmove(GSU.pvCache,t1,i);
-	memmove(&GSU.pvCache[i],t2,512-i);
-    }
-}
-#endif
-
 void FxCacheWriteAccess(uint16 vAddress)
 {
-#if 0
-    if(!GSU.bCacheActive)
-    {
-	uint8 v = GSU.pvCache[GSU.pvCache[vAddress&0x1ff];
-	fx_setCache();
-	GSU.pvCache[GSU.pvCache[vAddress&0x1ff] = v;
-    }
-#endif
     if((vAddress & 0x00f) == 0x00f)
 	GSU.vCacheFlags |= 1 << ((vAddress&0x1f0) >> 4);
 }
@@ -144,88 +106,13 @@ void FxFlushCache()
     GSU.vCacheFlags = 0;
     GSU.vCacheBaseReg = 0;
     GSU.bCacheActive = FALSE;
-//    GSU.vPipe = 0x1;
-}
-
-static void fx_backupCache()
-{
-#if 0
-    uint32 i;
-    uint32 v = GSU.vCacheFlags;
-    uint32 c = USEX16(GSU.vCacheBaseReg);
-    if(v)
-	for(i=0; i<32; i++)
-	{
-	    if(v&1)
-	    {
-		if(c < (0x10000-16))
-		{
-		    uint8 * t = &GSU.pvPrgBank[c];
-		    memmove(&GSU.avCacheBackup[i<<4],t,16);
-		    memmove(t,&GSU.pvCache[i<<4],16);
-		}
-		else
-		{
-		    uint8 * t1;
-		    uint8 * t2;
-		    uint32 a = 0x10000 - c;
-		    t1 = &GSU.pvPrgBank[c];
-		    t2 = &GSU.pvPrgBank[0];
-		    memmove(&GSU.avCacheBackup[i<<4],t1,a);
-		    memmove(t1,&GSU.pvCache[i<<4],a);
-		    memmove(&GSU.avCacheBackup[(i<<4)+a],t2,16-a);
-		    memmove(t2,&GSU.pvCache[(i<<4)+a],16-a);
-		}		
-	    }
-	    c = USEX16(c+16);
-	    v >>= 1;
-	}
-#endif
-}
-
-static void fx_restoreCache()
-{
-#if 0
-    uint32 i;
-    uint32 v = GSU.vCacheFlags;
-    uint32 c = USEX16(GSU.vCacheBaseReg);
-    if(v)
-	for(i=0; i<32; i++)
-	{
-	    if(v&1)
-	    {
-		if(c < (0x10000-16))
-		{
-		    uint8 * t = &GSU.pvPrgBank[c];
-		    memmove(t,&GSU.avCacheBackup[i<<4],16);
-		    memmove(&GSU.pvCache[i<<4],t,16);
-		}
-		else
-		{
-		    uint8 * t1;
-		    uint8 * t2;
-		    uint32 a = 0x10000 - c;
-		    t1 = &GSU.pvPrgBank[c];
-		    t2 = &GSU.pvPrgBank[0];
-		    memmove(t1,&GSU.avCacheBackup[i<<4],a);
-		    memmove(&GSU.pvCache[i<<4],t1,a);
-		    memmove(t2,&GSU.avCacheBackup[(i<<4)+a],16-a);
-		    memmove(&GSU.pvCache[(i<<4)+a],t2,16-a);
-		}		
-	    }
-	    c = USEX16(c+16);
-	    v >>= 1;
-	}
-#endif
 }
 
 void fx_flushCache()
 {
-    fx_restoreCache();
     GSU.vCacheFlags = 0;
     GSU.bCacheActive = FALSE;
 }
-
 
 void fx_updateRamBank(uint8 Byte)
 {
@@ -234,15 +121,12 @@ void fx_updateRamBank(uint8 Byte)
     GSU.pvRamBank = GSU.apvRamBank[Byte & 0x3];
 }
 
-
 static void fx_readRegisterSpace()
 {
     int i;
     uint8 *p;
     static uint32 avHeight[] = { 128, 160, 192, 256 };
     static uint32 avMult[] = { 16, 32, 32, 64 };
-
-    GSU.vErrorCode = 0;
 
     /* Update R0-R15 */
     p = GSU.pvRegisters;
@@ -279,33 +163,20 @@ static void fx_readRegisterSpace()
     i |= ((int)(!!(p[GSU_SCMR] & 0x20))) << 1;
     GSU.vScreenHeight = GSU.vScreenRealHeight = avHeight[i];
     GSU.vMode = p[GSU_SCMR] & 0x03;
-#if 0
-    if(GSU.vMode == 2)
-	error illegal color depth GSU.vMode;
-#endif
     if(i == 3)
-	GSU.vScreenSize = (256/8) * (256/8) * 32;
+      GSU.vScreenSize = 32768;
     else
-	GSU.vScreenSize = (GSU.vScreenHeight/8) * (256/8) * avMult[GSU.vMode];
-    if (GSU.vPlotOptionReg & 0x10)
-    {
-	/* OBJ Mode (for drawing into sprites) */
-	GSU.vScreenHeight = 256;
-    }
-#if 0
-    if(GSU.pvScreenBase + GSU.vScreenSize > GSU.pvRam + (GSU.nRamBanks * 65536))
-	error illegal address for screen base register
-#else
-    if(GSU.pvScreenBase + GSU.vScreenSize > GSU.pvRam + (GSU.nRamBanks * 65536))
-	GSU.pvScreenBase =  GSU.pvRam + (GSU.nRamBanks * 65536) - GSU.vScreenSize;
-#endif
-
+      GSU.vScreenSize = GSU.vScreenHeight * 4 * avMult[GSU.vMode];
+   if (GSU.vPlotOptionReg & 0x10)
+      GSU.vScreenHeight = 256; /* OBJ Mode (for drawing into sprites) */
+   if (GSU.pvScreenBase + GSU.vScreenSize > GSU.pvRam + (GSU.nRamBanks * 65536))
+      GSU.pvScreenBase =  GSU.pvRam + (GSU.nRamBanks * 65536) - GSU.vScreenSize;
+    
     fx_apfOpcodeTable[0x24c] = fx_apfOpcodeTable[0x04c] = fx_apfPlotTable[GSU.vMode];
     fx_apfOpcodeTable[0x14c] = fx_apfOpcodeTable[0x34c] = fx_apfPlotTable[GSU.vMode + 5];
-
-    fx_computeScreenPointers ();
-
-    fx_backupCache();
+    
+    if(GSU.vMode != GSU.vPrevMode || GSU.vPrevScreenHeight != GSU.vScreenHeight || GSU.vSCBRDirty)
+       fx_computeScreenPointers ();
 }
 
 void fx_dirtySCBR()
@@ -314,134 +185,48 @@ void fx_dirtySCBR()
 }
 
 void fx_computeScreenPointers ()
-{
-    if (GSU.vMode != GSU.vPrevMode || 
-	GSU.vPrevScreenHeight != GSU.vScreenHeight ||
-	GSU.vSCBRDirty)
     {
-	int i;
-
+	int i, j, condition, mask, result;
+	uint apvIncrement, vMode, xIncrement;
 	GSU.vSCBRDirty = FALSE;
 
-	/* Make a list of pointers to the start of each screen column */
-	switch (GSU.vScreenHeight)
-	{
-	    case 128:
-		switch (GSU.vMode)
-		{
-		    case 0:
-			for (i = 0; i < 32; i++)
-			{
-			    GSU.apvScreen[i] = GSU.pvScreenBase + (i << 4);
-			    GSU.x[i] = i << 8;
-			}
-			break;
-		    case 1:
-			for (i = 0; i < 32; i++)
-			{
-			    GSU.apvScreen[i] = GSU.pvScreenBase + (i << 5);
-			    GSU.x[i] = i << 9;
-			}
-			break;
-		    case 2:
-		    case 3:
-			for (i = 0; i < 32; i++)
-			{
-			    GSU.apvScreen[i] = GSU.pvScreenBase + (i << 6);
-			    GSU.x[i] = i << 10;
-			}
-			break;
-		}
-		break;
-	    case 160:
-		switch (GSU.vMode)
-		{
-		    case 0:
-			for (i = 0; i < 32; i++)
-			{
-			    GSU.apvScreen[i] = GSU.pvScreenBase + (i << 4);
-			    GSU.x[i] = (i << 8) + (i << 6);
-			}
-			break;
-		    case 1:
-			for (i = 0; i < 32; i++)
-			{
-			    GSU.apvScreen[i] = GSU.pvScreenBase + (i << 5);
-			    GSU.x[i] = (i << 9) + (i << 7);
-			}
-			break;
-		    case 2:
-		    case 3:
-			for (i = 0; i < 32; i++)
-			{
-			    GSU.apvScreen[i] = GSU.pvScreenBase + (i << 6);
-			    GSU.x[i] = (i << 10) + (i << 8);
-			}
-			break;
-		}
-		break;
-	    case 192:
-		switch (GSU.vMode)
-		{
-		    case 0:
-			for (i = 0; i < 32; i++)
-			{
-			    GSU.apvScreen[i] = GSU.pvScreenBase + (i << 4);
-			    GSU.x[i] = (i << 8) + (i << 7);
-			}
-			break;
-		    case 1:
-			for (i = 0; i < 32; i++)
-			{
-			    GSU.apvScreen[i] = GSU.pvScreenBase + (i << 5);
-			    GSU.x[i] = (i << 9) + (i << 8);
-			}
-			break;
-		    case 2:
-		    case 3:
-			for (i = 0; i < 32; i++)
-			{
-			    GSU.apvScreen[i] = GSU.pvScreenBase + (i << 6);
-			    GSU.x[i] = (i << 10) + (i << 9);
-			}
-			break;
-		}
-		break;
-	    case 256:
-		switch (GSU.vMode)
-		{
-		    case 0:
-			for (i = 0; i < 32; i++)
-			{
-			    GSU.apvScreen[i] = GSU.pvScreenBase + 
-				((i & 0x10) << 9) + ((i & 0xf) << 8);
-			    GSU.x[i] = ((i & 0x10) << 8) + ((i & 0xf) << 4);
-			}
-			break;
-		    case 1:
-			for (i = 0; i < 32; i++)
-			{
-			    GSU.apvScreen[i] = GSU.pvScreenBase + 
-				((i & 0x10) << 10) + ((i & 0xf) << 9);
-			    GSU.x[i] = ((i & 0x10) << 9) + ((i & 0xf) << 5);
-			}
-			break;
-		    case 2:
-		    case 3:
-			for (i = 0; i < 32; i++)
-			{
-			    GSU.apvScreen[i] = GSU.pvScreenBase + 
-				((i & 0x10) << 11) + ((i & 0xf) << 10);
-			    GSU.x[i] = ((i & 0x10) << 10) + ((i & 0xf) << 6);
-			}
-			break;
-		}
-		break;
+  /* Make a list of pointers to the start of each screen column*/
+   vMode = GSU.vMode;
+   condition = vMode - 2;
+   mask = (condition | -condition) >> 31;
+   result = (vMode & mask) | (3 & ~mask);
+   vMode = result + 1;
+   GSU.x[0] = 0;
+   GSU.apvScreen[0] = GSU.pvScreenBase;
+   apvIncrement = vMode << 4;
+
+   if(GSU.vScreenHeight == 256)
+   {
+      GSU.x[16] = vMode << 12;
+      GSU.apvScreen[16] = GSU.pvScreenBase + (vMode << 13);
+      apvIncrement <<= 4;
+      xIncrement = vMode << 4;
+
+      for(i = 1, j = 17 ; i < 16 ; i++, j++)
+      {
+         GSU.x[i] = GSU.x[i - 1] + xIncrement;
+         GSU.apvScreen[i] = GSU.apvScreen[i - 1] + apvIncrement;
+         GSU.x[j] = GSU.x[j - 1] + xIncrement;
+         GSU.apvScreen[j] = GSU.apvScreen[j - 1] + apvIncrement;
+      }
+   }
+   else
+   {
+      xIncrement = (vMode * GSU.vScreenHeight) << 1;
+      for(i = 1 ; i < 32 ; i++)
+      {
+         GSU.x[i] = GSU.x[i - 1] + xIncrement;
+         GSU.apvScreen[i] = GSU.apvScreen[i - 1] + apvIncrement;
+           }
 	}
 	GSU.vPrevMode = GSU.vMode;
 	GSU.vPrevScreenHeight = GSU.vScreenHeight;
     }
-}
 
 static void fx_writeRegisterSpace()
 {
@@ -473,8 +258,6 @@ static void fx_writeRegisterSpace()
     p[GSU_RAMBR] = (uint8)GSU.vRamBankReg;
     p[GSU_CBR] = (uint8)GSU.vCacheBaseReg;
     p[GSU_CBR+1] = (uint8)(GSU.vCacheBaseReg>>8);
-    
-    fx_restoreCache();
 }
 
 /* Reset the FxChip */
@@ -537,8 +320,6 @@ void FxReset(struct FxInit_s *psFxInfo)
     /* Start with a nop in the pipe */
     GSU.vPipe = 0x01;
 
-    /* Set pointer to GSU cache */
-    GSU.pvCache = &GSU.pvRegisters[0x100];
 
     fx_readRegisterSpace();
 }
@@ -589,15 +370,4 @@ void FxEmulate(uint32 nInstructions)
 
     /* Store GSU registers */
     fx_writeRegisterSpace();
-}
-
-/* Errors */
-int FxGetErrorCode()
-{
-    return GSU.vErrorCode;
-}
-
-int FxGetIllegalAddress()
-{
-    return GSU.vIllegalAddress;
 }
