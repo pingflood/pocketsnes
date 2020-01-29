@@ -266,10 +266,9 @@ const char *S9xGetFilename (const char *ex)
 uint32 S9xReadJoypad (int which1)
 {
 	uint32 val=0x80000000;
-	if (mInMenu) return val;
-	if (which1 != 0) return val;
+	if (mInMenu || which1 > 1) return val;
 
-	u32 joy = sal_InputPoll();
+	u32 joy = sal_InputPoll(which1);
 
 	if (((joy & SAL_INPUT_SELECT) && (joy & SAL_INPUT_START)) || (joy & SAL_INPUT_MENU))
 	{

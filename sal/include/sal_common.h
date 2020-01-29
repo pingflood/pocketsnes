@@ -106,8 +106,8 @@ u32 sal_InputHeld();
 void sal_InputWaitForRelease();
 void sal_InputWaitForPress();
 void sal_InputIgnore();
-u32 sal_InputPoll();
-u32 sal_InputPollRepeat();
+u32 sal_InputPoll(u32 j);
+u32 sal_InputPollRepeat(u32 j);
 
 void sal_Sleep(u32 milliSecs);
 

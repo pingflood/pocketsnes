@@ -21,55 +21,87 @@ s32 mCpuSpeedLookup[1]={0};
 
 #include <sal_common.h>
 
-static u32 inputHeld = 0;
+static u32 inputHeld[2] = {0, 0};
+static SDL_Joystick *joy[2];
 
-static u32 sal_Input(int held)
+static u32 sal_Input(int held, u32 j)
 {
-	SDL_Event event;
-	if (!SDL_PollEvent(&event)) {
-		if (held) return inputHeld;
-		return 0;
+	inputHeld[j] = 0;
+
+	if (SDL_NumJoysticks() > 0) {
+		int deadzone = 10000;
+		if (joy[j] == NULL) joy[j] = SDL_JoystickOpen(j);
+
+		SDL_JoystickUpdate();
+
+		int joy_x = SDL_JoystickGetAxis(joy[j], 0);
+		int joy_y = SDL_JoystickGetAxis(joy[j], 1);
+
+		if (joy_x < -deadzone) inputHeld[j] |= SAL_INPUT_LEFT;
+		else if (joy_x > deadzone) inputHeld[j] |= SAL_INPUT_RIGHT;
+
+		if (joy_y < -deadzone) inputHeld[j] |= SAL_INPUT_UP;
+		else if (joy_y > deadzone) inputHeld[j] |= SAL_INPUT_DOWN;
+
+		if (SDL_JoystickGetButton(joy[j], 0)) inputHeld[j] |= SAL_INPUT_X;
+		if (SDL_JoystickGetButton(joy[j], 1)) inputHeld[j] |= SAL_INPUT_A;
+		if (SDL_JoystickGetButton(joy[j], 2)) inputHeld[j] |= SAL_INPUT_B;
+		if (SDL_JoystickGetButton(joy[j], 3)) inputHeld[j] |= SAL_INPUT_Y;
+		if (SDL_JoystickGetButton(joy[j], 4)) inputHeld[j] |= SAL_INPUT_L;
+		if (SDL_JoystickGetButton(joy[j], 5)) inputHeld[j] |= SAL_INPUT_R;
+		if (SDL_JoystickGetButton(joy[j], 8)) inputHeld[j] |= SAL_INPUT_SELECT;
+		if (SDL_JoystickGetButton(joy[j], 9)) inputHeld[j] |= SAL_INPUT_START;
+		if (SDL_JoystickGetButton(joy[j], 8) && SDL_JoystickGetButton(joy[j], 9)) inputHeld[j] |= SAL_INPUT_MENU;
 	}
 
-	inputHeld = 0;
+	if (j == 0) {
+		u8 *keys = SDL_GetKeyState(NULL);
 
-	u8 *keystate = SDL_GetKeyState(NULL);
-	if ( keystate[SDLK_LCTRL] )		inputHeld |= SAL_INPUT_A;
-	if ( keystate[SDLK_LALT] )		inputHeld |= SAL_INPUT_B;
-	if ( keystate[SDLK_SPACE] )		inputHeld |= SAL_INPUT_X;
-	if ( keystate[SDLK_LSHIFT] )	inputHeld |= SAL_INPUT_Y;
-	if ( keystate[SDLK_TAB] )		inputHeld |= SAL_INPUT_L;
-	if ( keystate[SDLK_BACKSPACE] )	inputHeld |= SAL_INPUT_R;
-	if ( keystate[SDLK_RETURN] )	inputHeld |= SAL_INPUT_START;
-	if ( keystate[SDLK_ESCAPE] )	inputHeld |= SAL_INPUT_SELECT;
-	if ( keystate[SDLK_UP] )		inputHeld |= SAL_INPUT_UP;
-	if ( keystate[SDLK_DOWN] )		inputHeld |= SAL_INPUT_DOWN;
-	if ( keystate[SDLK_LEFT] )		inputHeld |= SAL_INPUT_LEFT;
-	if ( keystate[SDLK_RIGHT] )		inputHeld |= SAL_INPUT_RIGHT;
-	if ( keystate[SDLK_END] )		inputHeld |= SAL_INPUT_MENU;
+		if (keys[SDLK_LCTRL])		inputHeld[j] |= SAL_INPUT_A;
+		if (keys[SDLK_LALT])		inputHeld[j] |= SAL_INPUT_B;
+		if (keys[SDLK_SPACE])		inputHeld[j] |= SAL_INPUT_X;
+		if (keys[SDLK_LSHIFT])		inputHeld[j] |= SAL_INPUT_Y;
+		if (keys[SDLK_TAB])			inputHeld[j] |= SAL_INPUT_L;
+		if (keys[SDLK_BACKSPACE])	inputHeld[j] |= SAL_INPUT_R;
+		if (keys[SDLK_PAGEDOWN])	inputHeld[j] |= SAL_INPUT_L;
+		if (keys[SDLK_PAGEUP])		inputHeld[j] |= SAL_INPUT_R;
+		if (keys[SDLK_RETURN])		inputHeld[j] |= SAL_INPUT_START;
+		if (keys[SDLK_ESCAPE])		inputHeld[j] |= SAL_INPUT_SELECT;
+		if (keys[SDLK_UP])			inputHeld[j] |= SAL_INPUT_UP;
+		if (keys[SDLK_DOWN])		inputHeld[j] |= SAL_INPUT_DOWN;
+		if (keys[SDLK_LEFT])		inputHeld[j] |= SAL_INPUT_LEFT;
+		if (keys[SDLK_RIGHT])		inputHeld[j] |= SAL_INPUT_RIGHT;
+		if (keys[SDLK_ESCAPE] && keys[SDLK_RETURN]) inputHeld[j] |= SAL_INPUT_MENU;
 
-	mInputRepeat = inputHeld;
-	return inputHeld;
+		SDL_Event event;
+		if (!SDL_PollEvent(&event)) {
+			if (held) return inputHeld[j];
+			return 0;
+		}
+	}
+
+	mInputRepeat = inputHeld[j];
+	return inputHeld[j];
 }
 
 static int key_repeat_enabled = 1;
 
-u32 sal_InputPollRepeat()
+u32 sal_InputPollRepeat(u32 j)
 {
 	if (!key_repeat_enabled) {
 		SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 		key_repeat_enabled = 1;
 	}
-	return sal_Input(0);
+	return sal_Input(0, j);
 }
 
-u32 sal_InputPoll()
+u32 sal_InputPoll(u32 j)
 {
 	if (key_repeat_enabled) {
 		SDL_EnableKeyRepeat(0, 0);
 		key_repeat_enabled = 0;
 	}
-	return sal_Input(1);
+	return sal_Input(1, j);
 }
 
 const char* sal_DirectoryGetTemp(void)
@@ -241,6 +273,8 @@ void sal_VideoPaletteSet(u32 index, u32 color)
 
 void sal_Reset(void)
 {
+	for(int j = 0; j < SDL_NumJoysticks(); j++)
+		SDL_JoystickClose(joy[j]);
 	sal_AudioClose();
 	SDL_Quit();
 }

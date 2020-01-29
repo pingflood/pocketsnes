@@ -151,15 +151,12 @@ s32 MenuMessageBox(const char *message1, const char *message2, const char *messa
 	s32 subaction = -1;
 	u32 keys = 0;
 
-  while(subaction==-1)
-  {
-     keys=sal_InputPollRepeat();
-     if (keys & SAL_INPUT_UP)
-     {
-       select=SAL_OK; // Up
-     }
-  }
 	sal_InputIgnore();
+	while (subaction == -1) {
+		keys = sal_InputPollRepeat(0);
+		if (keys & SAL_INPUT_UP) {
+			select = SAL_OK; // Up
+		}
 		else if (keys & SAL_INPUT_DOWN) {
 			select = SAL_ERROR; // Down
 		}
@@ -191,6 +188,7 @@ s32 MenuMessageBox(const char *message1, const char *message2, const char *messa
 				break;
 		}
 		sal_VideoFlip(1);
+	}
 	sal_InputIgnore();
 	return(subaction);
 }
@@ -420,14 +418,11 @@ s32 FileSelect()
 
 	smooth = focus << 8;
 	sal_InputIgnore();
-	while (menuExit==0)
-	{
-		keys=sal_InputPollRepeat();
+	while (menuExit == 0) {
+		keys = sal_InputPollRepeat(0);
 
-		if (keys & INP_BUTTON_MENU_SELECT)
-		{
-			switch(focus)
-			{
+		if (keys & INP_BUTTON_MENU_SELECT) {
+			switch (focus) {
 				case ROM_SELECTOR_SAVE_DEFAULT_DIR: //Save default directory
 					DelLastSelectedRomPos(); //delete any previously saved position in the romlist
 					SaveMenuOptions(mSystemDir, DEFAULT_ROM_DIR_FILENAME, DEFAULT_ROM_DIR_EXT, mRomDir, strlen(mRomDir), 1);
@@ -696,7 +691,7 @@ static s32 SaveStateSelect(s32 mode)
 
 	while (action!=0&&action!=100)
 	{
-		keys=sal_InputPollRepeat();
+		keys=sal_InputPollRepeat(0);
 
 		if(keys&SAL_INPUT_UP || keys&SAL_INPUT_LEFT) {saveno--; action=1;}
 		if(keys&SAL_INPUT_DOWN || keys&SAL_INPUT_RIGHT) {saveno++; action=1;}
@@ -915,7 +910,7 @@ void ShowCredits()
 	sal_InputIgnore();
 	while (!menuExit)
 	{
-		keys=sal_InputPollRepeat();
+		keys=sal_InputPollRepeat(0);
 
 		if (keys & SAL_INPUT_UP) menufocus--; // Up
 		if (keys & SAL_INPUT_DOWN) menufocus++; // Down
@@ -1188,7 +1183,7 @@ s32 SettingsMenu(void)
 		RenderMenu("Settings", menuCount,menuSmooth,menufocus);
 		sal_VideoFlip(1);
 
-		keys=sal_InputPollRepeat();
+		keys=sal_InputPollRepeat(0);
 
 		if (keys & INP_BUTTON_MENU_CANCEL)
 		{
@@ -1199,7 +1194,7 @@ s32 SettingsMenu(void)
 				RenderMenu("Settings", menuCount,menuSmooth,menufocus);
 				sal_VideoFlip(1);
 
-				keys=sal_InputPoll();
+				keys=sal_InputPoll(0);
 			}
 
 			menuExit=1;
@@ -1213,7 +1208,7 @@ s32 SettingsMenu(void)
 				RenderMenu("Settings", menuCount,menuSmooth,menufocus);
 				sal_VideoFlip(1);
 
-				keys=sal_InputPoll();
+				keys=sal_InputPoll(0);
 			}
 
 			switch(menufocus)
@@ -1449,7 +1444,7 @@ s32 MenuRun(s8 *romName)
 		RenderMenu("Main Menu", menuCount,menuSmooth,menufocus);
 		sal_VideoFlip(1);
 
-		keys=sal_InputPollRepeat();
+		keys=sal_InputPollRepeat(0);
 
 		if (keys & INP_BUTTON_MENU_SELECT)
 		{
@@ -1460,7 +1455,7 @@ s32 MenuRun(s8 *romName)
 				RenderMenu("Main Menu", menuCount,menuSmooth,menufocus);
 				sal_VideoFlip(1);
 
-				keys=sal_InputPoll();
+				keys=sal_InputPoll(0);
 
 				usleep(10000);
 			}
