@@ -1,0 +1,52 @@
+
+# Define the applications properties here:
+
+TARGET = pocketsnes/pocketsnes.bin
+
+CROSS_COMPILE=
+CC = $(CROSS_COMPILE)gcc
+CXX = $(CROSS_COMPILE)g++
+STRIP = $(CROSS_COMPILE)strip
+SYSROOT     :=
+SDL_CFLAGS  := $(shell $(SYSROOT)/usr/bin/sdl-config --cflags)
+SDL_LIBS    := $(shell $(SYSROOT)/usr/bin/sdl-config --libs)
+
+INCLUDE = -I src \
+		-I sal/linux/include -I sal/include \
+		-I src/include \
+		-I menu -I src/linux -I src/snes9x
+
+CFLAGS =  -std=gnu++03 $(INCLUDE) -DRC_OPTIMIZED -D__LINUX__ -D__DINGUX__ -DFOREVER_16_BIT  $(SDL_CFLAGS)
+
+CFLAGS +=  -O0 -g #-m32
+
+CFLAGS += -DGCW_ZERO #-DFAST_LSB_WORD_ACCESS -DNO_ROM_BROWSER
+CXXFLAGS = $(CFLAGS) -fno-exceptions -fno-rtti -fno-math-errno -fno-threadsafe-statics
+
+# LDFLAGS = $(CXXFLAGS) -lpthread -lz -lpng  $(SDL_LIBS) -flto -Wl,--as-needed -Wl,--gc-sections -s
+LDFLAGS = $(CXXFLAGS) -lpthread -lz -lpng  $(SDL_LIBS) -lSDL_image -Wl,--as-needed -Wl,--gc-sections -s
+
+# Find all source files
+SOURCE = src/snes9x menu sal/linux sal
+SRC_CPP = $(foreach dir, $(SOURCE), $(wildcard $(dir)/*.cpp))
+SRC_C   = $(foreach dir, $(SOURCE), $(wildcard $(dir)/*.c))
+OBJ_CPP = $(patsubst %.cpp, %.o, $(SRC_CPP))
+OBJ_C   = $(patsubst %.c, %.o, $(SRC_C))
+OBJS    = $(OBJ_CPP) $(OBJ_C)
+
+.PHONY : all
+all : $(TARGET)
+
+$(TARGET) : $(OBJS)
+	$(CXX) $(CXXFLAGS) $^ $(LDFLAGS) -o $@
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+%.o: %.cpp
+	$(CXX) $(CFLAGS) -c $< -o $@
+
+.PHONY : clean
+clean :
+	rm -f $(OBJS) $(TARGET)
+	rm -rf .opk_data $(TARGET).opk

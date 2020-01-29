@@ -5,4 +5,5 @@
 .opk_data
 *.ipk
 *.elf
+*.bin
 profile/*
