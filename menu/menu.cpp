@@ -41,17 +41,17 @@ extern "C" void S9xSaveSRAM(int showWarning);
 
 void DefaultMenuOptions(void)
 {
-	mMenuOptions->frameSkip=0;   //auto
-	mMenuOptions->soundEnabled = 1; 
-	mMenuOptions->volume=25; 
-	mMenuOptions->cpuSpeed=336; 
-	mMenuOptions->country=0;
-	mMenuOptions->showFps=0;
-	mMenuOptions->soundRate=22050; //44100;
-	mMenuOptions->stereo=0;
-	mMenuOptions->fullScreen=3;
-	mMenuOptions->autoSaveSram=1;
-	mMenuOptions->soundSync=1;
+	mMenuOptions->frameSkip = 0;   //auto
+	mMenuOptions->soundEnabled = 1;
+	mMenuOptions->volume = 25;
+	mMenuOptions->cpuSpeed = 336;
+	mMenuOptions->country = 0;
+	mMenuOptions->showFps = 0;
+	mMenuOptions->soundRate = 48000;
+	mMenuOptions->stereo = 0;
+	mMenuOptions->fullScreen = 3;
+	mMenuOptions->autoSaveSram = 1;
+	mMenuOptions->soundSync = 1;
 }
 
 s32 LoadMenuOptions(const char *path, const char *filename, const char *ext, const char *optionsmem, s32 maxSize, s32 showMessage)
