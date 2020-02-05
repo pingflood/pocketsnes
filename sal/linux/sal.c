@@ -52,6 +52,8 @@ static u32 sal_Input(int held, u32 j)
 		if (SDL_JoystickGetButton(joy[j], 8)) inputHeld[j] |= SAL_INPUT_SELECT;
 		if (SDL_JoystickGetButton(joy[j], 9)) inputHeld[j] |= SAL_INPUT_START;
 		if (SDL_JoystickGetButton(joy[j], 8) && SDL_JoystickGetButton(joy[j], 9)) inputHeld[j] |= SAL_INPUT_MENU;
+		if (SDL_JoystickGetButton(joy[j], 8) && SDL_JoystickGetButton(joy[j], 4)) inputHeld[j] |= SAL_INPUT_QUICKLOAD;
+		if (SDL_JoystickGetButton(joy[j], 8) && SDL_JoystickGetButton(joy[j], 5)) inputHeld[j] |= SAL_INPUT_QUICKSAVE;
 	}
 
 	if (j == 0) {
@@ -71,7 +73,9 @@ static u32 sal_Input(int held, u32 j)
 		if (keys[SDLK_DOWN])		inputHeld[j] |= SAL_INPUT_DOWN;
 		if (keys[SDLK_LEFT])		inputHeld[j] |= SAL_INPUT_LEFT;
 		if (keys[SDLK_RIGHT])		inputHeld[j] |= SAL_INPUT_RIGHT;
-		if (keys[SDLK_ESCAPE] && keys[SDLK_RETURN]) inputHeld[j] |= SAL_INPUT_MENU;
+		if (keys[SDLK_END] || keys[SDLK_HOME] || (keys[SDLK_ESCAPE] && keys[SDLK_RETURN])) inputHeld[j] |= SAL_INPUT_MENU;
+		if (keys[SDLK_ESCAPE] && keys[SDLK_TAB]) inputHeld[j] |= SAL_INPUT_QUICKLOAD;
+		if (keys[SDLK_ESCAPE] && keys[SDLK_BACKSPACE]) inputHeld[j] |= SAL_INPUT_QUICKSAVE;
 
 		SDL_Event event;
 		if (!SDL_PollEvent(&event)) {

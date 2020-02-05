@@ -28,7 +28,7 @@ static struct SAL_DIRECTORY_ENTRY *mRomList=NULL;
 static s32 mRomCount;
 static s8 mRomDir[SAL_MAX_PATH]={""};
 
-static struct SAVE_STATE mSaveState[10];  // holds the filenames for the savestate and "inuse" flags
+struct SAVE_STATE mSaveState[10];  // holds the filenames for the savestate and "inuse" flags
 static s8 mSaveStateName[SAL_MAX_PATH]={""};       // holds the last filename to be scanned for save states
 static s8 mRomName[SAL_MAX_PATH]={""};
 static s8 mSystemDir[SAL_MAX_PATH];
@@ -648,21 +648,23 @@ void DeleteStateTemp()
 	sal_FileDelete(name);
 }
 
-static
-bool8 LoadStateFile(s8 *filename)
+// static
+bool LoadStateFile(s8 *filename)
 {
-	bool8 ret;
-	if (!(ret = S9xUnfreezeGame(filename)))
+	bool ret;
+	if (!(ret = S9xUnfreezeGame(filename))) {
 		fprintf(stderr, "Failed to read saved state at %s: %s\n", filename, strerror(errno));
+	}
 	return ret;
 }
 
-static
-bool8 SaveStateFile(s8 *filename)
+// static
+bool SaveStateFile(s8 *filename)
 {
-	bool8 ret;
-	if (!(ret = S9xFreezeGame(filename)))
+	bool ret;
+	if (!(ret = S9xFreezeGame(filename))) {
 		fprintf(stderr, "Failed to write saved state at %s: %s\n", filename, strerror(errno));
+	}
 	return ret;
 }
 

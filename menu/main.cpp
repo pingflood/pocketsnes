@@ -263,6 +263,9 @@ const char *S9xGetFilename (const char *ex)
 	return (dir);
 }
 
+extern struct SAVE_STATE mSaveState[10];
+extern s32 saveno;
+
 uint32 S9xReadJoypad (int which1)
 {
 	uint32 val=0x80000000;
@@ -270,9 +273,14 @@ uint32 S9xReadJoypad (int which1)
 
 	u32 joy = sal_InputPoll(which1);
 
-	if (((joy & SAL_INPUT_SELECT) && (joy & SAL_INPUT_START)) || (joy & SAL_INPUT_MENU))
-	{
+	if (joy & SAL_INPUT_MENU) {
 		mEnterMenu = 1;
+		return val;
+	} else if (joy & SAL_INPUT_QUICKLOAD) {
+		LoadStateFile(mSaveState[saveno].fullFilename);
+		return val;
+	} else if (joy & SAL_INPUT_QUICKSAVE) {
+		SaveStateFile(mSaveState[saveno].fullFilename);
 		return val;
 	}
 

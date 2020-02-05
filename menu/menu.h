@@ -166,5 +166,8 @@ s32 MenuMessageBox(const char *message1, const char *message2,
 			const char *message3, enum MENU_MESSAGE_BOX_MODE mode);
 u32 IsPreviewingState();
 
+bool LoadStateFile(s8 *filename);
+bool SaveStateFile(s8 *filename);
+
 
 #endif /* _MENU_H_ */
