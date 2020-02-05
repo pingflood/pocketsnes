@@ -137,7 +137,7 @@ s32 sal_DirectoryGet(const char *path, struct SAL_DIRECTORY_ENTRY *dir,
 s32 sal_DirectoryCreate(const char *path);
 s32 sal_DirectoryOpen(const char *path, struct SAL_DIR *d);
 s32 sal_DirectoryClose(struct SAL_DIR *d);
-s32 sal_DirectoryRead(struct SAL_DIR *d, struct SAL_DIRECTORY_ENTRY *dir);
+s32 sal_DirectoryRead(struct SAL_DIR *d, struct SAL_DIRECTORY_ENTRY *dir, s8 *base_dir);
 
 s32 sal_ImageLoad(const char *fname, void *dest, u32 width, u32 height);
 s32 sal_ImageDrawTiled(u16 *image, u32 width, u32 height, s32 xScroll, s32 yScroll, s32 x, s32 y);

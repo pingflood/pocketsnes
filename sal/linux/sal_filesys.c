@@ -71,9 +71,11 @@ s32 sal_DirectoryClose(struct SAL_DIR *d)
 	}
 }
 
-s32 sal_DirectoryRead(struct SAL_DIR *d, struct SAL_DIRECTORY_ENTRY *dir)
+s32 sal_DirectoryRead(struct SAL_DIR *d, struct SAL_DIRECTORY_ENTRY *dir, s8 *base_dir)
 {
 	struct dirent *de=NULL;
+	struct stat s;
+	char path[PATH_MAX];
 
 	if(d)
 	{
@@ -82,9 +84,11 @@ s32 sal_DirectoryRead(struct SAL_DIR *d, struct SAL_DIRECTORY_ENTRY *dir)
 			de=readdir(d->dir);
 			if(de)
 			{
+				sprintf(path, "%s/%s", base_dir, de->d_name);
 				strcpy(dir->filename,de->d_name);
 				strcpy(dir->displayName,de->d_name);
-				if (de->d_type == 4)
+				if (stat(path, &s) != 0) return SAL_ERROR;
+				if (s.st_mode & S_IFDIR)
 				  dir->type=SAL_FILE_TYPE_DIRECTORY;
 				else
 				  dir->type=SAL_FILE_TYPE_FILE;
