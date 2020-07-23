@@ -195,7 +195,8 @@ s32 MenuMessageBox(const char *message1, const char *message2, const char *messa
 
 void PrintTitle(const char *title)
 {
-	sal_ImageDraw(mMenuBackground,SAL_SCREEN_WIDTH, SAL_SCREEN_HEIGHT,0,0);
+	sal_ImageDraw(mMenuBackground, SAL_SCREEN_WIDTH, SAL_SCREEN_HEIGHT, 0, 0);
+	sal_VideoPrint(8, 4, title, SAL_RGB(31, 8, 8));
 }
 
 void PrintBar(u32 givenY)
