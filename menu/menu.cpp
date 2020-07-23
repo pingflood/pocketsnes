@@ -947,25 +947,24 @@ void ShowCredits()
 static
 void MainMenuUpdateText(s32 menu_index)
 {
-	switch(menu_index)
-	{
+	switch (menu_index) {
 		case MENU_ROM_SELECT:
-			strcpy(mMenuText[MENU_ROM_SELECT],"Select ROM");
+			strcpy(mMenuText[menu_index], "Select ROM");
 			break;
 		case SAVESTATE_MENU_LOAD:
-			strcpy(mMenuText[SAVESTATE_MENU_LOAD],"Load state");
+			strcpy(mMenuText[menu_index], "Load state");
 			break;
 		case SAVESTATE_MENU_SAVE:
-			strcpy(mMenuText[SAVESTATE_MENU_SAVE],"Save state");
+			strcpy(mMenuText[menu_index], "Save state");
 			break;
 		case MENU_RESET_GAME:
-			strcpy(mMenuText[MENU_RESET_GAME],"Reset");
+			strcpy(mMenuText[menu_index], "Reset");
 			break;
 		case MENU_EXIT_APP:
-			strcpy(mMenuText[MENU_EXIT_APP],"Exit");
+			strcpy(mMenuText[menu_index], "Exit");
 			break;
 		case MENU_SETTINGS:
-			strcpy(mMenuText[MENU_SETTINGS],"Settings");
+			strcpy(mMenuText[menu_index], "Settings");
 			break;
 	}
 }
@@ -973,51 +972,45 @@ void MainMenuUpdateText(s32 menu_index)
 static
 void VideoSettingsMenuUpdateText(s32 menu_index)
 {
-	switch(menu_index)
-	{
+	switch (menu_index) {
 		case VIDEO_SETTINGS_MENU_FRAMESKIP:
-			switch(mMenuOptions->frameSkip)
-			{
+			switch (mMenuOptions->frameSkip) {
 				case 0:
-					strcpy(mMenuText[VIDEO_SETTINGS_MENU_FRAMESKIP],
-						"Frameskip                  AUTO");
+					strcpy(mMenuText[menu_index],  "Frameskip                  AUTO");
 					break;
 				default:
-					sprintf(mMenuText[VIDEO_SETTINGS_MENU_FRAMESKIP],
-						"Frameskip                     %1d",mMenuOptions->frameSkip-1);
+					sprintf(mMenuText[menu_index], "Frameskip                     %1d", mMenuOptions->frameSkip - 1);
 					break;
 			}
 			break;
 
 		case VIDEO_SETTINGS_MENU_FPS:
-			switch(mMenuOptions->showFps)
-			{
-				case 0:
-					strcpy(mMenuText[VIDEO_SETTINGS_MENU_FPS],"Show FPS                    OFF");
-					break;
+			switch (mMenuOptions->showFps) {
 				case 1:
-					strcpy(mMenuText[VIDEO_SETTINGS_MENU_FPS],"Show FPS                     ON");
+					strcpy(mMenuText[menu_index], "Show FPS                     ON");
+					break;
+				default:
+					strcpy(mMenuText[menu_index], "Show FPS                    OFF");
 					break;
 			}
 			break;
 
 		case VIDEO_SETTINGS_MENU_FULLSCREEN:
-			switch(mMenuOptions->fullScreen)
-			{
-				case 0:
-					strcpy(mMenuText[VIDEO_SETTINGS_MENU_FULLSCREEN],"Video scaling          ORIGINAL");
-					break;
+			switch (mMenuOptions->fullScreen) {
 				case 1:
-					strcpy(mMenuText[VIDEO_SETTINGS_MENU_FULLSCREEN],"Video scaling              FAST");
+					strcpy(mMenuText[menu_index], "Video scaling              FAST");
 					break;
 				case 2:
-					strcpy(mMenuText[VIDEO_SETTINGS_MENU_FULLSCREEN],"Video scaling            SMOOTH");
+					strcpy(mMenuText[menu_index], "Video scaling            SMOOTH");
 					break;
 				case 3:
-					strcpy(mMenuText[VIDEO_SETTINGS_MENU_FULLSCREEN],"Video scaling          HARDWARE");
+					strcpy(mMenuText[menu_index], "Video scaling          HARDWARE");
 					break;
 				case 4:
-					strcpy(mMenuText[VIDEO_SETTINGS_MENU_FULLSCREEN],"Video scaling              CROP");
+					strcpy(mMenuText[menu_index], "Video scaling              CROP");
+					break;
+				default:
+					strcpy(mMenuText[menu_index], "Video scaling          ORIGINAL");
 					break;
 			}
 	}
@@ -1063,42 +1056,42 @@ void SettingsMenuUpdateText(s32 menu_index)
 {
 	switch (menu_index) {
 		case VIDEO_MENU_SETTINGS:
-			strcpy(mMenuText[VIDEO_MENU_SETTINGS],"Video Settings");
+			strcpy(mMenuText[menu_index], "Video Settings");
 			break;
 
 		case AUDIO_MENU_SETTINGS:
-			strcpy(mMenuText[AUDIO_MENU_SETTINGS],"Audio Settings");
+			strcpy(mMenuText[menu_index], "Audio Settings");
 			break;
 
 		case SETTINGS_MENU_AUTO_SAVE_SRAM:
-			sprintf(mMenuText[SETTINGS_MENU_AUTO_SAVE_SRAM], "Save SRAM                %s", mMenuOptions->autoSaveSram ? "  AUTO" : "MANUAL");
+			sprintf(mMenuText[menu_index], "Save SRAM                %s", mMenuOptions->autoSaveSram ? "  AUTO" : "MANUAL");
 			break;
 
 #if 0
 		case SETTINGS_MENU_CPU_SPEED:
-			sprintf(mMenuText[SETTINGS_MENU_CPU_SPEED],"Cpu Speed:                  %d",mMenuOptions->cpuSpeed);
+			sprintf(mMenuText[menu_index], "Cpu Speed:                  %d", mMenuOptions->cpuSpeed);
 			break;
 #endif
 		case SETTINGS_MENU_SAVE_GLOBAL_SETTINGS:
-			sprintf(mMenuText[SETTINGS_MENU_SAVE_GLOBAL_SETTINGS], "Global settings            %s", menuGlobalSettings ? "LOAD" : "SAVE");
+			sprintf(mMenuText[menu_index], "Global settings            %s", menuGlobalSettings ? "LOAD" : "SAVE");
 			break;
 
 		case SETTINGS_MENU_SAVE_CURRENT_SETTINGS:
 			switch (menuGameSettings) {
 				case 1:
-					strcpy(mMenuText[SETTINGS_MENU_SAVE_CURRENT_SETTINGS],"Game settings              LOAD");
+					strcpy(mMenuText[menu_index], "Game settings              LOAD");
 					break;
 				case 2:
-					strcpy(mMenuText[SETTINGS_MENU_SAVE_CURRENT_SETTINGS],"Game settings            DELETE");
+					strcpy(mMenuText[menu_index], "Game settings            DELETE");
 					break;
 				default:
-					strcpy(mMenuText[SETTINGS_MENU_SAVE_CURRENT_SETTINGS],"Game settings              SAVE");
+					strcpy(mMenuText[menu_index], "Game settings              SAVE");
 					break;
 			}
 			break;
 
 		case MENU_CREDITS:
-			strcpy(mMenuText[MENU_CREDITS],"Credits");
+			strcpy(mMenuText[menu_index], "Credits");
 			break;
 	}
 }
