@@ -875,27 +875,24 @@ void RenderMenu(const char *menuName, s32 menuCount, s32 menuSmooth, s32 menufoc
 	u16 color = 0;
 	PrintTitle(menuName);
 
-    	for (i=0;i<menuCount;i++)
-    	{
-      		int x=0,y=0;
-			x=8;
-      		y=(i<<4)-(menuSmooth>>4);
-      		y+=112 - 28;
+	for (i = 0; i < menuCount; i++) {
+		int x = 8;
+		int y = (i << 4) - (menuSmooth >> 4);
+		y += 88 - 28;
 
-      		if (y<=48 - 28 || y>=232 - 36) continue;
+		if (y <= 48 - 28 || y >= 232 - 36) {
+			continue;
+		}
 
-      		if (i==menufocus)
-      		{
-        		color=SAL_RGB(31,31,31);
-				PrintBar(y-4);
-      		}
-      		else
-      		{
-        		color=SAL_RGB(31,31,31);
-      		}
+		if (i == menufocus) {
+			color = SAL_RGB(31, 31, 31);
+			PrintBar(y - 4);
+		} else {
+			color = SAL_RGB(31, 31, 31);
+		}
 
-      		sal_VideoPrint(x,y,mMenuText[i],color);
-    	}
+		sal_VideoPrint(x,y,mMenuText[i],color);
+	}
 }
 
 
