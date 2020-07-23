@@ -63,6 +63,12 @@ s32 LoadMenuOptions(const char *path, const char *filename, const char *ext, con
 	s8 _path[SAL_MAX_PATH];
 	s32 size = 0;
 
+	if (showMessage) {
+		PrintTitle("");
+		sal_VideoPrint(8,120,"Loading...", SAL_RGB(31, 31, 31));
+		sal_VideoFlip(1);
+	}
+
 	sal_DirectorySplitFilename(filename, _path, _filename, _ext);
 	sprintf(fullFilename, "%s%s%s.%s", path, SAL_DIR_SEP, _filename,ext);
 	return sal_FileLoad(fullFilename, (u8*)optionsmem, maxSize, (u32*)&size);
