@@ -1019,12 +1019,49 @@ void VideoSettingsMenuUpdateText(s32 menu_index)
 }
 
 static
+void AudioSettingsMenuUpdateText(s32 menu_index)
+{
+	switch (menu_index) {
+		case AUDIO_SETTINGS_MENU_SOUND_SYNC:
+			switch (mMenuOptions->soundSync) {
+				case 0:
+					strcpy(mMenuText[menu_index], "Prefer fluid              Video");
+					break;
+				case 1:
+					strcpy(mMenuText[menu_index], "Prefer fluid               Both");
+					break;
+				default:
+					strcpy(mMenuText[menu_index], "Prefer fluid              Audio");
+					break;
+			}
+
+		case AUDIO_SETTINGS_MENU_SOUND_ON:
+			sprintf(mMenuText[menu_index], "Sound                       %s", mMenuOptions->soundEnabled ? " ON" : "OFF");
+			break;
+
+		case AUDIO_SETTINGS_MENU_SOUND_RATE:
+			sprintf(mMenuText[menu_index], "Sound rate                %5d", mMenuOptions->soundRate);
+			break;
+
+		case AUDIO_SETTINGS_MENU_SOUND_STEREO:
+			sprintf(mMenuText[menu_index], "Stereo                      %s", mMenuOptions->stereo ? " ON" : "OFF");
+			break;
+		// case SETTINGS_MENU_SOUND_VOL:
+		// 	sprintf(mMenuText[menu_index], "Volume:                     %d", mMenuOptions->volume);
+		// 	break;
+	}
+}
+
+static
 void SettingsMenuUpdateText(s32 menu_index)
 {
-	switch(menu_index)
-	{
+	switch (menu_index) {
 		case VIDEO_MENU_SETTINGS:
 			strcpy(mMenuText[VIDEO_MENU_SETTINGS],"Video Settings");
+			break;
+
+		case AUDIO_MENU_SETTINGS:
+			strcpy(mMenuText[AUDIO_MENU_SETTINGS],"Audio Settings");
 			break;
 
 		case SAVESTATE_MENU_SAVE_SRAM:
@@ -1037,39 +1074,9 @@ void SettingsMenuUpdateText(s32 menu_index)
 						mMenuOptions->autoSaveSram ? " ON" : "OFF");
 			break;
 
-		case SETTINGS_MENU_SOUND_SYNC:
-			switch (mMenuOptions->soundSync)
-			{
-				case 0:
-					strcpy(mMenuText[SETTINGS_MENU_SOUND_SYNC], "Prefer fluid              Video");
-					break;
-				case 1:
-					strcpy(mMenuText[SETTINGS_MENU_SOUND_SYNC], "Prefer fluid               Both");
-					break;
-				default:
-					strcpy(mMenuText[SETTINGS_MENU_SOUND_SYNC], "Prefer fluid              Audio");
-					break;
-			}
-
-		case SETTINGS_MENU_SOUND_ON:
-			sprintf(mMenuText[SETTINGS_MENU_SOUND_ON], "Sound                       %s", mMenuOptions->soundEnabled ? " ON" : "OFF");
-			break;
-
-		case SETTINGS_MENU_SOUND_RATE:
-			sprintf(mMenuText[SETTINGS_MENU_SOUND_RATE],"Sound rate                %5d",mMenuOptions->soundRate);
-			break;
-
-		case SETTINGS_MENU_SOUND_STEREO:
-			sprintf(mMenuText[SETTINGS_MENU_SOUND_STEREO], "Stereo                      %s", mMenuOptions->stereo ? " ON" : "OFF");
-			break;
-
 #if 0
 		case SETTINGS_MENU_CPU_SPEED:
 			sprintf(mMenuText[SETTINGS_MENU_CPU_SPEED],"Cpu Speed:                  %d",mMenuOptions->cpuSpeed);
-			break;
-
-		case SETTINGS_MENU_SOUND_VOL:
-			sprintf(mMenuText[SETTINGS_MENU_SOUND_VOL],"Volume:                     %d",mMenuOptions->volume);
 			break;
 #endif
 		case SETTINGS_MENU_LOAD_GLOBAL_SETTINGS:
@@ -1101,14 +1108,9 @@ void SettingsMenuUpdateText(s32 menu_index)
 static
 void SettingsMenuUpdateTextAll(void)
 {
-
 	SettingsMenuUpdateText(VIDEO_MENU_SETTINGS);
+	SettingsMenuUpdateText(AUDIO_MENU_SETTINGS);
 //	SettingsMenuUpdateText(SETTINGS_MENU_CPU_SPEED);
-	SettingsMenuUpdateText(SETTINGS_MENU_SOUND_ON);
-	SettingsMenuUpdateText(SETTINGS_MENU_SOUND_STEREO);
-	SettingsMenuUpdateText(SETTINGS_MENU_SOUND_RATE);
-	SettingsMenuUpdateText(SETTINGS_MENU_SOUND_SYNC);
-//	SettingsMenuUpdateText(SETTINGS_MENU_SOUND_VOL);
 	SettingsMenuUpdateText(SETTINGS_MENU_LOAD_GLOBAL_SETTINGS);
 	SettingsMenuUpdateText(SETTINGS_MENU_SAVE_GLOBAL_SETTINGS);
 	SettingsMenuUpdateText(SETTINGS_MENU_LOAD_CURRENT_SETTINGS);
@@ -1117,6 +1119,15 @@ void SettingsMenuUpdateTextAll(void)
 	SettingsMenuUpdateText(SETTINGS_MENU_AUTO_SAVE_SRAM);
 	SettingsMenuUpdateText(SAVESTATE_MENU_SAVE_SRAM);
 	SettingsMenuUpdateText(MENU_CREDITS);
+}
+
+static
+void AudioSettingsMenuUpdateTextAll(void)
+{
+	AudioSettingsMenuUpdateText(AUDIO_SETTINGS_MENU_SOUND_ON);
+	AudioSettingsMenuUpdateText(AUDIO_SETTINGS_MENU_SOUND_STEREO);
+	AudioSettingsMenuUpdateText(AUDIO_SETTINGS_MENU_SOUND_RATE);
+	AudioSettingsMenuUpdateText(AUDIO_SETTINGS_MENU_SOUND_SYNC);
 }
 
 static
@@ -1286,12 +1297,131 @@ s32 VideoSettingsMenu(void)
 }
 
 static
-s32 SettingsMenu(void)
+s32 AudioSettingsMenu(void)
 {
-	s32 menuExit=0,menuCount=SETTINGS_MENU_COUNT,menufocus=0,menuSmooth=0;
+	s32 menuExit=0,menuCount=AUDIO_SETTINGS_MENU_COUNT,menufocus=0,menuSmooth=0;
 	s32 action=0;
 	s32 subaction=0;
 	u32 keys=0;
+
+	AudioSettingsMenuUpdateTextAll();
+
+	sal_InputIgnore();
+
+	while (!menuExit)
+	{
+		// Draw screen:
+		menuSmooth=menuSmooth*7+(menufocus<<8); menuSmooth>>=3;
+		RenderMenu("Audio Settings", menuCount,menuSmooth,menufocus);
+		sal_VideoFlip(1);
+
+		keys=sal_InputPollRepeat(0);
+
+		if (keys & INP_BUTTON_MENU_CANCEL)
+		{
+			while (keys)
+			{
+				// Draw screen:
+				menuSmooth=menuSmooth*7+(menufocus<<8); menuSmooth>>=3;
+				RenderMenu("Audio Settings", menuCount,menuSmooth,menufocus);
+				sal_VideoFlip(1);
+
+				keys=sal_InputPoll(0);
+			}
+
+			menuExit=1;
+		}
+		else if (keys & INP_BUTTON_MENU_SELECT)
+		{
+			while (keys)
+			{
+				// Draw screen:
+				menuSmooth=menuSmooth*7+(menufocus<<8); menuSmooth>>=3;
+				RenderMenu("Audio Settings", menuCount,menuSmooth,menufocus);
+				sal_VideoFlip(1);
+
+				keys=sal_InputPoll(0);
+			}
+
+		}
+		else if ((keys & (SAL_INPUT_LEFT | SAL_INPUT_RIGHT))
+		      && (keys & (SAL_INPUT_LEFT | SAL_INPUT_RIGHT)) != (SAL_INPUT_LEFT | SAL_INPUT_RIGHT))
+		{
+			switch(menufocus)
+			{
+				case AUDIO_SETTINGS_MENU_SOUND_ON:
+					mMenuOptions->soundEnabled ^= 1;
+					break;
+
+				case AUDIO_SETTINGS_MENU_SOUND_STEREO:
+					mMenuOptions->stereo ^= 1;
+					break;
+
+				case AUDIO_SETTINGS_MENU_SOUND_SYNC:
+					if (keys & SAL_INPUT_RIGHT) {
+						mMenuOptions->soundSync++;
+						if (mMenuOptions->soundSync > 2) mMenuOptions->soundSync = 0;
+					} else {
+						mMenuOptions->soundSync--;
+						if (mMenuOptions->soundSync > 2) mMenuOptions->soundSync = 2;
+					}
+					break;
+
+				case AUDIO_SETTINGS_MENU_SOUND_RATE:
+					if (keys & SAL_INPUT_RIGHT) {
+						mMenuOptions->soundRate = sal_AudioRateNext(mMenuOptions->soundRate);
+					} else {
+						mMenuOptions->soundRate = sal_AudioRatePrevious(mMenuOptions->soundRate);
+					}
+					break;
+
+#if 0
+				case SETTINGS_MENU_SOUND_VOL:
+					if (keys & SAL_INPUT_RIGHT)
+					{
+						mMenuOptions->volume+=1;
+						if (mMenuOptions->volume>31) mMenuOptions->volume=0;
+					}
+					else
+					{
+						mMenuOptions->volume-=1;
+						if (mMenuOptions->volume>31) mMenuOptions->volume=31;
+
+					}
+					SettingsMenuUpdateText(SETTINGS_MENU_SOUND_VOL);
+					break;
+#endif
+			}
+			AudioSettingsMenuUpdateText(menufocus);
+		}
+		else if (keys & SAL_INPUT_UP) {
+			menufocus--; // Up
+			if (menufocus < 0) {
+				menufocus = menuCount - 1;
+				menuSmooth = (menufocus << 8) - 1;
+			}
+		}
+		else if (keys & SAL_INPUT_DOWN) {
+			menufocus++; // Down
+			if (menufocus > menuCount - 1) {
+				menufocus = 0;
+				menuSmooth = (menufocus << 8) - 1;
+			}
+		}
+
+		usleep(10000);
+	}
+	sal_InputIgnore();
+	return action;
+}
+
+static
+s32 SettingsMenu(void)
+{
+	s32 menuExit = 0, menuCount = SETTINGS_MENU_COUNT, menufocus = 0, menuSmooth = 0;
+	s32 action = 0;
+	s32 subaction = 0;
+	u32 keys = 0;
 
 	SettingsMenuUpdateTextAll();
 
@@ -1338,6 +1468,10 @@ s32 SettingsMenu(void)
 					VideoSettingsMenu();
 					SettingsMenuUpdateTextAll();
 					break;
+				case AUDIO_MENU_SETTINGS:
+					AudioSettingsMenu();
+					SettingsMenuUpdateTextAll();
+					break;
 				case SETTINGS_MENU_LOAD_GLOBAL_SETTINGS:
 					LoadMenuOptions(mSystemDir, MENU_OPTIONS_FILENAME, MENU_OPTIONS_EXT, (char*)mMenuOptions, sizeof(struct MENU_OPTIONS), 1);
 					SettingsMenuUpdateTextAll();
@@ -1380,16 +1514,6 @@ s32 SettingsMenu(void)
 		{
 			switch(menufocus)
 			{
-				case SETTINGS_MENU_SOUND_ON:
-					mMenuOptions->soundEnabled^=1;
-					SettingsMenuUpdateText(SETTINGS_MENU_SOUND_ON);
-					break;
-
-				case SETTINGS_MENU_SOUND_STEREO:
-					mMenuOptions->stereo^=1;
-					SettingsMenuUpdateText(SETTINGS_MENU_SOUND_STEREO);
-					break;
-
 				case SETTINGS_MENU_AUTO_SAVE_SRAM:
 					mMenuOptions->autoSaveSram^=1;
 					SettingsMenuUpdateText(SETTINGS_MENU_AUTO_SAVE_SRAM);
@@ -1402,21 +1526,6 @@ s32 SettingsMenu(void)
 						S9xSaveSRAM(1);
 						usleep(1e6);
 					}
-					break;
-
-				case SETTINGS_MENU_SOUND_SYNC:
-					if (keys & SAL_INPUT_RIGHT)
-					{
-						mMenuOptions->soundSync = (mMenuOptions->soundSync + 1) % 3;
-					}
-					else
-					{
-						if (mMenuOptions->soundSync == 0)
-							mMenuOptions->soundSync = 2;
-						else
-							mMenuOptions->soundSync--;
-					}
-					SettingsMenuUpdateText(SETTINGS_MENU_SOUND_SYNC);
 					break;
 
 #if 0
@@ -1446,33 +1555,7 @@ s32 SettingsMenu(void)
 					}
 					SettingsMenuUpdateText(SETTINGS_MENU_CPU_SPEED);
 					break;
-				case SETTINGS_MENU_SOUND_VOL:
-					if (keys & SAL_INPUT_RIGHT)
-					{
-						mMenuOptions->volume+=1;
-						if(mMenuOptions->volume>31) mMenuOptions->volume=0;
-					}
-					else
-					{
-						mMenuOptions->volume-=1;
-						if(mMenuOptions->volume>31) mMenuOptions->volume=31;
-
-					}
-					SettingsMenuUpdateText(SETTINGS_MENU_SOUND_VOL);
-					break;
 #endif
-				case SETTINGS_MENU_SOUND_RATE:
-					if (keys & SAL_INPUT_RIGHT)
-					{
-						mMenuOptions->soundRate=sal_AudioRateNext(mMenuOptions->soundRate);
-					}
-					else
-					{
-						mMenuOptions->soundRate=sal_AudioRatePrevious(mMenuOptions->soundRate);
-					}
-					SettingsMenuUpdateText(SETTINGS_MENU_SOUND_RATE);
-					break;
-
 			}
 		}
 		else if ((keys & (SAL_INPUT_UP | SAL_INPUT_DOWN))
