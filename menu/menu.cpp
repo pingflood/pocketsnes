@@ -1056,6 +1056,9 @@ void SettingsMenuUpdateText(s32 menu_index)
 				case 3:
 					strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Video scaling          HARDWARE");
 					break;
+				case 4:
+					strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Video scaling              CROP");
+					break;
 			}
 
 		case SETTINGS_MENU_LOAD_GLOBAL_SETTINGS:
@@ -1373,12 +1376,12 @@ s32 SettingsMenu(void)
 					if (keys & SAL_INPUT_RIGHT)
 					{
 						mMenuOptions->fullScreen++;
-						if(mMenuOptions->fullScreen > 3) mMenuOptions->fullScreen = 0;
+						if(mMenuOptions->fullScreen > 4) mMenuOptions->fullScreen = 0;
 					}
 					else
 					{
 						mMenuOptions->fullScreen--;
-						if(mMenuOptions->fullScreen > 3) mMenuOptions->fullScreen = 3;
+						if(mMenuOptions->fullScreen > 4) mMenuOptions->fullScreen = 4;
 					}
 					SettingsMenuUpdateText(SETTINGS_MENU_FULLSCREEN);
 					break;

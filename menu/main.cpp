@@ -187,12 +187,20 @@ bool8_32 S9xDeinitUpdate (int Width, int Height, bool8_32)
 	{
 		case 0: /* No scaling */
 		// case 3: /* Hardware scaling */
+		case 4: /* Crop scaling */
 		{
 			u32 h = PAL ? SNES_HEIGHT_EXTENDED : SNES_HEIGHT;
 			u32 y, pitch = sal_VideoGetPitch();
-			u8 *src = (u8*) IntermediateScreen, *dst = (u8*) sal_VideoGetBuffer()
-				+ ((sal_VideoGetWidth() - SNES_WIDTH) / 2) * sizeof(u16)
-				+ ((sal_VideoGetHeight() - h) / 2) * pitch;
+			u8 *src = (u8*) IntermediateScreen, *dst = (u8*) sal_VideoGetBuffer();
+
+			if (mMenuOptions.fullScreen == 4) { // crop; use ipu to center
+				src += 23 * SNES_WIDTH * sizeof(u16);
+				h -= 32;
+			} else { // original; center on screen
+				dst += ((sal_VideoGetWidth() - SNES_WIDTH) / 2) * sizeof(u16)
+				     + ((sal_VideoGetHeight() - h) / 2) * pitch;
+			}
+
 			for (y = 0; y < h; y++)
 			{
 				memmove(dst, src, SNES_WIDTH * sizeof(u16));

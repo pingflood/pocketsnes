@@ -207,11 +207,17 @@ void sal_VideoEnterGame(u32 fullscreenOption, u32 pal, u32 refreshRate)
 	/* Copied from C++ headers which we can't include in C */
 	unsigned int Width = 256 /* SNES_WIDTH */,
 	             Height = pal ? 239 /* SNES_HEIGHT_EXTENDED */ : 224 /* SNES_HEIGHT */;
+
+	if (fullscreenOption == 4) // crop
+	{
+		Height -= 32;
+	} else
 	if (fullscreenOption != 3)
 	{
 		Width = SAL_SCREEN_WIDTH;
 		Height = SAL_SCREEN_HEIGHT;
 	}
+
 	if (SDL_MUSTLOCK(mScreen)) SDL_UnlockSurface(mScreen);
 	mScreen = SDL_SetVideoMode(Width, Height, mBpp, SDL_HWSURFACE |
 #ifdef SDL_TRIPLEBUF
