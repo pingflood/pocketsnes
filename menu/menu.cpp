@@ -40,6 +40,8 @@ static char errormsg[MAX_DISPLAY_CHARS];
 extern volatile bool argv_rom_loaded;
 extern "C" void S9xSaveSRAM(int showWarning);
 
+u8 menuGameSettings=0, menuGlobalSettings=0;
+
 void DefaultMenuOptions(void)
 {
 	mMenuOptions->frameSkip = 0;   //auto
@@ -1037,6 +1039,7 @@ void AudioSettingsMenuUpdateText(s32 menu_index)
 					strcpy(mMenuText[menu_index], "Prefer fluid              Audio");
 					break;
 			}
+			break;
 
 		case AUDIO_SETTINGS_MENU_SOUND_ON:
 			sprintf(mMenuText[menu_index], "Sound                       %s", mMenuOptions->soundEnabled ? " ON" : "OFF");
@@ -1067,14 +1070,8 @@ void SettingsMenuUpdateText(s32 menu_index)
 			strcpy(mMenuText[AUDIO_MENU_SETTINGS],"Audio Settings");
 			break;
 
-		case SAVESTATE_MENU_SAVE_SRAM:
-			strcpy(mMenuText[SAVESTATE_MENU_SAVE_SRAM],"Save SRAM now");
-			break;
-
 		case SETTINGS_MENU_AUTO_SAVE_SRAM:
-			sprintf(mMenuText[SETTINGS_MENU_AUTO_SAVE_SRAM],
-						"Save SRAM on change         %s",
-						mMenuOptions->autoSaveSram ? " ON" : "OFF");
+			sprintf(mMenuText[SETTINGS_MENU_AUTO_SAVE_SRAM], "Save SRAM                %s", mMenuOptions->autoSaveSram ? "  AUTO" : "MANUAL");
 			break;
 
 #if 0
@@ -1082,24 +1079,22 @@ void SettingsMenuUpdateText(s32 menu_index)
 			sprintf(mMenuText[SETTINGS_MENU_CPU_SPEED],"Cpu Speed:                  %d",mMenuOptions->cpuSpeed);
 			break;
 #endif
-		case SETTINGS_MENU_LOAD_GLOBAL_SETTINGS:
-			strcpy(mMenuText[SETTINGS_MENU_LOAD_GLOBAL_SETTINGS],"Load global settings");
-			break;
-
 		case SETTINGS_MENU_SAVE_GLOBAL_SETTINGS:
-			strcpy(mMenuText[SETTINGS_MENU_SAVE_GLOBAL_SETTINGS],"Save global settings");
-			break;
-
-		case SETTINGS_MENU_LOAD_CURRENT_SETTINGS:
-			strcpy(mMenuText[SETTINGS_MENU_LOAD_CURRENT_SETTINGS],"Load game settings");
+			sprintf(mMenuText[SETTINGS_MENU_SAVE_GLOBAL_SETTINGS], "Global settings            %s", menuGlobalSettings ? "LOAD" : "SAVE");
 			break;
 
 		case SETTINGS_MENU_SAVE_CURRENT_SETTINGS:
-			strcpy(mMenuText[SETTINGS_MENU_SAVE_CURRENT_SETTINGS],"Save game settings");
-			break;
-
-		case SETTINGS_MENU_DELETE_CURRENT_SETTINGS:
-			strcpy(mMenuText[SETTINGS_MENU_DELETE_CURRENT_SETTINGS],"Delete game settings");
+			switch (menuGameSettings) {
+				case 1:
+					strcpy(mMenuText[SETTINGS_MENU_SAVE_CURRENT_SETTINGS],"Game settings              LOAD");
+					break;
+				case 2:
+					strcpy(mMenuText[SETTINGS_MENU_SAVE_CURRENT_SETTINGS],"Game settings            DELETE");
+					break;
+				default:
+					strcpy(mMenuText[SETTINGS_MENU_SAVE_CURRENT_SETTINGS],"Game settings              SAVE");
+					break;
+			}
 			break;
 
 		case MENU_CREDITS:
@@ -1114,13 +1109,9 @@ void SettingsMenuUpdateTextAll(void)
 	SettingsMenuUpdateText(VIDEO_MENU_SETTINGS);
 	SettingsMenuUpdateText(AUDIO_MENU_SETTINGS);
 //	SettingsMenuUpdateText(SETTINGS_MENU_CPU_SPEED);
-	SettingsMenuUpdateText(SETTINGS_MENU_LOAD_GLOBAL_SETTINGS);
 	SettingsMenuUpdateText(SETTINGS_MENU_SAVE_GLOBAL_SETTINGS);
-	SettingsMenuUpdateText(SETTINGS_MENU_LOAD_CURRENT_SETTINGS);
 	SettingsMenuUpdateText(SETTINGS_MENU_SAVE_CURRENT_SETTINGS);
-	SettingsMenuUpdateText(SETTINGS_MENU_DELETE_CURRENT_SETTINGS);
 	SettingsMenuUpdateText(SETTINGS_MENU_AUTO_SAVE_SRAM);
-	SettingsMenuUpdateText(SAVESTATE_MENU_SAVE_SRAM);
 	SettingsMenuUpdateText(MENU_CREDITS);
 }
 
@@ -1430,11 +1421,40 @@ s32 SettingsMenu(void)
 
 	sal_InputIgnore();
 
-	while (!menuExit)
-	{
+	while (!menuExit) {
 		// Draw screen:
-		menuSmooth=menuSmooth*7+(menufocus<<8); menuSmooth>>=3;
-		RenderMenu("Settings", menuCount,menuSmooth,menufocus);
+		menuSmooth = menuSmooth * 7 + (menufocus << 8); menuSmooth >>= 3;
+		RenderMenu("Settings", menuCount, menuSmooth, menufocus);
+
+		switch (menufocus) {
+			case SETTINGS_MENU_AUTO_SAVE_SRAM:
+				sal_VideoPrint(60, 180, "Press A to save now", SAL_RGB(31, 31, 31));
+				break;
+
+			case SETTINGS_MENU_SAVE_CURRENT_SETTINGS:
+				if (mRomName[0] != 0) {
+					switch (menuGameSettings) {
+						case 1:
+							sal_VideoPrint(70, 180, "Press A to load", SAL_RGB(31, 31, 31));
+							break;
+						case 2:
+							sal_VideoPrint(66, 180, "Press A to delete", SAL_RGB(31, 31, 31));
+							break;
+						default:
+							sal_VideoPrint(70, 180, "Press A to save", SAL_RGB(31, 31, 31));
+					}
+				}
+				break;
+
+			case SETTINGS_MENU_SAVE_GLOBAL_SETTINGS:
+				if (menuGlobalSettings) {
+					sal_VideoPrint(70, 180, "Press A to load", SAL_RGB(31, 31, 31));
+				} else {
+					sal_VideoPrint(70, 180, "Press A to save", SAL_RGB(31, 31, 31));
+				}
+				break;
+		}
+
 		sal_VideoFlip(1);
 
 		keys=sal_InputPollRepeat(0);
@@ -1475,59 +1495,60 @@ s32 SettingsMenu(void)
 					AudioSettingsMenu();
 					SettingsMenuUpdateTextAll();
 					break;
-				case SETTINGS_MENU_LOAD_GLOBAL_SETTINGS:
-					LoadMenuOptions(mSystemDir, MENU_OPTIONS_FILENAME, MENU_OPTIONS_EXT, (char*)mMenuOptions, sizeof(struct MENU_OPTIONS), 1);
-					SettingsMenuUpdateTextAll();
-					usleep(5e5);
+				case SETTINGS_MENU_AUTO_SAVE_SRAM:
+					if (mRomName[0] != 0) {
+						MenuMessageBox("", "", "Saving SRAM...", MENU_MESSAGE_BOX_MODE_MSG);
+						S9xSaveSRAM(1);
+						usleep(3e6);
+					}
 					break;
 				case SETTINGS_MENU_SAVE_GLOBAL_SETTINGS:
-					SaveMenuOptions(mSystemDir, MENU_OPTIONS_FILENAME, MENU_OPTIONS_EXT, (char*)mMenuOptions, sizeof(struct MENU_OPTIONS), 1);
-					usleep(5e5);
-					break;
-				case SETTINGS_MENU_LOAD_CURRENT_SETTINGS:
-					if(mRomName[0]!=0)
-					{
-						LoadMenuOptions(mSystemDir, mRomName, MENU_OPTIONS_EXT, (char*)mMenuOptions, sizeof(struct MENU_OPTIONS), 1);
-						SettingsMenuUpdateTextAll();
-						usleep(5e5);
+					if (menuGlobalSettings) {
+						LoadMenuOptions(mSystemDir, MENU_OPTIONS_FILENAME, MENU_OPTIONS_EXT, (char*)mMenuOptions, sizeof(struct MENU_OPTIONS), 1);
+					} else {
+						SaveMenuOptions(mSystemDir, MENU_OPTIONS_FILENAME, MENU_OPTIONS_EXT, (char*)mMenuOptions, sizeof(struct MENU_OPTIONS), 1);
 					}
+					usleep(3e5);
 					break;
 				case SETTINGS_MENU_SAVE_CURRENT_SETTINGS:
-					if(mRomName[0]!=0)
-					{
-						SaveMenuOptions(mSystemDir, mRomName, MENU_OPTIONS_EXT, (char*)mMenuOptions, sizeof(struct MENU_OPTIONS), 1);
-						usleep(5e5);
-					}
-					break;
-				case SETTINGS_MENU_DELETE_CURRENT_SETTINGS:
-					if(mRomName[0]!=0)
-					{
-						DeleteMenuOptions(mSystemDir, mRomName, MENU_OPTIONS_EXT, 1);
-						usleep(5e5);
+					if (mRomName[0] != 0) {
+						switch (menuGameSettings) {
+							case 1:
+								LoadMenuOptions(mSystemDir, mRomName, MENU_OPTIONS_EXT, (char*)mMenuOptions, sizeof(struct MENU_OPTIONS), 1);
+								break;
+							case 2:
+								DeleteMenuOptions(mSystemDir, mRomName, MENU_OPTIONS_EXT, 1);
+								break;
+							default:
+								SaveMenuOptions(mSystemDir, mRomName, MENU_OPTIONS_EXT, (char*)mMenuOptions, sizeof(struct MENU_OPTIONS), 1);
+						}
+						usleep(3e5);
+						SettingsMenuUpdateTextAll();
 					}
 					break;
 				case MENU_CREDITS:
 					ShowCredits();
-					MainMenuUpdateTextAll();
+					SettingsMenuUpdateTextAll();
 					break;
 			}
 		}
-		else if ((keys & (SAL_INPUT_LEFT | SAL_INPUT_RIGHT))
-		      && (keys & (SAL_INPUT_LEFT | SAL_INPUT_RIGHT)) != (SAL_INPUT_LEFT | SAL_INPUT_RIGHT))
-		{
-			switch(menufocus)
-			{
+		else if (keys & (SAL_INPUT_LEFT | SAL_INPUT_RIGHT)) {
+			switch (menufocus) {
 				case SETTINGS_MENU_AUTO_SAVE_SRAM:
-					mMenuOptions->autoSaveSram^=1;
-					SettingsMenuUpdateText(SETTINGS_MENU_AUTO_SAVE_SRAM);
+					mMenuOptions->autoSaveSram ^= 1;
 					break;
 
-				case SAVESTATE_MENU_SAVE_SRAM:
-					if(mRomName[0]!=0)
-					{
-						MenuMessageBox("","","Saving SRAM...",MENU_MESSAGE_BOX_MODE_MSG);
-						S9xSaveSRAM(1);
-						usleep(1e6);
+				case SETTINGS_MENU_SAVE_GLOBAL_SETTINGS:
+					menuGlobalSettings = menuGlobalSettings > 0 ? 0 : 1;
+					break;
+
+				case SETTINGS_MENU_SAVE_CURRENT_SETTINGS:
+					if (keys & SAL_INPUT_RIGHT) {
+						menuGameSettings++;
+						if (menuGameSettings > 2) menuGameSettings = 0;
+					} else {
+						menuGameSettings--;
+						if (menuGameSettings > 2) menuGameSettings = 2;
 					}
 					break;
 
@@ -1560,6 +1581,7 @@ s32 SettingsMenu(void)
 					break;
 #endif
 			}
+			SettingsMenuUpdateText(menufocus);
 		}
 		else if ((keys & (SAL_INPUT_UP | SAL_INPUT_DOWN))
 		      && (keys & (SAL_INPUT_UP | SAL_INPUT_DOWN)) != (SAL_INPUT_UP | SAL_INPUT_DOWN))
