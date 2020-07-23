@@ -718,8 +718,7 @@ static s32 SaveStateSelect(s32 mode)
 			if(MenuMessageBox("Are you sure you want to delete","this save?","",MENU_MESSAGE_BOX_MODE_YESNO)==SAL_OK) action=13;  //delete slot with no preview
 		}
 
-		PrintTitle("Save States");
-		sal_VideoPrint(8,4,"Choose a slot",SAL_RGB(31,8,8));
+		PrintTitle("Choose a slot");
 
 		if (saveno == -1) {
 			if (action != 10 && action != 0) {
