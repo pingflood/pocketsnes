@@ -966,12 +966,70 @@ void MainMenuUpdateText(s32 menu_index)
 }
 
 static
+void VideoSettingsMenuUpdateText(s32 menu_index)
+{
+	switch(menu_index)
+	{
+		case VIDEO_SETTINGS_MENU_FRAMESKIP:
+			switch(mMenuOptions->frameSkip)
+			{
+				case 0:
+					strcpy(mMenuText[VIDEO_SETTINGS_MENU_FRAMESKIP],
+						"Frameskip                  AUTO");
+					break;
+				default:
+					sprintf(mMenuText[VIDEO_SETTINGS_MENU_FRAMESKIP],
+						"Frameskip                     %1d",mMenuOptions->frameSkip-1);
+					break;
+			}
+			break;
+
+		case VIDEO_SETTINGS_MENU_FPS:
+			switch(mMenuOptions->showFps)
+			{
+				case 0:
+					strcpy(mMenuText[VIDEO_SETTINGS_MENU_FPS],"Show FPS                    OFF");
+					break;
+				case 1:
+					strcpy(mMenuText[VIDEO_SETTINGS_MENU_FPS],"Show FPS                     ON");
+					break;
+			}
+			break;
+
+		case VIDEO_SETTINGS_MENU_FULLSCREEN:
+			switch(mMenuOptions->fullScreen)
+			{
+				case 0:
+					strcpy(mMenuText[VIDEO_SETTINGS_MENU_FULLSCREEN],"Video scaling          ORIGINAL");
+					break;
+				case 1:
+					strcpy(mMenuText[VIDEO_SETTINGS_MENU_FULLSCREEN],"Video scaling              FAST");
+					break;
+				case 2:
+					strcpy(mMenuText[VIDEO_SETTINGS_MENU_FULLSCREEN],"Video scaling            SMOOTH");
+					break;
+				case 3:
+					strcpy(mMenuText[VIDEO_SETTINGS_MENU_FULLSCREEN],"Video scaling          HARDWARE");
+					break;
+				case 4:
+					strcpy(mMenuText[VIDEO_SETTINGS_MENU_FULLSCREEN],"Video scaling              CROP");
+					break;
+			}
+	}
+}
+
+static
 void SettingsMenuUpdateText(s32 menu_index)
 {
 	switch(menu_index)
 	{
+		case VIDEO_MENU_SETTINGS:
+			strcpy(mMenuText[VIDEO_MENU_SETTINGS],"Video Settings");
+			break;
+
 		case SAVESTATE_MENU_SAVE_SRAM:
 			strcpy(mMenuText[SAVESTATE_MENU_SAVE_SRAM],"Save SRAM now");
+			break;
 
 		case SETTINGS_MENU_AUTO_SAVE_SRAM:
 			sprintf(mMenuText[SETTINGS_MENU_AUTO_SAVE_SRAM],
@@ -1014,53 +1072,6 @@ void SettingsMenuUpdateText(s32 menu_index)
 			sprintf(mMenuText[SETTINGS_MENU_SOUND_VOL],"Volume:                     %d",mMenuOptions->volume);
 			break;
 #endif
-
-		case SETTINGS_MENU_FRAMESKIP:
-			switch(mMenuOptions->frameSkip)
-			{
-				case 0:
-					strcpy(mMenuText[SETTINGS_MENU_FRAMESKIP],
-						"Frameskip                  AUTO");
-					break;
-				default:
-					sprintf(mMenuText[SETTINGS_MENU_FRAMESKIP],
-						"Frameskip                     %1d",mMenuOptions->frameSkip-1);
-					break;
-			}
-			break;
-
-		case SETTINGS_MENU_FPS:
-			switch(mMenuOptions->showFps)
-			{
-				case 0:
-					strcpy(mMenuText[SETTINGS_MENU_FPS],"Show FPS                    OFF");
-					break;
-				case 1:
-					strcpy(mMenuText[SETTINGS_MENU_FPS],"Show FPS                     ON");
-					break;
-			}
-			break;
-
-		case SETTINGS_MENU_FULLSCREEN:
-			switch(mMenuOptions->fullScreen)
-			{
-				case 0:
-					strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Video scaling          ORIGINAL");
-					break;
-				case 1:
-					strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Video scaling              FAST");
-					break;
-				case 2:
-					strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Video scaling            SMOOTH");
-					break;
-				case 3:
-					strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Video scaling          HARDWARE");
-					break;
-				case 4:
-					strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Video scaling              CROP");
-					break;
-			}
-
 		case SETTINGS_MENU_LOAD_GLOBAL_SETTINGS:
 			strcpy(mMenuText[SETTINGS_MENU_LOAD_GLOBAL_SETTINGS],"Load global settings");
 			break;
@@ -1090,15 +1101,14 @@ void SettingsMenuUpdateText(s32 menu_index)
 static
 void SettingsMenuUpdateTextAll(void)
 {
+
+	SettingsMenuUpdateText(VIDEO_MENU_SETTINGS);
 //	SettingsMenuUpdateText(SETTINGS_MENU_CPU_SPEED);
 	SettingsMenuUpdateText(SETTINGS_MENU_SOUND_ON);
 	SettingsMenuUpdateText(SETTINGS_MENU_SOUND_STEREO);
 	SettingsMenuUpdateText(SETTINGS_MENU_SOUND_RATE);
-//	SettingsMenuUpdateText(SETTINGS_MENU_SOUND_VOL);
-	SettingsMenuUpdateText(SETTINGS_MENU_FRAMESKIP);
-	SettingsMenuUpdateText(SETTINGS_MENU_FPS);
 	SettingsMenuUpdateText(SETTINGS_MENU_SOUND_SYNC);
-	SettingsMenuUpdateText(SETTINGS_MENU_FULLSCREEN);
+//	SettingsMenuUpdateText(SETTINGS_MENU_SOUND_VOL);
 	SettingsMenuUpdateText(SETTINGS_MENU_LOAD_GLOBAL_SETTINGS);
 	SettingsMenuUpdateText(SETTINGS_MENU_SAVE_GLOBAL_SETTINGS);
 	SettingsMenuUpdateText(SETTINGS_MENU_LOAD_CURRENT_SETTINGS);
@@ -1107,6 +1117,14 @@ void SettingsMenuUpdateTextAll(void)
 	SettingsMenuUpdateText(SETTINGS_MENU_AUTO_SAVE_SRAM);
 	SettingsMenuUpdateText(SAVESTATE_MENU_SAVE_SRAM);
 	SettingsMenuUpdateText(MENU_CREDITS);
+}
+
+static
+void VideoSettingsMenuUpdateTextAll(void)
+{
+	VideoSettingsMenuUpdateText(VIDEO_SETTINGS_MENU_FRAMESKIP);
+	VideoSettingsMenuUpdateText(VIDEO_SETTINGS_MENU_FPS);
+	VideoSettingsMenuUpdateText(VIDEO_SETTINGS_MENU_FULLSCREEN);
 }
 
 static
@@ -1168,6 +1186,104 @@ void MenuInit(const char *systemDir, struct MENU_OPTIONS *menuOptions)
 	MenuReloadOptions();
 }
 
+static
+s32 VideoSettingsMenu(void)
+{
+	s32 menuExit = 0, menuCount = VIDEO_SETTINGS_MENU_COUNT, menufocus = 0, menuSmooth = 0;
+	s32 action = 0;
+	s32 subaction = 0;
+	u32 keys = 0;
+
+	VideoSettingsMenuUpdateTextAll();
+
+	sal_InputIgnore();
+
+	while (!menuExit)
+	{
+		// Draw screen:
+		menuSmooth=menuSmooth*7+(menufocus<<8); menuSmooth>>=3;
+		RenderMenu("Video Settings", menuCount,menuSmooth,menufocus);
+		sal_VideoFlip(1);
+
+		keys=sal_InputPollRepeat(0);
+
+		if (keys & INP_BUTTON_MENU_CANCEL)
+		{
+			while (keys)
+			{
+				// Draw screen:
+				menuSmooth=menuSmooth*7+(menufocus<<8); menuSmooth>>=3;
+				RenderMenu("Video Settings", menuCount,menuSmooth,menufocus);
+				sal_VideoFlip(1);
+
+				keys=sal_InputPoll(0);
+			}
+
+			menuExit=1;
+		}
+		else if (keys & INP_BUTTON_MENU_SELECT)
+		{
+			while (keys)
+			{
+				// Draw screen:
+				menuSmooth=menuSmooth*7+(menufocus<<8); menuSmooth>>=3;
+				RenderMenu("Video Settings", menuCount,menuSmooth,menufocus);
+				sal_VideoFlip(1);
+
+				keys=sal_InputPoll(0);
+			}
+
+		}
+		else if ((keys & (SAL_INPUT_LEFT | SAL_INPUT_RIGHT))
+		      && (keys & (SAL_INPUT_LEFT | SAL_INPUT_RIGHT)) != (SAL_INPUT_LEFT | SAL_INPUT_RIGHT))
+		{
+			switch(menufocus)
+			{
+				case VIDEO_SETTINGS_MENU_FRAMESKIP:
+					if (keys & SAL_INPUT_RIGHT) {
+						mMenuOptions->frameSkip++;
+						if (mMenuOptions->frameSkip > 6) mMenuOptions->frameSkip = 0;
+					} else {
+						mMenuOptions->frameSkip--;
+						if (mMenuOptions->frameSkip > 6) mMenuOptions->frameSkip = 6;
+					}
+					break;
+
+				case VIDEO_SETTINGS_MENU_FPS:
+					mMenuOptions->showFps ^= 1;
+					break;
+
+				case VIDEO_SETTINGS_MENU_FULLSCREEN:
+					if (keys & SAL_INPUT_RIGHT) {
+						mMenuOptions->fullScreen++;
+						if (mMenuOptions->fullScreen > 4) mMenuOptions->fullScreen = 0;
+					} else {
+						mMenuOptions->fullScreen--;
+						if (mMenuOptions->fullScreen > 4) mMenuOptions->fullScreen = 4;
+					}
+					break;
+			}
+			VideoSettingsMenuUpdateText(menufocus);
+		}
+		else if (keys & SAL_INPUT_UP) {
+			menufocus--; // Up
+			if (menufocus < 0) {
+				menufocus = menuCount - 1;
+				menuSmooth = (menufocus << 8) - 1;
+			}
+		}
+		else if (keys & SAL_INPUT_DOWN) {
+			menufocus++; // Down
+			if (menufocus > menuCount - 1) {
+				menufocus = 0;
+				menuSmooth = (menufocus << 8) - 1;
+			}
+		}
+		usleep(10000);
+	}
+	sal_InputIgnore();
+	return action;
+}
 
 static
 s32 SettingsMenu(void)
@@ -1218,6 +1334,10 @@ s32 SettingsMenu(void)
 
 			switch(menufocus)
 			{
+				case VIDEO_MENU_SETTINGS:
+					VideoSettingsMenu();
+					SettingsMenuUpdateTextAll();
+					break;
 				case SETTINGS_MENU_LOAD_GLOBAL_SETTINGS:
 					LoadMenuOptions(mSystemDir, MENU_OPTIONS_FILENAME, MENU_OPTIONS_EXT, (char*)mMenuOptions, sizeof(struct MENU_OPTIONS), 1);
 					SettingsMenuUpdateTextAll();
@@ -1353,38 +1473,6 @@ s32 SettingsMenu(void)
 					SettingsMenuUpdateText(SETTINGS_MENU_SOUND_RATE);
 					break;
 
-				case SETTINGS_MENU_FRAMESKIP:
-					if (keys & SAL_INPUT_RIGHT)
-					{
-						mMenuOptions->frameSkip++;
-						if(mMenuOptions->frameSkip>6) mMenuOptions->frameSkip=0;
-					}
-					else
-					{
-						mMenuOptions->frameSkip--;
-						if(mMenuOptions->frameSkip>6) mMenuOptions->frameSkip=6;
-					}
-					SettingsMenuUpdateText(SETTINGS_MENU_FRAMESKIP);
-					break;
-
-				case SETTINGS_MENU_FPS:
-					mMenuOptions->showFps^=1;
-					SettingsMenuUpdateText(SETTINGS_MENU_FPS);
-					break;
-
-				case SETTINGS_MENU_FULLSCREEN:
-					if (keys & SAL_INPUT_RIGHT)
-					{
-						mMenuOptions->fullScreen++;
-						if(mMenuOptions->fullScreen > 4) mMenuOptions->fullScreen = 0;
-					}
-					else
-					{
-						mMenuOptions->fullScreen--;
-						if(mMenuOptions->fullScreen > 4) mMenuOptions->fullScreen = 4;
-					}
-					SettingsMenuUpdateText(SETTINGS_MENU_FULLSCREEN);
-					break;
 			}
 		}
 		else if ((keys & (SAL_INPUT_UP | SAL_INPUT_DOWN))
