@@ -495,39 +495,27 @@ s32 FileSelect()
 			action = 0;
 			menuExit = 1;
 		}
-		else if ((keys & (SAL_INPUT_UP | SAL_INPUT_DOWN))
-		      && (keys & (SAL_INPUT_UP | SAL_INPUT_DOWN)) != (SAL_INPUT_UP | SAL_INPUT_DOWN))
-		{
-			if (keys & SAL_INPUT_UP)
-				focus--; // Up
-			else if (keys & SAL_INPUT_DOWN)
-				focus++; // Down
+		else if (keys & SAL_INPUT_UP) {
+			focus--; // Up
 		}
-		else if ((keys & (SAL_INPUT_LEFT | SAL_INPUT_RIGHT))
-		      && (keys & (SAL_INPUT_LEFT | SAL_INPUT_RIGHT)) != (SAL_INPUT_LEFT | SAL_INPUT_RIGHT))
-		{
-			if (keys & SAL_INPUT_LEFT)
-				focus-=12;
-			else if (keys & SAL_INPUT_RIGHT)
-				focus+=12;
-
-			if (focus>mRomCount-1)
-				focus=mRomCount-1;
-			else if (focus<0)
-				focus=0;
-
-			smooth=(focus<<8)-1;
+		else if (keys & SAL_INPUT_DOWN) {
+			focus++; // Down
+		}
+		else if (keys & SAL_INPUT_LEFT) {
+			focus -= 12;
+		}
+		else if (keys & SAL_INPUT_RIGHT) {
+			focus += 12;
 		}
 
-		if (focus>mRomCount-1)
-		{
-			focus=0;
-			smooth=(focus<<8)-1;
+		if (focus > mRomCount - 1) {
+			focus = 0;
+			smooth = (focus << 8) - 1;
 		}
-		else if (focus<0)
+		else if (focus < 0)
 		{
-			focus=mRomCount-1;
-			smooth=(focus<<8)-1;
+			focus = mRomCount - 1;
+			smooth = (focus << 8) - 1;
 		}
 
 		// Draw screen:
@@ -700,30 +688,41 @@ static s32 SaveStateSelect(s32 mode)
 	ScanSaveStates(mRomName);
 	sal_InputIgnore();
 
-	while (action!=0&&action!=100)
-	{
-		keys=sal_InputPollRepeat(0);
+	while (action != 0 && action != 100) {
+		keys = sal_InputPollRepeat(0);
 
-		if(keys&SAL_INPUT_UP || keys&SAL_INPUT_LEFT) {saveno--; action=1;}
-		if(keys&SAL_INPUT_DOWN || keys&SAL_INPUT_RIGHT) {saveno++; action=1;}
-		if(saveno<0) saveno=9;
-		if(saveno>9) saveno=0;
-
-		if(keys&INP_BUTTON_MENU_CANCEL) action=0; // exit
-		else if((keys&INP_BUTTON_MENU_SELECT)&&(saveno==-1)) action=0; // exit
-		else if((keys&INP_BUTTON_MENU_SELECT)&&(mode==0)&&((action==2)||(action==5))) action=6;  // pre-save mode
-		else if((keys&INP_BUTTON_MENU_SELECT)&&(mode==1)&&(action==5)) action=8;  // pre-load mode
-		else if((keys&INP_BUTTON_MENU_SELECT)&&(mode==2)&&(action==5)
-		|| (keys&SAL_INPUT_X)&&(mode==0))
-		{
-			if(MenuMessageBox("Are you sure you want to delete","this save?","",MENU_MESSAGE_BOX_MODE_YESNO)==SAL_OK) action=13;  //delete slot with no preview
+		if (keys & (SAL_INPUT_UP | SAL_INPUT_LEFT)) {
+			saveno--;
+			if (saveno < 0) saveno = 9;
+			action = 1;
 		}
-		else if((keys&INP_BUTTON_MENU_PREVIEW_SAVESTATE)&&(action==12)) action=3;  // preview slot mode
-		else if((keys&INP_BUTTON_MENU_SELECT)&&(mode==1)&&(action==12)) action=8;  //load slot with no preview
-		else if((keys&INP_BUTTON_MENU_SELECT)&&(mode==0)&&(action==12)) action=6;  //save slot with no preview
-		else if((keys&INP_BUTTON_MENU_SELECT)&&(mode==2)&&(action==12))
-		{
-			if(MenuMessageBox("Are you sure you want to delete","this save?","",MENU_MESSAGE_BOX_MODE_YESNO)==SAL_OK) action=13;  //delete slot with no preview
+		else if (keys & (SAL_INPUT_DOWN | SAL_INPUT_RIGHT)) {
+			saveno++;
+			if (saveno > 9) saveno = 0;
+			action = 1;
+		}
+
+		if (keys & INP_BUTTON_MENU_CANCEL) {
+			action = 0; // exit
+		}
+		else if ((keys & INP_BUTTON_MENU_PREVIEW_SAVESTATE) && (action == 12)) {
+			action = 3;  // preview slot mode
+		}
+		else if (keys & INP_BUTTON_MENU_SELECT) {
+			if (saveno == -1) {
+				action = 0; // exit
+			}
+			else if ((mode == 0) && ((action == 2) || (action == 5) || (action == 12))) {
+				action = 6;  // pre-save mode
+			}
+			else if ((mode == 1) && ((action == 5) || (action == 12))) {
+				action = 8;  // pre-load mode
+			}
+			else if (((mode == 2) && ((action == 5) || (action == 12))) || ((keys & SAL_INPUT_X) && (mode == 0))) {
+				if (MenuMessageBox("Are you sure you want to delete", "this save?", "", MENU_MESSAGE_BOX_MODE_YESNO) == SAL_OK) {
+					action = 13;  //delete slot with no preview
+				}
+			}
 		}
 
 		PrintTitle("Choose a slot");
@@ -751,18 +750,27 @@ static s32 SaveStateSelect(s32 mode)
 			case 4:
 				sal_VideoPrint(59, 145 - 36, "Previewing failed", SAL_RGB(31, 8, 8));
 				snprintf(errormsg, sizeof(errormsg), "%s",strerror(errno));
-				sal_VideoPrint((320-strlen(errormsg)*8)/2,145-20,errormsg,SAL_RGB(31,8,8));
-				sal_VideoDrawRect(0, 186, 262, 16, SAL_RGB(22,0,0));
-				if(mode==0) sal_VideoPrint((262-(strlen(MENU_TEXT_DELETE_SAVESTATE)<<3))>>1,190,MENU_TEXT_DELETE_SAVESTATE,SAL_RGB(31,31,31));
+				sal_VideoPrint((320 - strlen(errormsg) * 8) / 2, 145 - 20, errormsg, SAL_RGB(31, 8, 8));
+				sal_VideoDrawRect(0, 186, 262, 16, SAL_RGB(22, 0, 0));
+				if (mode == 0) {
+					sal_VideoPrint((262 - (strlen(MENU_TEXT_DELETE_SAVESTATE) << 3)) >> 1, 190, MENU_TEXT_DELETE_SAVESTATE, SAL_RGB(31, 31, 31));
+				}
 				break;
-			case 5:
-			{
+			case 5: {
 				u32 DestWidth = 205, DestHeight = 154;
-				sal_VideoBitmapScale(0, 0, SNES_WIDTH, SNES_HEIGHT, DestWidth, DestHeight, SAL_SCREEN_WIDTH - DestWidth, &mTempFb[0], (u16*)sal_VideoGetBuffer()+(SAL_SCREEN_WIDTH*(((202 + 16) - DestHeight)/2))+((262 - DestWidth)/2));
-				sal_VideoDrawRect(0, 186, 262, 16, SAL_RGB(22,0,0));
-				if(mode==1) sal_VideoPrint((262-(strlen(MENU_TEXT_LOAD_SAVESTATE)<<3))>>1,190,MENU_TEXT_LOAD_SAVESTATE,SAL_RGB(31,31,31));
-				else if(mode==0) sal_VideoPrint((262-(strlen(MENU_TEXT_OVERWRITE_SAVESTATE)<<3))>>1,190,MENU_TEXT_OVERWRITE_SAVESTATE,SAL_RGB(31,31,31));
-				else if(mode==2) sal_VideoPrint((262-(strlen(MENU_TEXT_DELETE_SAVESTATE)<<3))>>1,190,MENU_TEXT_DELETE_SAVESTATE,SAL_RGB(31,31,31));
+				sal_VideoBitmapScale(0, 0, SNES_WIDTH, SNES_HEIGHT, DestWidth, DestHeight, SAL_SCREEN_WIDTH - DestWidth, &mTempFb[0], (u16*)sal_VideoGetBuffer() + (SAL_SCREEN_WIDTH * (((202 + 16) - DestHeight) / 2)) + ((262 - DestWidth) / 2));
+				sal_VideoDrawRect(0, 186, 262, 16, SAL_RGB(22, 0, 0));
+				switch (mode) {
+					case 1:
+						sal_VideoPrint((262 - (strlen(MENU_TEXT_LOAD_SAVESTATE) << 3)) >> 1, 190, MENU_TEXT_LOAD_SAVESTATE, SAL_RGB(31, 31, 31));
+						break;
+					case 2:
+						sal_VideoPrint((262 - (strlen(MENU_TEXT_DELETE_SAVESTATE) << 3)) >> 1, 190, MENU_TEXT_DELETE_SAVESTATE, SAL_RGB(31, 31, 31));
+						break;
+					default:
+						sal_VideoPrint((262 - (strlen(MENU_TEXT_OVERWRITE_SAVESTATE) << 3)) >> 1, 190, MENU_TEXT_OVERWRITE_SAVESTATE, SAL_RGB(31, 31, 31));
+						break;
+				}
 				break;
 			}
 			case 6:
@@ -924,15 +932,19 @@ void ShowCredits()
 
 		if (keys&INP_BUTTON_MENU_CANCEL) menuExit=1;
 
-		if (menufocus>menuCount-1)
-		{
-			menufocus=0;
-			menuSmooth=(menufocus<<8)-1;
+		if (keys & SAL_INPUT_UP) {
+			menufocus--; // Up
+			if (menufocus < 0) {
+				menufocus = menuCount - 1;
+				menuSmooth = (menufocus << 8) - 1;
+			}
 		}
-		else if (menufocus<0)
-		{
-			menufocus=menuCount-1;
-			menuSmooth=(menufocus<<8)-1;
+		else if (keys & SAL_INPUT_DOWN) {
+			menufocus++; // Down
+			if (menufocus > menuCount - 1) {
+				menufocus = 0;
+				menuSmooth = (menufocus << 8) - 1;
+			}
 		}
 
 		// Draw screen:
@@ -1576,23 +1588,18 @@ s32 SettingsMenu(void)
 			}
 			SettingsMenuUpdateText(menufocus);
 		}
-		else if ((keys & (SAL_INPUT_UP | SAL_INPUT_DOWN))
-		      && (keys & (SAL_INPUT_UP | SAL_INPUT_DOWN)) != (SAL_INPUT_UP | SAL_INPUT_DOWN))
-		{
-			if (keys & SAL_INPUT_UP)
-				menufocus--; // Up
-			else if (keys & SAL_INPUT_DOWN)
-				menufocus++; // Down
-
-			if (menufocus>menuCount-1)
-			{
-				menufocus=0;
-				menuSmooth=(menufocus<<8)-1;
+		else if (keys & SAL_INPUT_UP) {
+			menufocus--; // Up
+			if (menufocus < 0) {
+				menufocus = menuCount - 1;
+				menuSmooth = (menufocus << 8) - 1;
 			}
-			else if (menufocus<0)
-			{
-				menufocus=menuCount-1;
-				menuSmooth=(menufocus<<8)-1;
+		}
+		else if (keys & SAL_INPUT_DOWN) {
+			menufocus++; // Down
+			if (menufocus > menuCount - 1) {
+				menufocus = 0;
+				menuSmooth = (menufocus << 8) - 1;
 			}
 		}
 
@@ -1631,31 +1638,16 @@ s32 MenuRun(s8 *romName)
 	MainMenuUpdateTextAll();
 	sal_InputIgnore();
 
-	while (!menuExit)
-	{
+	while (!menuExit) {
 		// Draw screen:
-		menuSmooth=menuSmooth*7+(menufocus<<8); menuSmooth>>=3;
-		RenderMenu("Main Menu", menuCount,menuSmooth,menufocus);
+		menuSmooth = menuSmooth * 7 + (menufocus << 8); menuSmooth >>= 3;
+		RenderMenu("Main Menu", menuCount, menuSmooth, menufocus);
 		sal_VideoFlip(1);
 
-		keys=sal_InputPollRepeat(0);
+		keys = sal_InputPollRepeat(0);
 
-		if (keys & INP_BUTTON_MENU_SELECT)
-		{
-			while (keys)
-			{
-				// Draw screen:
-				menuSmooth=menuSmooth*7+(menufocus<<8); menuSmooth>>=3;
-				RenderMenu("Main Menu", menuCount,menuSmooth,menufocus);
-				sal_VideoFlip(1);
-
-				keys=sal_InputPoll(0);
-
-				usleep(10000);
-			}
-
-			switch(menufocus)
-			{
+		if (keys & INP_BUTTON_MENU_SELECT) {
+			switch (menufocus) {
 				case MENU_ROM_SELECT:
 					subaction = FileSelect();
 					if (subaction == 1) {
@@ -1697,23 +1689,18 @@ s32 MenuRun(s8 *romName)
 				menuExit = 1;
 			}
 		}
-		else if ((keys & (SAL_INPUT_UP | SAL_INPUT_DOWN))
-		      && (keys & (SAL_INPUT_UP | SAL_INPUT_DOWN)) != (SAL_INPUT_UP | SAL_INPUT_DOWN))
-		{
-			if (keys & SAL_INPUT_UP)
-				menufocus--; // Up
-			else if (keys & SAL_INPUT_DOWN)
-				menufocus++; // Down
-
-			if (menufocus>menuCount-1)
-			{
-				menufocus=0;
-				menuSmooth=(menufocus<<8)-1;
+		else if (keys & SAL_INPUT_UP) {
+			menufocus--; // Up
+			if (menufocus < 0) {
+				menufocus = menuCount - 1;
+				menuSmooth = (menufocus << 8) - 1;
 			}
-			else if (menufocus<0)
-			{
-				menufocus=menuCount-1;
-				menuSmooth=(menufocus<<8)-1;
+		}
+		else if (keys & SAL_INPUT_DOWN) {
+			menufocus++; // Down
+			if (menufocus > menuCount - 1) {
+				menufocus = 0;
+				menuSmooth = (menufocus << 8) - 1;
 			}
 		}
 
