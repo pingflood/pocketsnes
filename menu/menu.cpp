@@ -923,14 +923,15 @@ void ShowCredits()
 	strcpy(mMenuText[menuCount++], "msx and pingflood");
 
 	sal_InputIgnore();
-	while (!menuExit)
-	{
-		keys=sal_InputPollRepeat(0);
 
-		if (keys & SAL_INPUT_UP) menufocus--; // Up
-		if (keys & SAL_INPUT_DOWN) menufocus++; // Down
+	while (!menuExit) {
+		// Draw screen:
+		menuSmooth = menuSmooth * 7 + (menufocus << 8); menuSmooth >>= 3;
+		RenderMenu("Credits", menuCount, menuSmooth, menufocus);
+		sal_VideoFlip(1);
 
-		if (keys&INP_BUTTON_MENU_CANCEL) menuExit=1;
+		keys = sal_InputPollRepeat(0);
+		menuExit = (keys & INP_BUTTON_MENU_CANCEL);
 
 		if (keys & SAL_INPUT_UP) {
 			menufocus--; // Up
@@ -947,10 +948,6 @@ void ShowCredits()
 			}
 		}
 
-		// Draw screen:
-		menuSmooth=menuSmooth*7+(menufocus<<8); menuSmooth>>=3;
-		RenderMenu("Credits", menuCount,menuSmooth,menufocus);
-		sal_VideoFlip(1);
 		usleep(10000);
 	}
 	sal_InputIgnore();
@@ -1208,47 +1205,17 @@ s32 VideoSettingsMenu(void)
 
 	sal_InputIgnore();
 
-	while (!menuExit)
-	{
+	while (!menuExit) {
 		// Draw screen:
-		menuSmooth=menuSmooth*7+(menufocus<<8); menuSmooth>>=3;
-		RenderMenu("Video Settings", menuCount,menuSmooth,menufocus);
+		menuSmooth = menuSmooth * 7 + (menufocus << 8); menuSmooth >>= 3;
+		RenderMenu("Video Settings", menuCount, menuSmooth, menufocus);
 		sal_VideoFlip(1);
 
-		keys=sal_InputPollRepeat(0);
+		keys = sal_InputPollRepeat(0);
+		menuExit = (keys & INP_BUTTON_MENU_CANCEL);
 
-		if (keys & INP_BUTTON_MENU_CANCEL)
-		{
-			while (keys)
-			{
-				// Draw screen:
-				menuSmooth=menuSmooth*7+(menufocus<<8); menuSmooth>>=3;
-				RenderMenu("Video Settings", menuCount,menuSmooth,menufocus);
-				sal_VideoFlip(1);
-
-				keys=sal_InputPoll(0);
-			}
-
-			menuExit=1;
-		}
-		else if (keys & INP_BUTTON_MENU_SELECT)
-		{
-			while (keys)
-			{
-				// Draw screen:
-				menuSmooth=menuSmooth*7+(menufocus<<8); menuSmooth>>=3;
-				RenderMenu("Video Settings", menuCount,menuSmooth,menufocus);
-				sal_VideoFlip(1);
-
-				keys=sal_InputPoll(0);
-			}
-
-		}
-		else if ((keys & (SAL_INPUT_LEFT | SAL_INPUT_RIGHT))
-		      && (keys & (SAL_INPUT_LEFT | SAL_INPUT_RIGHT)) != (SAL_INPUT_LEFT | SAL_INPUT_RIGHT))
-		{
-			switch(menufocus)
-			{
+		if (keys & (SAL_INPUT_LEFT | SAL_INPUT_RIGHT)) {
+			switch (menufocus) {
 				case VIDEO_SETTINGS_MENU_FRAMESKIP:
 					if (keys & SAL_INPUT_RIGHT) {
 						mMenuOptions->frameSkip++;
@@ -1307,47 +1274,17 @@ s32 AudioSettingsMenu(void)
 
 	sal_InputIgnore();
 
-	while (!menuExit)
-	{
+	while (!menuExit) {
 		// Draw screen:
-		menuSmooth=menuSmooth*7+(menufocus<<8); menuSmooth>>=3;
-		RenderMenu("Audio Settings", menuCount,menuSmooth,menufocus);
+		menuSmooth = menuSmooth * 7 + (menufocus << 8); menuSmooth >>= 3;
+		RenderMenu("Audio Settings", menuCount, menuSmooth, menufocus);
 		sal_VideoFlip(1);
 
-		keys=sal_InputPollRepeat(0);
+		keys = sal_InputPollRepeat(0);
+		menuExit = (keys & INP_BUTTON_MENU_CANCEL);
 
-		if (keys & INP_BUTTON_MENU_CANCEL)
-		{
-			while (keys)
-			{
-				// Draw screen:
-				menuSmooth=menuSmooth*7+(menufocus<<8); menuSmooth>>=3;
-				RenderMenu("Audio Settings", menuCount,menuSmooth,menufocus);
-				sal_VideoFlip(1);
-
-				keys=sal_InputPoll(0);
-			}
-
-			menuExit=1;
-		}
-		else if (keys & INP_BUTTON_MENU_SELECT)
-		{
-			while (keys)
-			{
-				// Draw screen:
-				menuSmooth=menuSmooth*7+(menufocus<<8); menuSmooth>>=3;
-				RenderMenu("Audio Settings", menuCount,menuSmooth,menufocus);
-				sal_VideoFlip(1);
-
-				keys=sal_InputPoll(0);
-			}
-
-		}
-		else if ((keys & (SAL_INPUT_LEFT | SAL_INPUT_RIGHT))
-		      && (keys & (SAL_INPUT_LEFT | SAL_INPUT_RIGHT)) != (SAL_INPUT_LEFT | SAL_INPUT_RIGHT))
-		{
-			switch(menufocus)
-			{
+		if (keys & (SAL_INPUT_LEFT | SAL_INPUT_RIGHT)) {
+			switch (menufocus) {
 				case AUDIO_SETTINGS_MENU_SOUND_ON:
 					mMenuOptions->soundEnabled ^= 1;
 					break;
@@ -1462,36 +1399,11 @@ s32 SettingsMenu(void)
 
 		sal_VideoFlip(1);
 
-		keys=sal_InputPollRepeat(0);
+		keys = sal_InputPollRepeat(0);
+		menuExit = (keys & INP_BUTTON_MENU_CANCEL);
 
-		if (keys & INP_BUTTON_MENU_CANCEL)
-		{
-			while (keys)
-			{
-				// Draw screen:
-				menuSmooth=menuSmooth*7+(menufocus<<8); menuSmooth>>=3;
-				RenderMenu("Settings", menuCount,menuSmooth,menufocus);
-				sal_VideoFlip(1);
-
-				keys=sal_InputPoll(0);
-			}
-
-			menuExit=1;
-		}
-		else if (keys & INP_BUTTON_MENU_SELECT)
-		{
-			while (keys)
-			{
-				// Draw screen:
-				menuSmooth=menuSmooth*7+(menufocus<<8); menuSmooth>>=3;
-				RenderMenu("Settings", menuCount,menuSmooth,menufocus);
-				sal_VideoFlip(1);
-
-				keys=sal_InputPoll(0);
-			}
-
-			switch(menufocus)
-			{
+		if (keys & INP_BUTTON_MENU_SELECT) {
+			switch (menufocus) {
 				case VIDEO_MENU_SETTINGS:
 					VideoSettingsMenu();
 					SettingsMenuUpdateTextAll();
