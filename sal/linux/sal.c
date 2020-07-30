@@ -5,6 +5,8 @@
 #include "sal.h"
 
 #define PALETTE_BUFFER_LENGTH	256*2*4
+#define SNES_WIDTH  256
+#define SNES_HEIGHT 239
 
 static SDL_Surface *mScreen = NULL;
 static SDL_Surface *rs97Screen = NULL;
