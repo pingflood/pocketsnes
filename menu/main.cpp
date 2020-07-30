@@ -143,6 +143,7 @@ void S9xLoadSDD1Data (void)
 
 u16 IntermediateScreen[SNES_WIDTH * SNES_HEIGHT_EXTENDED];
 SDL_Surface *image;
+extern SDL_Surface *mScreen;
 
 bool LastPAL; /* Whether the last frame's height was 239 (true) or 224. */
 
@@ -150,6 +151,10 @@ bool8_32 S9xInitUpdate ()
 {
 	if (mInMenu) return TRUE;
 
+#ifdef GCW_ZERO
+	if (mMenuOptions.fullScreen == 3) GFX.Screen = (uint8*) mScreen->pixels;
+	else
+#endif
 	GFX.Screen = (u8*) IntermediateScreen; /* replacement needed after loading the saved states menu */
 
 	return TRUE;
@@ -179,6 +184,7 @@ bool8_32 S9xDeinitUpdate (int Width, int Height, bool8_32)
 	switch (mMenuOptions.fullScreen)
 	{
 		case 0: /* No scaling */
+		// case 3: /* Hardware scaling */
 		{
 			u32 h = PAL ? SNES_HEIGHT_EXTENDED : SNES_HEIGHT;
 			u32 y, pitch = sal_VideoGetPitch();
@@ -208,13 +214,6 @@ bool8_32 S9xDeinitUpdate (int Width, int Height, bool8_32)
 				upscale_256x224_to_320x240_bilinearish((uint32_t*) sal_VideoGetBuffer() + 160, (uint32_t*) IntermediateScreen, SNES_WIDTH);
 			}
 			break;
-		case 3: /* Hardware scaling */
-		{
-			u32 h = PAL ? SNES_HEIGHT_EXTENDED : SNES_HEIGHT;
-			image = SDL_CreateRGBSurfaceFrom((uint16_t*)IntermediateScreen,SNES_WIDTH,h,16,SNES_WIDTH * sizeof(u16),0,0,0,0);
-			sal_VideoBlit(image);
-			break;
-		}
 	}
 
 	u32 newTimer;
@@ -591,8 +590,11 @@ int SnesInit()
 	Settings.C4 = TRUE;
 	Settings.SDD1 = TRUE;
 
-	GFX.Screen = (uint8*) IntermediateScreen;
-
+#ifdef GCW_ZERO
+	if (mMenuOptions.fullScreen == 3) GFX.Screen = (uint8*) mScreen->pixels;
+	else
+#endif
+	GFX.Screen = (u8*) IntermediateScreen; /* replacement needed after loading the saved states menu */
 
 	GFX.RealPitch = GFX.Pitch = 256 * sizeof(u16);
 

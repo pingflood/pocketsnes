@@ -47,7 +47,7 @@ void DefaultMenuOptions(void)
 	mMenuOptions->showFps=0;
 	mMenuOptions->soundRate=22050; //44100;
 	mMenuOptions->stereo=0;
-	mMenuOptions->fullScreen=0;
+	mMenuOptions->fullScreen=3;
 	mMenuOptions->autoSaveSram=1;
 	mMenuOptions->soundSync=1;
 }
@@ -1359,14 +1359,13 @@ s32 SettingsMenu(void)
 				case SETTINGS_MENU_FULLSCREEN:
 					if (keys & SAL_INPUT_RIGHT)
 					{
-						mMenuOptions->fullScreen = (mMenuOptions->fullScreen + 1) % 3;
+						mMenuOptions->fullScreen++;
+						if(mMenuOptions->fullScreen > 3) mMenuOptions->fullScreen = 0;
 					}
 					else
 					{
-						if (mMenuOptions->fullScreen == 0)
-							mMenuOptions->fullScreen = 2;
-						else
-							mMenuOptions->fullScreen--;
+						mMenuOptions->fullScreen--;
+						if(mMenuOptions->fullScreen > 3) mMenuOptions->fullScreen = 3;
 					}
 					SettingsMenuUpdateText(SETTINGS_MENU_FULLSCREEN);
 					break;
