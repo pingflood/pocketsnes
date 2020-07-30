@@ -16,7 +16,7 @@ which is a pain in the ass especially as I'm always changing things
 
 #include "sal_common.h"
 
-#define SAL_FRAME_BUFFER_COUNT	4
+#define SAL_FRAME_BUFFER_COUNT	1
 
 u32 mInputRepeat=0;
 u32 mInputRepeatTimer[32];
@@ -740,8 +740,6 @@ void sal_DirectoryCombine(s8 *path, const char *name)
 		i++;
 	}
 }
-
-
 
 s32 sal_ImageDrawTiled(u16 *image, u32 width, u32 height, s32 xScroll, s32 yScroll, s32 x, s32 y)
 {	

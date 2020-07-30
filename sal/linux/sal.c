@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <dirent.h>
 #include <SDL.h>
@@ -8,6 +7,7 @@
 #define PALETTE_BUFFER_LENGTH	256*2*4
 
 static SDL_Surface *mScreen = NULL;
+static SDL_Surface *rs97Screen = NULL;
 static u32 mSoundThreadFlag=0;
 static u32 mSoundLastCpuSpeed=0;
 static u32 mPaletteBuffer[PALETTE_BUFFER_LENGTH];
@@ -30,7 +30,6 @@ static u32 inputHeld = 0;
 
 static u32 sal_Input(int held)
 {
-#if 1
 	SDL_Event event;
 	int i=0;
 	u32 timer=0;
@@ -55,83 +54,11 @@ static u32 sal_Input(int held)
 		CASE(DOWN, DOWN);
 		CASE(LEFT, LEFT);
 		CASE(RIGHT, RIGHT);
-		CASE(HOME, MENU);
+		CASE(3, MENU);
 		default: break;
 	}
 
 	mInputRepeat = inputHeld;
-
-#else
-	int i=0;
-	u32 inputHeld=0;
-	u32 timer=0;
-	u8 *keystate;
-
-	SDL_PumpEvents();
-
-	keystate = SDL_GetKeyState(NULL);
-	
-	if ( keystate[SDLK_LCTRL] ) inputHeld|=SAL_INPUT_A;
-	if ( keystate[SDLK_LALT] ) inputHeld|=SAL_INPUT_B;
-	if ( keystate[SDLK_SPACE] ) inputHeld|=SAL_INPUT_X;
-	if ( keystate[SDLK_LSHIFT] ) inputHeld|=SAL_INPUT_Y;
-	if ( keystate[SDLK_TAB] ) inputHeld|=SAL_INPUT_L;
-	if ( keystate[SDLK_BACKSPACE] ) inputHeld|=SAL_INPUT_R;
-	if ( keystate[SDLK_RETURN] ) inputHeld|=SAL_INPUT_START;
-	if ( keystate[SDLK_ESCAPE] ) inputHeld|=SAL_INPUT_SELECT;
-	if ( keystate[SDLK_UP] ) inputHeld|=SAL_INPUT_UP;
-	if ( keystate[SDLK_DOWN] ) inputHeld|=SAL_INPUT_DOWN;
-	if ( keystate[SDLK_LEFT] ) inputHeld|=SAL_INPUT_LEFT;
-	if ( keystate[SDLK_RIGHT] ) inputHeld|=SAL_INPUT_RIGHT;
-
-	// Process key repeats
-	timer=sal_TimerRead();
-	for (i=0;i<32;i++)
-	{
-		if (inputHeld&(1<<i)) 
-		{
-			if(mInputFirst&(1<<i))
-			{
-				if (mInputRepeatTimer[i]<timer)
-				{
-					mInputRepeat|=1<<i;
-					mInputRepeatTimer[i]=timer+10;
-				}
-				else
-				{
-					mInputRepeat&=~(1<<i);
-				}
-			}
-			else
-			{
-				//First press of button
-				//set timer to expire later than usual
-				mInputFirst|=(1<<i);
-				mInputRepeat|=1<<i;
-				mInputRepeatTimer[i]=timer+50;
-			}
-		}
-		else			
-		{
-			mInputRepeatTimer[i]=timer-10;
-			mInputRepeat&=~(1<<i);
-			mInputFirst&=~(1<<i);
-		}
-		
-	}
-
-	if(mInputIgnore)
-	{
-		//A request to ignore all key presses until all keys have been released has been made
-		//check for release and clear flag, otherwise clear inputHeld and mInputRepeat
-		if (inputHeld == 0)
-		{
-			mInputIgnore=0;
-		}
-		inputHeld=0;
-		mInputRepeat=0;
-	}
-#endif
 
 	return inputHeld;
 }
@@ -163,7 +90,6 @@ const char* sal_DirectoryGetTemp(void)
 
 void sal_CpuSpeedSet(u32 mhz)
 {
-
 }
 
 u32 sal_CpuSpeedNext(u32 currSpeed)
@@ -196,7 +122,7 @@ u32 sal_CpuSpeedPreviousFast(u32 currSpeed)
 
 s32 sal_Init(void)
 {
-	if( SDL_Init( SDL_INIT_EVERYTHING ) == -1 )
+	if( SDL_Init( SDL_INIT_VIDEO|SDL_INIT_TIMER|SDL_INIT_JOYSTICK ) == -1 )
 	{
 		return SAL_ERROR;
 	}
@@ -214,33 +140,19 @@ u32 sal_VideoInit(u32 bpp)
 	SDL_ShowCursor(0);
 	
 	mBpp=bpp;
+	setenv("SDL_NOMOUSE", "1", 1);
 
 	//Set up the screen
-	mScreen = SDL_SetVideoMode( SAL_SCREEN_WIDTH, SAL_SCREEN_HEIGHT, bpp, SDL_HWSURFACE |
-#ifdef SDL_TRIPLEBUF
-		SDL_TRIPLEBUF
-#else
-		SDL_DOUBLEBUF
-#endif
-		);
-
-    	//If there was an error in setting up the screen
-    	if( mScreen == NULL )
-    	{
-		sal_LastErrorSet("SDL_SetVideoMode failed");        	
-		return SAL_ERROR;
-    	}
-
-    	// lock surface if needed 
-	if (SDL_MUSTLOCK(mScreen)) 
-	{ 
-		if (SDL_LockSurface(mScreen) < 0) 
-		{ 
-			sal_LastErrorSet("unable to lock surface"); 
-			return SAL_ERROR;
-		} 
+	// mScreen = SDL_SetVideoMode( 320, 480, bpp, SDL_HWSURFACE);
+	rs97Screen = SDL_SetVideoMode(320, 480, 16, SDL_HWSURFACE /* | SDL_DOUBLEBUF*/);
+	mScreen = SDL_CreateRGBSurface(SDL_SWSURFACE, SAL_SCREEN_WIDTH, SAL_SCREEN_HEIGHT, 16, 0, 0, 0, 0);
+	//If there was an error in setting up the screen
+	if( mScreen == NULL )
+	{
+	sal_LastErrorSet("SDL_SetVideoMode failed");
+	return SAL_ERROR;
 	}
-   
+
 	return SAL_OK;
 }
 
@@ -256,33 +168,11 @@ u32 sal_VideoGetHeight()
 
 u32 sal_VideoGetPitch()
 {
-	return mScreen->pitch;
+	return rs97Screen->pitch;
 }
 
 void sal_VideoEnterGame(u32 fullscreenOption, u32 pal, u32 refreshRate)
 {
-#ifdef GCW_ZERO
-	/* Copied from C++ headers which we can't include in C */
-	unsigned int Width = 256 /* SNES_WIDTH */,
-	             Height = pal ? 239 /* SNES_HEIGHT_EXTENDED */ : 224 /* SNES_HEIGHT */;
-	if (fullscreenOption != 3)
-	{
-		Width = SAL_SCREEN_WIDTH;
-		Height = SAL_SCREEN_HEIGHT;
-	}
-	if (SDL_MUSTLOCK(mScreen))
-		SDL_UnlockSurface(mScreen);
-	mScreen = SDL_SetVideoMode(Width, Height, mBpp, SDL_HWSURFACE |
-#ifdef SDL_TRIPLEBUF
-		SDL_TRIPLEBUF
-#else
-		SDL_DOUBLEBUF
-#endif
-		);
-	mRefreshRate = refreshRate;
-	if (SDL_MUSTLOCK(mScreen))
-		SDL_LockSurface(mScreen);
-#endif
 }
 
 void sal_VideoSetPAL(u32 fullscreenOption, u32 pal)
@@ -295,13 +185,6 @@ void sal_VideoSetPAL(u32 fullscreenOption, u32 pal)
 
 void sal_VideoExitGame()
 {
-#ifdef GCW_ZERO
-	if (SDL_MUSTLOCK(mScreen))
-		SDL_UnlockSurface(mScreen);
-	mScreen = SDL_SetVideoMode(SAL_SCREEN_WIDTH, SAL_SCREEN_HEIGHT, mBpp, SDL_HWSURFACE | SDL_DOUBLEBUF);
-	if (SDL_MUSTLOCK(mScreen))
-		SDL_LockSurface(mScreen);
-#endif
 }
 
 void sal_VideoBitmapDim(u16* img, u32 pixelCount)
@@ -315,12 +198,10 @@ void sal_VideoBitmapDim(u16* img, u32 pixelCount)
 
 void sal_VideoFlip(s32 vsync)
 {
-	if (SDL_MUSTLOCK(mScreen)) {
-		SDL_UnlockSurface(mScreen); 
-		SDL_Flip(mScreen);
-		SDL_LockSurface(mScreen);
-	} else
-		SDL_Flip(mScreen);
+	uint32_t *s = (uint32_t*)mScreen->pixels;
+	uint32_t *d = (uint32_t*)rs97Screen->pixels + 640 * 5 + 15;
+	for(uint8_t y = 0; y < 240; y++, s += 160, d += 320) memmove(d, s, SNES_WIDTH*2);
+	SDL_Flip(mScreen);
 }
 
 void *sal_VideoGetBuffer()
@@ -350,9 +231,7 @@ int mainEntry(int argc, char *argv[]);
 
 // Prove entry point wrapper
 int main(int argc, char *argv[])
-{	
+{
 	return mainEntry(argc,argv);
 //	return mainEntry(argc-1,&argv[1]);
 }
-
-
