@@ -799,7 +799,7 @@ static s32 SaveStateSelect(s32 mode)
 					unsigned int fullScreenSave = mMenuOptions->fullScreen;
 					mMenuOptions->fullScreen = 0;
 					S9xMainLoop ();
-					mMenuOptions->fullScreen = fullScreenSave;
+					// mMenuOptions->fullScreen = fullScreenSave;
 					sal_AudioSetMuted(0);
 					mPreviewingState = 0;
 					action=5;
@@ -843,7 +843,8 @@ static s32 SaveStateSelect(s32 mode)
 	if (action != 100) {
 		LoadStateTemp();
 	}
-	GFX.Screen = (uint8 *) sal_RS97VideoGetBuffer();
+
+	GFX.Screen = (uint8 *) sal_VideoGetBuffer();
 	DeleteStateTemp();
 	sal_InputIgnore();
 	return(action);
@@ -993,8 +994,8 @@ void ShowCredits()
 	strcpy(mMenuText[menuCount++],"Initial port to the Dingoo by Reesy");
 	strcpy(mMenuText[menuCount++],"Ported to OpenDingux by pcercuei");
 	strcpy(mMenuText[menuCount++],"Optimisations and fixes by Nebuleon");
-	strcpy(mMenuText[menuCount++],"Initial port to RS97 by Steward-Fu");
-	strcpy(mMenuText[menuCount++],"RS97 optimizations by Gameblabla");
+	strcpy(mMenuText[menuCount++],"Initial port to RetroGame by Steward-Fu");
+	strcpy(mMenuText[menuCount++],"RetroGame optimizations by Gameblabla");
 	strcpy(mMenuText[menuCount++],"and pingflood");
 
 	sal_InputIgnore();
@@ -1138,20 +1139,16 @@ void SettingsMenuUpdateText(s32 menu_index)
 					strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Video scaling          ORIGINAL");
 					break;
 				case 1:
-					strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Video scaling         SCANLINES");
-					break;  
+					strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Video scaling              FAST");
+					break;
 				case 2:
-					strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Video scaling           FS FAST");
-					break;  
+					strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Video scaling            SMOOTH");
+					break;
 				case 3:
-					strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Video scaling         FS SMOOTH");
-					break;  
-				// case 3:
-				// 	strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Full screen:          HARDWARE");
-				// 	break;
+					strcpy(mMenuText[SETTINGS_MENU_FULLSCREEN],"Video scaling          HARDWARE");
+					break;
 			}
-			break;
-			
+
 		case SETTINGS_MENU_LOAD_GLOBAL_SETTINGS:
 			strcpy(mMenuText[SETTINGS_MENU_LOAD_GLOBAL_SETTINGS],"Load global settings");
 			break;
@@ -1185,7 +1182,6 @@ void SettingsMenuUpdateTextAll(void)
 	SettingsMenuUpdateText(SETTINGS_MENU_FRAMESKIP);
 	SettingsMenuUpdateText(SETTINGS_MENU_FPS);
 	SettingsMenuUpdateText(SETTINGS_MENU_SOUND_SYNC);
-	SettingsMenuUpdateText(SETTINGS_MENU_FULLSCREEN);
 	SettingsMenuUpdateText(SETTINGS_MENU_LOAD_GLOBAL_SETTINGS);
 	SettingsMenuUpdateText(SETTINGS_MENU_SAVE_GLOBAL_SETTINGS);
 	SettingsMenuUpdateText(SETTINGS_MENU_LOAD_CURRENT_SETTINGS);
@@ -1439,20 +1435,6 @@ s32 SettingsMenu(void)
 					SettingsMenuUpdateText(SETTINGS_MENU_FPS);
 					break;
 
-				case SETTINGS_MENU_FULLSCREEN:
-					if (keys & SAL_INPUT_RIGHT)
-					{
-						mMenuOptions->fullScreen = (mMenuOptions->fullScreen + 1) % 4;
-					}
-					else
-					{
-						if (mMenuOptions->fullScreen == 0)
-							mMenuOptions->fullScreen = 3;
-						else
-							mMenuOptions->fullScreen--;
-					}
-					SettingsMenuUpdateText(SETTINGS_MENU_FULLSCREEN);
-					break;
 			}
 		}
 		else if ((keys & (SAL_INPUT_UP | SAL_INPUT_DOWN))

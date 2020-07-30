@@ -13,7 +13,6 @@
 #include "soundux.h"
 #include "snapshot.h"
 #include "scaler.h"
-#include <time.h>
 
 #define SNES_SCREEN_WIDTH  256
 #define SNES_SCREEN_HEIGHT 192
@@ -142,13 +141,15 @@ void S9xLoadSDD1Data (void)
 
 }
 
-u8 IntermediateScreen[SNES_WIDTH * SNES_HEIGHT_EXTENDED * 2];
+u16 IntermediateScreen[SNES_WIDTH * SNES_HEIGHT_EXTENDED];
 bool LastPAL; /* Whether the last frame's height was 239 (true) or 224. */
 
 bool8_32 S9xInitUpdate ()
 {
 	if (mInMenu) return TRUE;
-	GFX.Screen = (u8*)IntermediateScreen; /* replacement needed after loading the saved states menu */
+
+	GFX.Screen = (u8*) IntermediateScreen; /* replacement needed after loading the saved states menu */
+
 	return TRUE;
 }
 
@@ -173,74 +174,70 @@ bool8_32 S9xDeinitUpdate (int Width, int Height, bool8_32)
 		LastPAL = PAL;
 	}
 
-	u32 h = PAL ? SNES_HEIGHT_EXTENDED : SNES_HEIGHT;
 	switch (mMenuOptions.fullScreen)
 	{
-		case 0: /* No scaling / Hardware scaling */
+		case 0: /* No scaling */
+		case 3: /* Hardware scaling */
 		{
-			uint32_t *s = (uint32_t*) IntermediateScreen;
-			uint32_t *d = (uint32_t*) sal_RS97VideoGetBuffer() + (SAL_SCREEN_WIDTH - SNES_WIDTH)/4 + (SAL_SCREEN_HEIGHT - h) * 160;
-			for(uint8_t y = 0; y < h; y++, s += SNES_WIDTH/2, d += 160) {
-				memmove(d, s, SNES_WIDTH * 2);
-				d += 160;
-				memmove(d, s, SNES_WIDTH * 2);
+			u32 h = PAL ? SNES_HEIGHT_EXTENDED : SNES_HEIGHT;
+			u32 y, pitch = sal_VideoGetPitch();
+			u8 *src = (u8*) IntermediateScreen, *dst = (u8*) sal_VideoGetBuffer()
+				+ ((sal_VideoGetWidth() - SNES_WIDTH) / 2) * sizeof(u16)
+				+ ((sal_VideoGetHeight() - h) / 2) * pitch;
+			for (y = 0; y < h; y++)
+			{
+				memmove(dst, src, SNES_WIDTH * sizeof(u16));
+				src += SNES_WIDTH * sizeof(u16);
+				dst += pitch;
 			}
 			break;
 		}
-		case 1: /* Hardware with (scanlines mode) */
-		{
-			uint32_t *s = (uint32_t*) IntermediateScreen;
-			uint32_t *d = (uint32_t*) sal_RS97VideoGetBuffer() + (SAL_SCREEN_WIDTH - SNES_WIDTH)/4 + (SAL_SCREEN_HEIGHT - h) * 160;
-			for(uint8_t y = 0; y < h; y++, s += SNES_WIDTH/2, d += 320) memmove(d, s, SNES_WIDTH * 2);
-			break;
-		}
-
-		case 2: /* Fast software scaling */
+		case 1: /* Fast software scaling */
 			if (PAL) {
-				upscale_256x240_to_320x240((uint32_t*) sal_RS97VideoGetBuffer(), (uint32_t*) IntermediateScreen, SNES_WIDTH);
+				upscale_256x240_to_320x240((uint32_t*) sal_VideoGetBuffer(), (uint32_t*) IntermediateScreen, SNES_WIDTH);
 			} else {
-				upscale_256x224_to_320x240((uint32_t*) sal_RS97VideoGetBuffer(), (uint32_t*) IntermediateScreen, SNES_WIDTH);
+				upscale_256x224_to_320x240((uint32_t*) sal_VideoGetBuffer(), (uint32_t*) IntermediateScreen, SNES_WIDTH);
 			}
 			break;
 
-		case 3: /* Smooth software scaling */
+		case 2: /* Smooth software scaling */
 			// if (PAL) {
-				upscale_256x240_to_320x240_bilinearish((uint32_t*) sal_RS97VideoGetBuffer() + (SAL_SCREEN_HEIGHT - h) * 160, (uint32_t*) IntermediateScreen, SNES_WIDTH);
+				upscale_256x240_to_320x240_bilinearish((uint32_t*) sal_VideoGetBuffer() + 160, (uint32_t*) IntermediateScreen, SNES_WIDTH);
 			// } else {
-				// upscale_256x240_to_320x240_bilinearish((uint32_t*) sal_RS97VideoGetBuffer() + (SAL_SCREEN_HEIGHT - h) * 160, (uint32_t*) IntermediateScreen, SNES_WIDTH);
+				// upscale_256x224_to_320x240_bilinearish((uint32_t*) sal_VideoGetBuffer() + 160, (uint32_t*) IntermediateScreen, SNES_WIDTH);
 			// }
 			break;
 	}
 
-	// u32 newTimer;
-	if (mMenuOptions.showFps) 
+	u32 newTimer;
+	if (mMenuOptions.showFps)
 	{
 		mFps++;
-		u32 newTimer=sal_TimerRead();
+		newTimer=sal_TimerRead();
 		if(newTimer-mLastTimer>Memory.ROMFramesPerSecond)
 		{
 			mLastTimer=newTimer;
 			sprintf(mFpsDisplay,"%2d/%2d", mFps, Memory.ROMFramesPerSecond);
 			mFps=0;
 		}
-		
-		sal_RS97VideoDrawRect(0,0,5*8,8,SAL_RGB(0,0,0));
-		sal_RS97VideoPrint(0,0,mFpsDisplay,SAL_RGB(31,31,31));
+
+		sal_VideoDrawRect(0,0,5*8,8,SAL_RGB(0,0,0));
+		sal_VideoPrint(0,0,mFpsDisplay,SAL_RGB(31,31,31));
 	}
 
 	if(mVolumeDisplayTimer>0)
 	{
-		sal_RS97VideoDrawRect(100,0,8*8,8,SAL_RGB(0,0,0));
-		sal_RS97VideoPrint(100,0,mVolumeDisplay,SAL_RGB(31,31,31));
+		sal_VideoDrawRect(100,0,8*8,8,SAL_RGB(0,0,0));
+		sal_VideoPrint(100,0,mVolumeDisplay,SAL_RGB(31,31,31));
 	}
 
 	if(mQuickStateTimer>0)
 	{
-		sal_RS97VideoDrawRect(200,0,8*8,8,SAL_RGB(0,0,0));
-		sal_RS97VideoPrint(200,0,mQuickStateDisplay,SAL_RGB(31,31,31));
+		sal_VideoDrawRect(200,0,8*8,8,SAL_RGB(0,0,0));
+		sal_VideoPrint(200,0,mQuickStateDisplay,SAL_RGB(31,31,31));
 	}
 
-	// sal_VideoFlip(0);
+	sal_VideoFlip(0);
 }
 
 const char *S9xGetFilename (const char *ex)
@@ -264,10 +261,10 @@ uint32 S9xReadJoypad (int which1)
 	if (which1 != 0) return val;
 
 	u32 joy = sal_InputPoll();
-	
-	if (joy & SAL_INPUT_MENU)
+
+	if (((joy & SAL_INPUT_SELECT) && (joy & SAL_INPUT_START)) || (joy & SAL_INPUT_MENU))
 	{
-		mEnterMenu = 1;		
+		mEnterMenu = 1;
 		return val;
 	}
 
@@ -370,7 +367,7 @@ void S9xSyncSpeed(void)
 	}
 
 	while (sal_AudioGetFramesBuffered() >= sal_AudioGetMaxFrames())
-		nanosleep((const struct timespec[]){{0, 1e6L}}, NULL);
+		usleep(100);
 }
 
 const char *S9xBasename (const char *f)
@@ -539,7 +536,7 @@ int SnesInit()
 	ZeroMemory (&Settings, sizeof (Settings));
 
 	Settings.JoystickEnabled = FALSE;
-	Settings.SoundPlaybackRate = 22050;
+	Settings.SoundPlaybackRate = 44100;
 	Settings.Stereo = TRUE;
 	Settings.SoundBufferSize = 0;
 	Settings.CyclesPercentage = 100;
@@ -586,14 +583,14 @@ int SnesInit()
 	Settings.C4 = TRUE;
 	Settings.SDD1 = TRUE;
 
-	// GFX.Screen = (u8*) sal_VideoGetBuffer(); //IntermediateScreen;
-	GFX.Screen = (u8*) IntermediateScreen;
-	GFX.RealPitch = GFX.Pitch = SNES_WIDTH * 2 ;//sizeof(u16);
-	// GFX.RealPitch = GFX.Pitch = SAL_SCREEN_WIDTH * 2; //256 * sizeof(u16);
-	
-	GFX.SubScreen = (uint8 *)malloc(GFX.RealPitch * 240 * 2); 
-	GFX.ZBuffer =  (uint8 *)malloc(GFX.RealPitch * 240 * 2); 
-	GFX.SubZBuffer = (uint8 *)malloc(GFX.RealPitch * 240 * 2);
+	GFX.Screen = (uint8*) IntermediateScreen;
+
+
+	GFX.RealPitch = GFX.Pitch = 256 * sizeof(u16);
+
+	GFX.SubScreen = (uint8 *)malloc(GFX.RealPitch * 480 * 2);
+	GFX.ZBuffer =  (uint8 *)malloc(GFX.RealPitch * 480 * 2);
+	GFX.SubZBuffer = (uint8 *)malloc(GFX.RealPitch * 480 * 2);
 	GFX.Delta = (GFX.SubScreen - GFX.Screen) >> 1;
 	GFX.PPL = GFX.Pitch >> 1;
 	GFX.PPLx2 = GFX.Pitch;
@@ -622,7 +619,7 @@ int SnesInit()
 
 	if (!S9xGraphicsInit ())
 	{
-		S9xMessage (0,0,"Failed to init graphics");
+         	S9xMessage (0,0,"Failed to init graphics");
 		return SAL_ERROR;
 	}
 

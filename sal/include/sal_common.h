@@ -52,10 +52,8 @@ u32 sal_VideoGetBpp();
 void sal_VideoClear(u32 color);
 void sal_VideoClearAll(u32 color);
 void sal_VideoDrawRect(s32 x, s32 y, s32 width, s32 height, u32 color);
-void sal_RS97VideoDrawRect(s32 x, s32 y, s32 width, s32 height, u32 color);
 void sal_VideoBitmapDim(u16* img, u32 pixelCount);
 void sal_VideoPrint(s32 x, s32 y, const char *buffer, u32 color);
-void sal_RS97VideoPrint(s32 x, s32 y, const char *buffer, u32 color);
 
 u32 sal_VideoGetWidth();
 u32 sal_VideoGetHeight();
@@ -67,7 +65,6 @@ void sal_VideoExitGame();
 u32 sal_VideoGetPitch();
 void sal_VideoFlip(s32 vsync);
 void *sal_VideoGetBuffer();
-void *sal_RS97VideoGetBuffer();
 void sal_VideoPaletteSet(u32 index, u32 color);
 void sal_VideoPaletteSync();
 void sal_VideoBitmapScale(int startx, int starty, int viswidth, int visheight, int newwidth, int newheight,int pitch, u16 *src, u16 *dst);

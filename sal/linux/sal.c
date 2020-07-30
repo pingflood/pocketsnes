@@ -9,7 +9,6 @@
 #define SNES_HEIGHT 239
 
 static SDL_Surface *mScreen = NULL;
-static SDL_Surface *rs97Screen = NULL;
 static u32 mSoundThreadFlag=0;
 static u32 mSoundLastCpuSpeed=0;
 static u32 mPaletteBuffer[PALETTE_BUFFER_LENGTH];
@@ -112,6 +111,7 @@ u32 sal_CpuSpeedPreviousFast(u32 currSpeed)
 
 s32 sal_Init(void)
 {
+	setenv("SDL_NOMOUSE", "1", 1);
 	if( SDL_Init( SDL_INIT_VIDEO|SDL_INIT_TIMER|SDL_INIT_JOYSTICK ) == -1 )
 	{
 		return SAL_ERROR;
@@ -128,14 +128,13 @@ s32 sal_Init(void)
 u32 sal_VideoInit(u32 bpp)
 {
 	SDL_ShowCursor(0);
-	
+
 	mBpp=bpp;
-	setenv("SDL_NOMOUSE", "1", 1);
 
 	//Set up the screen
-	// mScreen = SDL_SetVideoMode( 320, 480, bpp, SDL_HWSURFACE);
-	rs97Screen = SDL_SetVideoMode(320, 480, 16, SDL_HWSURFACE /* | SDL_DOUBLEBUF*/);
-	mScreen = SDL_CreateRGBSurface(SDL_SWSURFACE, SAL_SCREEN_WIDTH, SAL_SCREEN_HEIGHT, 16, 0, 0, 0, 0);
+	mScreen = SDL_SetVideoMode(SAL_SCREEN_WIDTH, SAL_SCREEN_HEIGHT, bpp, SDL_HWSURFACE | SDL_DOUBLEBUF);
+	);
+
 	//If there was an error in setting up the screen
 	if( mScreen == NULL )
 	{
@@ -158,12 +157,12 @@ u32 sal_VideoGetHeight()
 
 u32 sal_VideoGetPitch()
 {
-	return rs97Screen->pitch;
+	return mScreen->pitch;
 }
 
 void sal_VideoEnterGame(u32 fullscreenOption, u32 pal, u32 refreshRate)
 {
-	memset(rs97Screen->pixels, 0, 320*480*2);
+	memset(mScreen->pixels, 0, SAL_SCREEN_WIDTH*SAL_SCREEN_HEIGHT*2);
 }
 
 void sal_VideoSetPAL(u32 fullscreenOption, u32 pal)
@@ -176,7 +175,7 @@ void sal_VideoSetPAL(u32 fullscreenOption, u32 pal)
 
 void sal_VideoExitGame()
 {
-	memset(rs97Screen->pixels, 0, 320*480*2);
+	memset(mScreen->pixels, 0, SAL_SCREEN_WIDTH*SAL_SCREEN_HEIGHT*2);
 }
 
 void sal_VideoBitmapDim(u16* img, u32 pixelCount)
@@ -190,10 +189,7 @@ void sal_VideoBitmapDim(u16* img, u32 pixelCount)
 
 void sal_VideoFlip(s32 vsync)
 {
-	uint32_t *s = (uint32_t*)mScreen->pixels;
-	uint32_t *d = (uint32_t*)rs97Screen->pixels;// + (SAL_SCREEN_WIDTH - SNES_WIDTH) / 4;
-	for(uint8_t y = 0; y < 240; y++, s += SAL_SCREEN_WIDTH/2, d += 320) memmove(d, s, SAL_SCREEN_WIDTH * 4);
-	// SDL_Flip(mScreen);
+		SDL_Flip(mScreen);
 }
 
 void *sal_VideoGetBuffer()
@@ -201,12 +197,10 @@ void *sal_VideoGetBuffer()
 	return (void*)mScreen->pixels;
 }
 
-void *sal_RS97VideoGetBuffer()
 void sal_VideoPaletteSync()
 {
-	return (void*)rs97Screen->pixels;
-}
 
+}
 
 void sal_VideoPaletteSet(u32 index, u32 color)
 {
