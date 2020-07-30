@@ -551,7 +551,7 @@ int SnesInit()
 	Settings.SDD1 = TRUE;
 
 	GFX.Screen = (u8*) sal_VideoGetBuffer(); //IntermediateScreen;
-	GFX.RealPitch = GFX.Pitch = 320 * 2; //256 * sizeof(u16);
+	GFX.RealPitch = GFX.Pitch = SAL_SCREEN_WIDTH * 2; //256 * sizeof(u16);
 	
 	GFX.SubScreen = (uint8 *)malloc(GFX.RealPitch * 240 * 2); 
 	GFX.ZBuffer =  (uint8 *)malloc(GFX.RealPitch * 240 * 2); 
