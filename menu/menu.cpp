@@ -886,16 +886,16 @@ void ShowCredits()
 	s32 menuExit = 0, menuCount = 0, menufocus = 0, menuSmooth = 0;
 	u32 keys = 0;
 
-	strcpy(mMenuText[menuCount++],"PocketSNES - built " __DATE__);
-	strcpy(mMenuText[menuCount++],"-------------------------------------");
-	strcpy(mMenuText[menuCount++],"Based on Snes9x version " VERSION /* snes9x.h */);
-	strcpy(mMenuText[menuCount++],"PocketSNES created by Scott Ramsby");
-	strcpy(mMenuText[menuCount++],"Initial port to the Dingoo by Reesy");
-	strcpy(mMenuText[menuCount++],"Ported to OpenDingux by pcercuei");
-	strcpy(mMenuText[menuCount++],"Optimisations and fixes by Nebuleon");
-	strcpy(mMenuText[menuCount++],"Initial port to RetroGame by Steward-Fu");
-	strcpy(mMenuText[menuCount++],"RetroGame optimizations by Gameblabla");
-	strcpy(mMenuText[menuCount++],"and pingflood");
+	strcpy(mMenuText[menuCount++], "PocketSNES - built " __DATE__);
+	strcpy(mMenuText[menuCount++], "-------------------------------------");
+	strcpy(mMenuText[menuCount++], "Based on Snes9x version " VERSION /* snes9x.h */);
+	strcpy(mMenuText[menuCount++], "PocketSNES created by Scott Ramsby");
+	strcpy(mMenuText[menuCount++], "Initial port to the Dingoo by Reesy");
+	strcpy(mMenuText[menuCount++], "Ported to OpenDingux by pcercuei");
+	strcpy(mMenuText[menuCount++], "Optimizations and fixes by Nebuleon");
+	strcpy(mMenuText[menuCount++], "Port to RetroGame by Steward-Fu");
+	strcpy(mMenuText[menuCount++], "RetroGame optimizations by Sauce,");
+	strcpy(mMenuText[menuCount++], "msx and pingflood");
 
 	sal_InputIgnore();
 	while (!menuExit)
