@@ -1089,6 +1089,7 @@ void SettingsMenuUpdateTextAll(void)
 	SettingsMenuUpdateText(SETTINGS_MENU_FRAMESKIP);
 	SettingsMenuUpdateText(SETTINGS_MENU_FPS);
 	SettingsMenuUpdateText(SETTINGS_MENU_SOUND_SYNC);
+	SettingsMenuUpdateText(SETTINGS_MENU_FULLSCREEN);
 	SettingsMenuUpdateText(SETTINGS_MENU_LOAD_GLOBAL_SETTINGS);
 	SettingsMenuUpdateText(SETTINGS_MENU_SAVE_GLOBAL_SETTINGS);
 	SettingsMenuUpdateText(SETTINGS_MENU_LOAD_CURRENT_SETTINGS);
@@ -1355,6 +1356,20 @@ s32 SettingsMenu(void)
 					SettingsMenuUpdateText(SETTINGS_MENU_FPS);
 					break;
 
+				case SETTINGS_MENU_FULLSCREEN:
+					if (keys & SAL_INPUT_RIGHT)
+					{
+						mMenuOptions->fullScreen = (mMenuOptions->fullScreen + 1) % 3;
+					}
+					else
+					{
+						if (mMenuOptions->fullScreen == 0)
+							mMenuOptions->fullScreen = 2;
+						else
+							mMenuOptions->fullScreen--;
+					}
+					SettingsMenuUpdateText(SETTINGS_MENU_FULLSCREEN);
+					break;
 			}
 		}
 		else if ((keys & (SAL_INPUT_UP | SAL_INPUT_DOWN))

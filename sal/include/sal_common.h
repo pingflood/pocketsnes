@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <SDL.h>
 
 #define SAL_OK						1
 #define SAL_ERROR					0
