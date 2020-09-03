@@ -292,7 +292,7 @@ void ComputeClipWindows ()
 								{
 									B = Window2Enabled;
 									// memmove converted: Different stack allocations [Neb]
-									memcpy (Bands, Win2,
+									memmove (Bands, Win2,
 											 sizeof(Win2[0]) * Window2Enabled);
 								}
 								else
@@ -357,7 +357,7 @@ void ComputeClipWindows ()
 										// could also be empty).
 										B = Window1Enabled;
 										// memmove converted: Different stack allocations [Neb]
-										memcpy (Bands, Win1,
+										memmove (Bands, Win1,
 												 sizeof(Win1[0]) * Window1Enabled);
 									}
 									else
@@ -471,7 +471,7 @@ void ComputeClipWindows ()
 							{
 								B = Window2Enabled;
 								// memmove converted: Different stack allocations [Neb]
-								memcpy (Bands, Win2,
+								memmove (Bands, Win2,
 										 sizeof(Win2[0]) * Window2Enabled);
 							}
 							else
@@ -479,7 +479,7 @@ void ComputeClipWindows ()
 								{
 									B = Window1Enabled;
 									// memmove converted: Different stack allocations [Neb]
-									memcpy (Bands, Win1,
+									memmove (Bands, Win1,
 											 sizeof(Win1[0]) * Window1Enabled);
 								}
 								else

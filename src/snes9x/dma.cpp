@@ -213,8 +213,8 @@ void S9xDoDMA (uint8 Channel)
 		{
 			spc7110_dma=new uint8[d->TransferBytes];
 			j=DECOMP_BUFFER_SIZE-i;
-			memcpy(spc7110_dma, &s7r.bank50[i], j);
-			memcpy(&spc7110_dma[j],s7r.bank50,d->TransferBytes-j);
+			memmove(spc7110_dma, &s7r.bank50[i], j);
+			memmove(&spc7110_dma[j],s7r.bank50,d->TransferBytes-j);
 			s7_wrap=true;
 		}
 		int icount=s7r.reg4809|(s7r.reg480A<<8);

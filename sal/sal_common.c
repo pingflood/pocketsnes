@@ -698,7 +698,7 @@ void sal_DirectorySplitFilename(const char *wholeFilename, s8* path, s8 *filenam
 	if (slash>=0)
 	{
 		//a directory has been found
-		memcpy(path,wholeFilename,slash);
+		memmove(path,wholeFilename,slash);
 		path[slash]=0;
 	}
 	
@@ -706,15 +706,15 @@ void sal_DirectorySplitFilename(const char *wholeFilename, s8* path, s8 *filenam
 	{
 		// /ppppppp/ppppppp/ffffff.eeeee
 		//                 S      D
-		memcpy(filename,wholeFilename+slash+1,dot-slash-1);
+		memmove(filename,wholeFilename+slash+1,dot-slash-1);
 		filename[dot-slash-1]=0; // change "." to zero to end string
-		memcpy(ext,wholeFilename+dot+1,len-dot);
+		memmove(ext,wholeFilename+dot+1,len-dot);
 		//ext[len-(y+1)+1]=0;
 		ext[len-dot+1]=0;
 	}
 	else
 	{
-		memcpy(filename,wholeFilename+slash+1,len-slash);
+		memmove(filename,wholeFilename+slash+1,len-slash);
 		filename[len-slash]=0;
 	}
 }

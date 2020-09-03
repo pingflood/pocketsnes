@@ -705,7 +705,7 @@ void S9xMovieFreeze (uint8** buf, uint32* size)
 	Write32(Movie.CurrentFrame, ptr);
 	Write32(Movie.MaxFrame, ptr);
 
-	memcpy(ptr, Movie.InputBuffer, Movie.BytesPerFrame * (Movie.MaxFrame+1));
+	memmove(ptr, Movie.InputBuffer, Movie.BytesPerFrame * (Movie.MaxFrame+1));
 }
 
 bool8 S9xMovieUnfreeze (const uint8* buf, uint32 size)
@@ -747,7 +747,7 @@ bool8 S9xMovieUnfreeze (const uint8* buf, uint32 size)
 		++Movie.RerecordCount;
 
 		reserve_buffer_space(space_needed);
-		memcpy(Movie.InputBuffer, ptr, space_needed);
+		memmove(Movie.InputBuffer, ptr, space_needed);
 		flush_movie();
 		fseek(Movie.File, Movie.ControllerDataOffset+(Movie.BytesPerFrame * (Movie.CurrentFrame+1)), SEEK_SET);
 	}

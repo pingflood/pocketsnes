@@ -228,7 +228,7 @@ void S9xSpc7110Init()
 }
 
 
-//full cache decompression routine (memcpy) Method 1
+//full cache decompression routine (memmove) Method 1
 void MovePackData()
 {
 	//log the last entry
@@ -303,7 +303,7 @@ void MovePackData()
 	//copy data
 	if(decompack->binfiles[decompack->idx])
 	{
-		memcpy(s7r.bank50,
+		memmove(s7r.bank50,
 			&(decompack->binfiles[decompack->idx][decompack->tableEnts[decompack->idx].location[s7r.reg4804].offset]),
 			decompack->tableEnts[decompack->idx].location[s7r.reg4804].size);
 	}
@@ -520,7 +520,7 @@ void GetPackData()
 		}
 		else
 		{
-			memcpy(s7r.bank50,
+			memmove(s7r.bank50,
 				&(decompack->binfiles[decompack->idx][decompack->tableEnts[decompack->idx].location[s7r.reg4804].offset]),
 				decompack->tableEnts[decompack->idx].location[s7r.reg4804].size);
 		}

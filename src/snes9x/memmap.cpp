@@ -231,13 +231,13 @@ void S9xDeinterleaveType1(int TotalFileSize, uint8 * base)
 				if (blocks [j] == i)
 				{
 					// memmove converted: Different mallocs [Neb]
-					memcpy (tmp, &base [blocks [j] * 0x8000], 0x8000);
+					memmove (tmp, &base [blocks [j] * 0x8000], 0x8000);
 					// memmove converted: Different addresses, or identical for blocks[i] == blocks[j] [Neb]
 					// DS2 DMA notes: Don't do DMA at all if blocks[i] == blocks[j]
-					memcpy (&base [blocks [j] * 0x8000],
+					memmove (&base [blocks [j] * 0x8000],
 						&base [blocks [i] * 0x8000], 0x8000);
 					// memmove converted: Different mallocs [Neb]
-					memcpy (&base [blocks [i] * 0x8000], tmp, 0x8000);
+					memmove (&base [blocks [i] * 0x8000], tmp, 0x8000);
 					uint8 b = blocks [j];
 					blocks [j] = blocks [i];
 					blocks [i] = b;
@@ -266,13 +266,13 @@ void S9xDeinterleaveGD24(int TotalFileSize, uint8 * base)
 	if (tmp)
 	{
 		// memmove converted: Different mallocs [Neb]
-		memcpy(tmp, &base[0x180000], 0x80000);
+		memmove(tmp, &base[0x180000], 0x80000);
 		// memmove converted: Different addresses [Neb]
-		memcpy(&base[0x180000], &base[0x200000], 0x80000);
+		memmove(&base[0x180000], &base[0x200000], 0x80000);
 		// memmove converted: Different addresses [Neb]
-		memcpy(&base[0x200000], &base[0x280000], 0x80000);
+		memmove(&base[0x200000], &base[0x280000], 0x80000);
 		// memmove converted: Different mallocs [Neb]
-		memcpy(&base[0x280000], tmp, 0x80000);
+		memmove(&base[0x280000], tmp, 0x80000);
 		free ((char *) tmp);
 
 		S9xDeinterleaveType1(TotalFileSize, base);
@@ -1274,13 +1274,13 @@ void S9xDeinterleaveType2 (bool8 reset)
 					ds2_DMA_stop(2);
 #else
 					// memmove converted: Different mallocs [Neb]
-					memcpy (tmp, &Memory.ROM [blocks [j] * 0x10000], 0x10000);
+					memmove (tmp, &Memory.ROM [blocks [j] * 0x10000], 0x10000);
 
 					// memmove converted: Different addresses, or identical if blocks[i] == blocks[j] [Neb]
-					memcpy (&Memory.ROM [blocks [j] * 0x10000],
+					memmove (&Memory.ROM [blocks [j] * 0x10000],
 						&Memory.ROM [blocks [i] * 0x10000], 0x10000);
 					// memmove converted: Different mallocs [Neb]
-					memcpy (&Memory.ROM [blocks [i] * 0x10000], tmp, 0x10000);
+					memmove (&Memory.ROM [blocks [i] * 0x10000], tmp, 0x10000);
 #endif
 					uint8 b = blocks [j];
 					blocks [j] = blocks [i];
@@ -1789,7 +1789,7 @@ void CMemory::ResetSpeedMap()
 void CMemory::WriteProtectROM ()
 {
 	// memmove converted: Different mallocs [Neb]
-    memcpy ((void *) WriteMap, (void *) Map, sizeof (Map));
+    memmove ((void *) WriteMap, (void *) Map, sizeof (Map));
     for (int c = 0; c < 0x1000; c++)
     {
 		if (BlockIsROM [c])
@@ -2641,9 +2641,9 @@ void CMemory::SuperFXROMMap ()
 		ds2_DMA_stop(3);
 #else
 		// memmove converted: Different addresses [Neb]
-		memcpy (&ROM [0x200000 + c * 0x10000], &ROM [c * 0x8000], 0x8000);
+		memmove (&ROM [0x200000 + c * 0x10000], &ROM [c * 0x8000], 0x8000);
 		// memmove converted: Different addresses [Neb]
-		memcpy (&ROM [0x208000 + c * 0x10000], &ROM [c * 0x8000], 0x8000);
+		memmove (&ROM [0x208000 + c * 0x10000], &ROM [c * 0x8000], 0x8000);
 #endif
     }
 	
@@ -2711,9 +2711,9 @@ void CMemory::SA1ROMMap ()
 	
     // Now copy the map and correct it for the SA1 CPU.
 	// memmove converted: Different mallocs [Neb]
-    memcpy ((void *) SA1.WriteMap, (void *) WriteMap, sizeof (WriteMap));
+    memmove ((void *) SA1.WriteMap, (void *) WriteMap, sizeof (WriteMap));
 	// memmove converted: Different mallocs [Neb]
-    memcpy ((void *) SA1.Map, (void *) Map, sizeof (Map));
+    memmove ((void *) SA1.Map, (void *) Map, sizeof (Map));
 	
     // Banks 00->3f and 80->bf
     for (c = 0; c < 0x400; c += 16)
@@ -3126,9 +3126,9 @@ void CMemory::GNextROMMap ()
 	
     // Now copy the map and correct it for the SA1 CPU.
 	// memmove converted: Different mallocs [Neb]
-    memcpy ((void *) SA1.WriteMap, (void *) WriteMap, sizeof (WriteMap));
+    memmove ((void *) SA1.WriteMap, (void *) WriteMap, sizeof (WriteMap));
 	// memmove converted: Different mallocs [Neb]
-    memcpy ((void *) SA1.Map, (void *) Map, sizeof (Map));
+    memmove ((void *) SA1.Map, (void *) Map, sizeof (Map));
 	
     // Banks 00->3f and 80->bf
     for (c = 0; c < 0x400; c += 16)
@@ -4488,10 +4488,10 @@ void CMemory::ParseSNESHeader(uint8* RomHeader)
 		ROMComplementChecksum = RomHeader [0x2c] + (RomHeader [0x2d] << 8);
 		ROMRegion= RomHeader[0x29];
 		// memmove converted: Different mallocs [Neb]
-		memcpy (ROMId, &RomHeader [0x2], 4);
+		memmove (ROMId, &RomHeader [0x2], 4);
 		if(RomHeader[0x2A]==0x33)
 			// memmove converted: Different mallocs [Neb]
-			memcpy (CompanyId, &RomHeader [0], 2);
+			memmove (CompanyId, &RomHeader [0], 2);
 		else sprintf(CompanyId, "%02X", RomHeader[0x2A]);
 }
 

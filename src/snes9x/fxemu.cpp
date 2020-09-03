@@ -110,7 +110,7 @@ void fx_setCache()
     if(c < (0x10000-512))
     {
 	uint8 const* t = &ROM(c);
-	memcpy(GSU.pvCache,t,512);
+	memmove(GSU.pvCache,t,512);
     }
     else
     {
@@ -119,8 +119,8 @@ void fx_setCache()
 	uint32 i = 0x10000 - c;
 	t1 = &ROM(c);
 	t2 = &ROM(0);
-	memcpy(GSU.pvCache,t1,i);
-	memcpy(&GSU.pvCache[i],t2,512-i);
+	memmove(GSU.pvCache,t1,i);
+	memmove(&GSU.pvCache[i],t2,512-i);
     }
 }
 #endif
@@ -161,8 +161,8 @@ static void fx_backupCache()
 		if(c < (0x10000-16))
 		{
 		    uint8 * t = &GSU.pvPrgBank[c];
-		    memcpy(&GSU.avCacheBackup[i<<4],t,16);
-		    memcpy(t,&GSU.pvCache[i<<4],16);
+		    memmove(&GSU.avCacheBackup[i<<4],t,16);
+		    memmove(t,&GSU.pvCache[i<<4],16);
 		}
 		else
 		{
@@ -171,10 +171,10 @@ static void fx_backupCache()
 		    uint32 a = 0x10000 - c;
 		    t1 = &GSU.pvPrgBank[c];
 		    t2 = &GSU.pvPrgBank[0];
-		    memcpy(&GSU.avCacheBackup[i<<4],t1,a);
-		    memcpy(t1,&GSU.pvCache[i<<4],a);
-		    memcpy(&GSU.avCacheBackup[(i<<4)+a],t2,16-a);
-		    memcpy(t2,&GSU.pvCache[(i<<4)+a],16-a);
+		    memmove(&GSU.avCacheBackup[i<<4],t1,a);
+		    memmove(t1,&GSU.pvCache[i<<4],a);
+		    memmove(&GSU.avCacheBackup[(i<<4)+a],t2,16-a);
+		    memmove(t2,&GSU.pvCache[(i<<4)+a],16-a);
 		}		
 	    }
 	    c = USEX16(c+16);
@@ -197,8 +197,8 @@ static void fx_restoreCache()
 		if(c < (0x10000-16))
 		{
 		    uint8 * t = &GSU.pvPrgBank[c];
-		    memcpy(t,&GSU.avCacheBackup[i<<4],16);
-		    memcpy(&GSU.pvCache[i<<4],t,16);
+		    memmove(t,&GSU.avCacheBackup[i<<4],16);
+		    memmove(&GSU.pvCache[i<<4],t,16);
 		}
 		else
 		{
@@ -207,10 +207,10 @@ static void fx_restoreCache()
 		    uint32 a = 0x10000 - c;
 		    t1 = &GSU.pvPrgBank[c];
 		    t2 = &GSU.pvPrgBank[0];
-		    memcpy(t1,&GSU.avCacheBackup[i<<4],a);
-		    memcpy(&GSU.pvCache[i<<4],t1,a);
-		    memcpy(t2,&GSU.avCacheBackup[(i<<4)+a],16-a);
-		    memcpy(&GSU.pvCache[(i<<4)+a],t2,16-a);
+		    memmove(t1,&GSU.avCacheBackup[i<<4],a);
+		    memmove(&GSU.pvCache[i<<4],t1,a);
+		    memmove(t2,&GSU.avCacheBackup[(i<<4)+a],16-a);
+		    memmove(&GSU.pvCache[(i<<4)+a],t2,16-a);
 		}		
 	    }
 	    c = USEX16(c+16);
