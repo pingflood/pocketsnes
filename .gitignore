@@ -1,4 +1,8 @@
 *.o
-PocketSNES
-PocketSNES.opk
+*.gcda
+*.dge
+*.opk
 .opk_data
+*.ipk
+*.elf
+profile/*
