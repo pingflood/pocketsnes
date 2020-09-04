@@ -7,3 +7,5 @@
 *.elf
 *.bin
 profile/*
+*.patch
+*~
