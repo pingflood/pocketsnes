@@ -545,7 +545,6 @@ int SnesRomLoad()
 		MenuMessageBox("Loading ROM",mRomName,"Failed!",MENU_MESSAGE_BOX_MODE_PAUSE);
 		return SAL_ERROR;
 	}
-	MenuMessageBox("Done loading the ROM",mRomName,"",MENU_MESSAGE_BOX_MODE_MSG);
 
 	S9xReset();
 	S9xResetSound(1);
