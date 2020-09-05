@@ -165,6 +165,8 @@ s32 MenuMessageBox(const char *message1, const char *message2, const char *messa
 	s32 subaction = -1;
 	u32 keys = 0;
 
+	printf("MessageBox: %s %s %s\n", message1, message2, message3);
+
 	sal_InputIgnore();
 	while (subaction == -1) {
 		keys = sal_InputPollRepeat(0);
