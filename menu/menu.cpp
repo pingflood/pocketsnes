@@ -42,6 +42,12 @@ extern "C" void S9xSaveSRAM(int showWarning);
 
 u8 menuGameSettings=0, menuGlobalSettings=0;
 
+bool file_exists(char *path) {
+	struct stat s;
+	return (stat(path, &s) == 0 && s.st_mode & S_IFREG); // exists and is file
+}
+int hwscale;
+
 void DefaultMenuOptions(void)
 {
 	mMenuOptions->frameSkip = 0;   //auto
@@ -52,7 +58,7 @@ void DefaultMenuOptions(void)
 	mMenuOptions->showFps = 0;
 	mMenuOptions->soundRate = 48000;
 	mMenuOptions->stereo = 0;
-	mMenuOptions->fullScreen = 3;
+	mMenuOptions->fullScreen = hwscale ? 3 : 1;
 	mMenuOptions->autoSaveSram = 1;
 	mMenuOptions->soundSync = 1;
 }
@@ -1231,12 +1237,13 @@ s32 VideoSettingsMenu(void)
 					break;
 
 				case VIDEO_SETTINGS_MENU_FULLSCREEN:
+					int max_val = hwscale ? 4 : 2;
 					if (keys & SAL_INPUT_RIGHT) {
 						mMenuOptions->fullScreen++;
-						if (mMenuOptions->fullScreen > 4) mMenuOptions->fullScreen = 0;
+						if (mMenuOptions->fullScreen > max_val) mMenuOptions->fullScreen = 0;
 					} else {
 						mMenuOptions->fullScreen--;
-						if (mMenuOptions->fullScreen > 4) mMenuOptions->fullScreen = 4;
+						if (mMenuOptions->fullScreen > max_val) mMenuOptions->fullScreen = max_val;
 					}
 					break;
 			}
@@ -1528,6 +1535,8 @@ s32 MenuRun(s8 *romName)
 	s32 subaction = 0;
 	u32 keys = 0;
 
+	hwscale = file_exists("/sys/devices/platform/jz-lcd.0/keep_aspect_ratio") || file_exists("/proc/jz/ipu");
+
 	sal_CpuSpeedSet(MENU_NORMAL_CPU_SPEED);
 
 	if (sal_StringCompare(mRomName, romName) != 0) {
@@ -1566,6 +1575,7 @@ s32 MenuRun(s8 *romName)
 						action = EVENT_LOAD_ROM;
 						strcpy(romName, mRomName);
 						MenuReloadOptions();
+						if (!hwscale && mMenuOptions->fullScreen > 2) mMenuOptions->fullScreen = 1;
 						menuExit = 1;
 					}
 					break;
